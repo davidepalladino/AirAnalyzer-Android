@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Air Analyzer</string>
+    <string name="addDevice">Aggiungi dispositivo</string>
+    <string name="temperature">Temperatura</string>
+    <string name="humidity">Umidità</string>
+    <string name="dateSeparator">/</string>
+    <string name="roomNoName"><![CDATA[\ | <NO NAME>\]]></string>
+    <string name="time">Ora</string>
+
+    <string name="editTextSignIn">Registrati</string>
+    <string name="editTextUsername">Username</string>
+    <string name="editTextPassword">Password</string>
+    <string name="editTextEmail">Email</string>
+    <string name="editTextName">Nome</string>
+    <string name="editTextSurname">Cognome</string>
+    <string name="editTextAnswer">Risposta</string>
+    <string name="editTextLocalIP">IP locale</string>
+
+    <string name="textViewQuestion1">Domanda #1</string>
+    <string name="textViewQuestion2">Domanda #2</string>
+    <string name="textViewQuestion3">Domanda #3</string>
+    <string name="textViewNew">Sei nuovo?\u0020</string>
+    <string name="textViewSignup">Registrati</string>
+    <string name="textViewLogin">Login</string>
+    <string name="textViewForgotPassword">Password dimenticata</string>
+    <string name="textViewSeparator">|</string>
+    <string name="textViewLatestMeasurement">Ultima misurazione</string>
+    <string name="textViewSignupComplete">Registrazione completata</string>
+    <string name="textViewNone">None</string>
+    <string name="textViewLatestMeasurementAt">alle\u0020</string>
+    <string name="textViewDateSelected">Data selezionata</string>
+    <string name="textViewAddRoom">Aggiungi stanza</string>
+    <string name="textViewAddRoomDescription">Per aggiungere una stanza, selezionane una dalla lista e premi \'OK\' per confermare.</string>
+    <string name="textViewAddDeviceDescription">Per aggiungere un nuovo dispositivo, segui prima l\'installazione su di esso e quando verrà visualizzato l\'IP locale (ad esempio 192.168.0.100), copialo in questo campo e premi \'OK\' per confermare.</string>
+    <string name="textViewAddDeviceRemember">Ricorda: i dispositivi devono essere connessi sulla stessa rete locale.</string>
+
+    <string name="buttonLogin">Login</string>
+    <string name="buttonContinue">Continua</string>
+    <string name="buttonOk">OK</string>
+    <string name="buttonCancel">Annulla</string>
+
+    <string name="question1">Il primo animale domestico di un tuo genitore?</string>
+    <string name="question2">In quale città si sono conosciuti i tuoi nonni?</string>
+    <string name="question3">Il primo lavoro di tuo\o nonno\a?</string>
+    <string name="question4">Qual\'è stato il primo viaggio di un tuo parente?</string>
+    <string name="question5">Come si chiama il primo amico del cuore di tuo padre?</string>
+    <string name="question6">Qual\'è il primo insegnante che ti ha dato il massimo dei voti?</string>
+    <string name="question7">Qual\'è il tempo libero di tuo zio?</string>
+    <string name="question8">In quale città si trovava la prima casa dei tuoi nonni?</string>
+    <string name="question9">Chi è il primo laureato in famiglia?</string>
+    <string name="question10">In quale nazione si voleva trasferire un tuo parente?</string>
+    <string name="question11">Qual\'è stata la vacanza più interessante di un tuo conoscente?</string>
+    <string name="question12">In quale anno un tuo parente ha avuto la patente?</string>
+    <string name="question13">Come si chiama la prima amica del cuore di tua madre?</string>
+    <string name="question14">In quale occasione un tuo genitore ha ricevuto la prima multa?</string>
+    <string name="question15">Qual\'è la prima auto di un tuo parente?</string>
+
+    <string name="errorUsername">Inserisci l\'username</string>
+    <string name="errorPassowrd">Inserisci la password</string>
+    <string name="errorEmail">Inserisci la email</string>
+    <string name="errorName">Inserisci il nome</string>
+    <string name="errorSurname">Inserisci il cognome</string>
+    <string name="errorAnswer">Inserisci la risposta</string>
+    <string name="existsUsername">Quest\'username esiste già. Provane un altro!</string>
+    <string name="existsEmail">Questa email esiste già. Provane un\'altra!</string>
+
+    <string name="noticeUsername">L\'username deve contenere tra i 5 e 20 caratteri, e può avere \"-\" e \"_\" come caratteri speciali.</string>
+    <string name="noticePassword">La password deve contenere tra i 16 ed i 24 caratteri, deve avere almeno una lettera maiuscola, un numero ed un carattere speciale (@$!%*?&amp;.#).</string>
+    <string name="noticeEmail">Inserisci una email corretta</string>
+    <string name="noticeGraphTryAgain">Riprova alle\u0020</string>
+    <string name="noticeGraphNoMeasure">Nessuna misura per questa data</string>
+
+    <string name="toastErrorField">C\'è qualche errore in qualche campo</string>
+    <string name="toastServerOffline">Server offline, riprova più tardi</string>
+    <string name="toastUserNotValidated">Quest\'utente non è stato ancora verificato</string>
+    <string name="toastUserError">C\'è qualche errore con l\'autenticazione</string>
+    <string name="toastIncorrectUsernamePassword">Username o password non corretta</string>
+    <string name="toastErrorService">Il servizio è disabilitato</string>
+    <string name="toastErrorConnectionDevice">Errore di connessione con il dispositivo</string>
+    <string name="toastErrorLocalNetwork">Devi essere sulla stessa rete locale</string>
+
+    <string name="dialogSignup">La tua registrazione è quasi completa. Controlla la email per verificarla.</string>
+    <string name="dialogRenameRoom">Scrivi il nuovo nome per questa stanza. Il campo vuoto non applicherà alcun cambiamento.</string>
+    <string name="dialogRemoveRoom">Sei sicuro di voler rimuovere questa stanza? Questa operazione non cancellerà tutte le misure rilevate.</string>
+    <string name="dialogSettingNewDevice">Impostando il nuovo dispositivo…</string>
+
+    <string name="menuItemRenameThisRoom">Rinomina questa stanza</string>
+    <string name="menuItemRemoveThisRoom">Rimuovi questa stanza</string>
+    <string name="menuItemLogout">Logout</string>
+
+    <array name="Questions1">
+        <item name="a">@string/question1</item>
+        <item>@string/question2</item>
+        <item>@string/question3</item>
+        <item>@string/question4</item>
+        <item>@string/question5</item>
+    </array>
+
+    <array name="Questions2">
+        <item>@string/question6</item>
+        <item>@string/question7</item>
+        <item>@string/question8</item>
+        <item>@string/question9</item>
+        <item>@string/question10</item>
+    </array>
+
+    <array name="Questions3">
+        <item>@string/question11</item>
+        <item>@string/question12</item>
+        <item>@string/question13</item>
+        <item>@string/question14</item>
+        <item>@string/question15</item>
+    </array>
+
+    <string name="formatDate">dd/MM/yyyy</string>
+</resources>

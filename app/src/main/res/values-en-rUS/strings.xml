@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Air Analyzer</string>
+    <string name="addDevice">Add device</string>
+    <string name="temperature">Temperature</string>
+    <string name="humidity">Humidity</string>
+    <string name="dateSeparator">/</string>
+    <string name="roomNoName"><![CDATA[\ | <NO NAME>\]]></string>
+    <string name="time">Time</string>
+
+    <string name="editTextSignIn">Sign up</string>
+    <string name="editTextUsername">Username</string>
+    <string name="editTextPassword">Password</string>
+    <string name="editTextEmail">Email</string>
+    <string name="editTextName">Name</string>
+    <string name="editTextSurname">Surname</string>
+    <string name="editTextAnswer">Answer</string>
+    <string name="editTextLocalIP">Local IP</string>
+
+    <string name="textViewQuestion1">Question #1</string>
+    <string name="textViewQuestion2">Question #2</string>
+    <string name="textViewQuestion3">Question #3</string>
+    <string name="textViewNew">New?\u0020</string>
+    <string name="textViewSignup">Sign up</string>
+    <string name="textViewLogin">Login</string>
+    <string name="textViewForgotPassword">Forgot password</string>
+    <string name="textViewSeparator">|</string>
+    <string name="textViewLatestMeasurement">Latest measurement</string>
+    <string name="textViewSignupComplete">Sign up complete</string>
+    <string name="textViewNone">None</string>
+    <string name="textViewLatestMeasurementAt">at the\u0020</string>
+    <string name="textViewDateSelected">Date selected</string>
+    <string name="textViewAddRoom">Add room</string>
+    <string name="textViewAddRoomDescription">To add a room, please select one from the list and confirm it.</string>
+    <string name="textViewAddDeviceDescription">To add a new device, firstly follow the setup on it and when is viewed an local IP (e.g. 192.168.0.100), copy it in this field and confirm it.</string>
+    <string name="textViewAddDeviceRemember">Remember: your devices will have to be connected to the same local network.</string>
+
+    <string name="buttonLogin">Login</string>
+    <string name="buttonContinue">Continue</string>
+    <string name="buttonOk">OK</string>
+    <string name="buttonCancel">Cancel</string>
+
+    <string name="question1">Your parent\'s first pet?</string>
+    <string name="question2">In which city did your grandparents meet?</string>
+    <string name="question3">Your grandfather/grandmother\'s first job?</string>
+    <string name="question4">What was the first trip of a relative of yours?</string>
+    <string name="question5">What is the name of your father\'s first close friend?</string>
+    <string name="question6">What is the first teacher who gave you top marks?</string>
+    <string name="question7">What is your uncle\'s free time?</string>
+    <string name="question8">In which city was your grandparents\' first home located?</string>
+    <string name="question9">Who is the first graduate in the family?</string>
+    <string name="question10">Which country did you want to move a relative to?</string>
+    <string name="question11">What was the most interesting holiday for an acquaintance of yours?</string>
+    <string name="question12">In which year did a relative of yours have a driver\'s license?</string>
+    <string name="question13">What is the name of your mother\'s first best friend?</string>
+    <string name="question14">On what occasion did your parent receive the first traffic ticket?</string>
+    <string name="question15">What is the first car of a relative of yours?</string>
+
+    <string name="errorUsername">Enter the username</string>
+    <string name="errorPassowrd">Enter the password</string>
+    <string name="errorEmail">Enter the email</string>
+    <string name="errorName">Enter the name</string>
+    <string name="errorSurname">Enter the surname</string>
+    <string name="errorAnswer">Enter the answer</string>
+    <string name="existsUsername">This username already exists. Try another!</string>
+    <string name="existsEmail">This email already exists. Try another!</string>
+
+    <string name="noticeUsername">Username should be 5–20 characters long and can contain \"-\" and \"_\" like special characters.</string>
+    <string name="noticePassword">Password should be 16–24 characters long and must contain one upper case letter, one numeric character and one special character (@$!%*?&amp;.#).</string>
+    <string name="noticeEmail">Enter the correct email</string>
+    <string name="noticeGraphTryAgain">Please try again at the\u0020</string>
+    <string name="noticeGraphNoMeasure">No measure in this date</string>
+
+    <string name="toastErrorField">There are some error on some field</string>
+    <string name="toastServerOffline">Server offline, try again later</string>
+    <string name="toastUserNotValidated">This user is not validated</string>
+    <string name="toastUserError">There is some error with authentication</string>
+    <string name="toastIncorrectUsernamePassword">Incorrect username or password</string>
+    <string name="toastErrorService">This service is disabled</string>
+    <string name="toastErrorConnectionDevice">Error connection to device</string>
+    <string name="toastErrorLocalNetwork">You must be in same local network</string>
+
+    <string name="dialogSignup">Your registration is nearly complete. Check you email to validate it.</string>
+    <string name="dialogRenameRoom">Write the new name of this room. Empty field will not apply any change.</string>
+    <string name="dialogRemoveRoom">Are you sure you want to remove this room? This operation will not delete all the measures read.</string>
+    <string name="dialogSettingNewDevice">Setting the new device…</string>
+
+    <string name="menuItemRenameThisRoom">Rename this room</string>
+    <string name="menuItemRemoveThisRoom">Remove this room</string>
+    <string name="menuItemLogout">Logout</string>
+
+    <array name="Questions1">
+        <item name="a">@string/question1</item>
+        <item>@string/question2</item>
+        <item>@string/question3</item>
+        <item>@string/question4</item>
+        <item>@string/question5</item>
+    </array>
+
+    <array name="Questions2">
+        <item>@string/question6</item>
+        <item>@string/question7</item>
+        <item>@string/question8</item>
+        <item>@string/question9</item>
+        <item>@string/question10</item>
+    </array>
+
+    <array name="Questions3">
+        <item>@string/question11</item>
+        <item>@string/question12</item>
+        <item>@string/question13</item>
+        <item>@string/question14</item>
+        <item>@string/question15</item>
+    </array>
+
+    <string name="formatDate">MM/dd/yyyy</string>
+</resources>

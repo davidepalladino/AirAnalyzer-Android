@@ -1,0 +1,56 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayoutToast"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="15dp"
+    android:elevation="8dp"
+    android:background="@drawable/toast_shape_blue" >
+
+    <ImageView android:id="@+id/imageViewTypeMessageToast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginEnd="15dp"
+        android:src="@drawable/ic_baseline_error_24" />
+
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:textColor="@color/secondaryTextDarkColor1" >
+
+        <TableRow>
+            <TextView android:id="@+id/textViewDateString"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
+                android:gravity="start"
+                android:textStyle="bold"
+                android:textColor="@color/secondaryTextDarkColor1" />
+
+            <TextView android:id="@+id/textViewDateValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:textColor="@color/secondaryTextDarkColor1" />
+        </TableRow>
+
+        <TableRow>
+            <TextView android:id="@+id/textViewMeasureType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
+                android:gravity="start"
+                android:textStyle="bold"
+                android:textColor="@color/secondaryTextDarkColor1" />
+
+            <TextView android:id="@+id/textViewMeasureValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:textColor="@color/secondaryTextDarkColor1" />
+        </TableRow>
+    </TableLayout>
+</LinearLayout>

@@ -1,0 +1,36 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.AirAnalyzer" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryVariant">@color/primaryLightColor</item>
+        <item name="colorOnPrimary">@color/primaryTextColor</item>
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondaryColor</item>
+        <item name="colorSecondaryVariant">@color/secondaryColor</item>
+        <item name="colorOnSecondary">@color/primaryTextColor</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+
+        <item name="actionOverflowButtonStyle">@style/overflowButtonStyle</item>
+
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+
+    <!-- Floating Action Button. -->
+    <style name="overflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:tint">@color/primaryTextDarkColor1</item>
+    </style>
+
+
+    <!-- TabLayout. -->
+    <style name="TabLayoutMain" parent="Widget.Design.TabLayout">
+        <item name="android:background">@color/primaryColor</item>
+        <item name="tabTextColor">@color/secondaryTextDarkColor2</item>
+        <item name="tabSelectedTextColor">@color/secondaryTextDarkColor1</item>
+        <item name="tabIndicatorColor">@color/secondaryTextDarkColor1</item>
+        <item name="tabIndicatorHeight">3dp</item>
+    </style>
+</resources>

@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.activity.SignupActivity"
+    android:background="@color/primaryColor" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="335dp"
+            android:layout_height="wrap_content"
+            android:text="@string/textViewSignup"
+            android:textColor="@color/primaryTextDarkColor1"
+            android:textSize="50sp"
+            android:layout_gravity="center"
+            android:layout_marginTop="100dp" />
+
+        <!-- Username -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:boxBackgroundColor="@color/primaryColor"
+            android:textColorHint="@color/primaryTextDarkColor2"
+            app:hintTextColor="@color/primaryTextDarkColor2"
+            app:boxStrokeColor="@color/primaryTextDarkColor2"
+            android:layout_marginTop="25dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextUsername"
+                android:layout_width="330dp"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:hint="@string/editTextUsername"
+                android:textSize="15sp"
+                android:textColor="@color/primaryTextDarkColor1"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/textViewUsername"
+            android:layout_width="324dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:textColor="@color/error"
+            android:textStyle="bold"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="5dp" />
+
+        <!-- Password -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:passwordToggleEnabled="true"
+            app:boxBackgroundColor="@color/primaryColor"
+            android:textColorHint="@color/primaryTextDarkColor2"
+            app:hintTextColor="@color/primaryTextDarkColor2"
+            app:boxStrokeColor="@color/primaryTextDarkColor2" >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextPassword"
+                android:layout_width="330dp"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:hint="@string/editTextPassword"
+                android:textSize="15sp"
+                android:textColor="@color/primaryTextDarkColor1"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/textViewPassword"
+            android:layout_width="324dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:textColor="@color/error"
+            android:textStyle="bold"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="5dp" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="330dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="25dp"
+            android:layout_gravity="center">
+
+            <!-- Name -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayoutName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:textColorHint="@color/primaryTextDarkColor2"
+                app:boxBackgroundColor="@color/primaryColor"
+                app:boxStrokeColor="@color/primaryTextDarkColor2"
+                app:hintTextColor="@color/primaryTextDarkColor2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextName"
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/editTextName"
+                    android:inputType="textPersonName"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
+                    android:textColor="@color/primaryTextDarkColor1"
+                    android:textSize="15sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/textViewName"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/error"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayoutName" />
+
+            <!-- Surname -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayoutSurname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:textColorHint="@color/primaryTextDarkColor2"
+                app:boxBackgroundColor="@color/primaryColor"
+                app:boxStrokeColor="@color/primaryTextDarkColor2"
+                app:hintTextColor="@color/primaryTextDarkColor2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextSurname"
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/editTextSurname"
+                    android:inputType="textPersonName"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
+                    android:textColor="@color/primaryTextDarkColor1"
+                    android:textSize="15sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/textViewSurname"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/error"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayoutSurname" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Email -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:boxBackgroundColor="@color/primaryColor"
+            android:textColorHint="@color/primaryTextDarkColor2"
+            app:hintTextColor="@color/primaryTextDarkColor2"
+            app:boxStrokeColor="@color/primaryTextDarkColor2" >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextEmail"
+                android:layout_width="330dp"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:hint="@string/editTextEmail"
+                android:textSize="15sp"
+                android:textColor="@color/primaryTextDarkColor1"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/textViewEmail"
+            android:layout_width="324dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:textColor="@color/error"
+            android:textStyle="bold"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="5dp" />
+
+        <!-- Qeustion 1 -->
+        <Spinner
+            android:id="@+id/spinnerQuestions1"
+            android:layout_width="330dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:boxBackgroundColor="@color/primaryColor"
+            android:textColorHint="@color/primaryTextDarkColor2"
+            app:hintTextColor="@color/primaryTextDarkColor2"
+            app:boxStrokeColor="@color/primaryTextDarkColor2" >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextAnswer1"
+                android:layout_width="330dp"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:hint="@string/editTextAnswer"
+                android:textSize="15sp"
+                android:textColor="@color/primaryTextDarkColor1"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/textViewAnswer1"
+            android:layout_width="324dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:textColor="@color/error"
+            android:textStyle="bold"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="5dp" />
+
+        <!-- Qeustion 2 -->
+        <Spinner
+            android:id="@+id/spinnerQuestions2"
+            android:layout_width="330dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:boxBackgroundColor="@color/primaryColor"
+            android:textColorHint="@color/primaryTextDarkColor2"
+            app:hintTextColor="@color/primaryTextDarkColor2"
+            app:boxStrokeColor="@color/primaryTextDarkColor2" >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextAnswer2"
+                android:layout_width="330dp"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:hint="@string/editTextAnswer"
+                android:textSize="15sp"
+                android:textColor="@color/primaryTextDarkColor1"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/textViewAnswer2"
+            android:layout_width="324dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:textColor="@color/error"
+            android:textStyle="bold"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="5dp" />
+
+        <!-- Qeustion 3 -->
+        <Spinner
+            android:id="@+id/spinnerQuestions3"
+            android:layout_width="330dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:boxBackgroundColor="@color/primaryColor"
+            android:textColorHint="@color/primaryTextDarkColor2"
+            app:hintTextColor="@color/primaryTextDarkColor2"
+            app:boxStrokeColor="@color/primaryTextDarkColor2" >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextAnswer3"
+                android:layout_width="330dp"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:hint="@string/editTextAnswer"
+                android:textSize="15sp"
+                android:textColor="@color/primaryTextDarkColor1"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/textViewAnswer3"
+            android:layout_width="324dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:textColor="@color/error"
+            android:textStyle="bold"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="5dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonContinue"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/button_shape"
+            android:textColor="@color/primaryTextDarkColor1"
+            android:textSize="12sp"
+            android:text="@string/buttonContinue"
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="100dp" />
+    </LinearLayout>
+</ScrollView>
+
+

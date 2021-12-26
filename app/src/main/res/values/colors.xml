@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primaryColor">#006db3</color>
+    <color name="primaryDarkColor">#006db3</color>
+    <color name="primaryLightColor">#006db3</color>
+    <color name="primaryTextColor">#000000</color>
+    <color name="primaryTextDarkColor1">#FFFFFFFF</color>
+    <color name="primaryTextDarkColor2">#BBFFFFFF</color>
+
+
+    <color name="secondaryColor">#006db3</color>
+    <color name="secondaryLightColor">#006db3</color>
+    <color name="secondaryDarkColor">#006db3</color>
+    <color name="secondaryTextColor">#000000</color>
+    <color name="secondaryTextDarkColor1">#FFFFFF</color>
+    <color name="secondaryTextDarkColor2">#BBFFFFFF</color>
+
+    <color name="backgroundPrimary">#BBFFFFFF</color>
+    <color name="backgroundSecondary">#FFFFFFFF</color>
+
+    <color name="buttonPrimary">#006db3</color>
+    <color name="buttonSecondary">#039be5</color>
+
+    <color name="buttonUnselectedPrimary">#FF808080</color>
+    <color name="buttonUnselectedSecondary">#FFFFFFFF</color>
+
+    <color name="toastBlack">#101010</color>
+    <color name="toastBlue">#006db3</color>
+
+    <color name="error">#FF5722</color>
+</resources>
