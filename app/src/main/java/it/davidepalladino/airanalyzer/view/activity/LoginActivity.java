@@ -1,3 +1,28 @@
+/*
+ * This view class provides to show a screen, where the user can access to the Air Analyzer service,
+ *  or to request to signup.
+ *
+ * Copyright (c) 2020 Davide Palladino.
+ * All right reserved.
+ *
+ * @author Davide Palladino
+ * @contact me@davidepalladino.com
+ * @website www.davidepalladino.com
+ * @version 2.0.0
+ * @date 24th November, 2021
+ *
+ * This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 3.0 of the License, or (at your option) any later version
+ *
+ * This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Lesser General Public License for more details.
+ *
+ */
+
 package it.davidepalladino.airanalyzer.view.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,66 +42,72 @@ import android.widget.TextView;
 
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.DatabaseService;
-import it.davidepalladino.airanalyzer.controller.Setting;
+import it.davidepalladino.airanalyzer.controller.FileManager;
 import it.davidepalladino.airanalyzer.view.widget.TextWatcherField;
-import it.davidepalladino.airanalyzer.model.Login;
-import it.davidepalladino.airanalyzer.view.widget.Toast;
+import it.davidepalladino.airanalyzer.model.User;
+import it.davidepalladino.airanalyzer.view.widget.GeneralToast;
 
 import static it.davidepalladino.airanalyzer.controller.CheckField.*;
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.REQUEST_CODE_SERVICE;
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.STATUS_CODE_SERVICE;
-import static it.davidepalladino.airanalyzer.controller.Setting.NAMEPREFERENCE_TOKEN;
-import static it.davidepalladino.airanalyzer.controller.IntentConst.*;
+import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
+import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
+import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 
 public class LoginActivity extends AppCompatActivity implements TextWatcherField.AuthTextWatcherCallback, View.OnClickListener {
-    private static final String BROADCAST_REQUEST_CODE_MASTER = "LoginActivity";
-
     private EditText editTextUsername;
     private EditText editTextPassword;
 
-    private TextView textViewUsername;
-    private TextView textViewPassword;
+    private TextView textViewUsernameMessage;
+    private TextView textViewPasswordMessage;
 
-    private Toast toast;
-    private Setting setting;
-    private Login login;
+    private GeneralToast generalToast;
+    private FileManager fileManager;
+    private User user;
+
+    private DatabaseService databaseService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        editTextUsername = (EditText) findViewById(R.id.editTextUsername);
-        editTextPassword = (EditText) findViewById(R.id.editTextPassword);
+        editTextUsername = findViewById(R.id.editTextUsername);
+        editTextPassword = findViewById(R.id.editTextPassword);
 
-        textViewUsername = (TextView) findViewById(R.id.textViewUsername);
-        textViewPassword = (TextView) findViewById(R.id.textViewPassword);
+        textViewUsernameMessage = findViewById(R.id.textViewUsernameMessage);
+        textViewPasswordMessage = findViewById(R.id.textViewPasswordMessage);
 
         editTextUsername.addTextChangedListener(new TextWatcherField(this, editTextUsername));
         editTextPassword.addTextChangedListener(new TextWatcherField(this, editTextPassword));
 
-        TextView textViewSignUp = (TextView) findViewById(R.id.textViewSignUp);
+        TextView textViewSignUp = findViewById(R.id.textViewSignUp);
         textViewSignUp.setOnClickListener(this);
 
-        Button buttonLogin = (Button) findViewById(R.id.buttonLogin);
+        Button buttonLogin = findViewById(R.id.buttonLogin);
         buttonLogin.setOnClickListener(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        toast = new Toast(LoginActivity.this, getLayoutInflater());
 
-        setting = new Setting(LoginActivity.this);
+        generalToast = new GeneralToast(LoginActivity.this, getLayoutInflater());
+        fileManager = new FileManager(LoginActivity.this);
 
-        login = setting.readLogin();
-        if (login != null) {
-            editTextUsername.setText(login.getUsername());
+        /*
+         * Checking if there is a User stored into the internal memory of the phone. In this case,
+         *  where will be set the EditText with the username; else, will be created a new Ususerer object.
+         */
+        user = (User) fileManager.readObject(User.NAMEFILE);
+        if (user != null) {
+            editTextUsername.setText(user.username);
+        } else {
+            user = new User();
         }
 
+        /* Getting the Intent object and check if there is some Toast message, to show if exists. */
         Intent intentFrom = getIntent();
-        if (intentFrom != null && intentFrom.hasExtra(INTENT_MESSAGE_TOAST)) {
-            toast.makeToastBlack(R.drawable.ic_baseline_error_24, intentFrom.getStringExtra(INTENT_MESSAGE_TOAST));
+        if (intentFrom != null && intentFrom.hasExtra(INTENT_TOAST_MESSAGE)) {
+            generalToast.make(R.drawable.ic_error, intentFrom.getStringExtra(INTENT_TOAST_MESSAGE));
         }
     }
 
@@ -104,24 +135,21 @@ public class LoginActivity extends AppCompatActivity implements TextWatcherField
             case R.id.buttonLogin:
                 boolean errorField = false;
 
-                if (!checkAuthEditText(editTextUsername)) {
+                if (!checkSyntaxEditText(editTextUsername)) {
                     errorField = true;
                 }
 
-                if (!checkAuthEditText(editTextPassword)) {
+                if (!checkSyntaxEditText(editTextPassword)) {
                     errorField = true;
                 }
 
                 if (!errorField) {
-                    login = new Login(
-                            editTextUsername.getText().toString(),
-                            editTextPassword.getText().toString()
-                    );
+                    user.setLoginCredentials(editTextUsername.getText().toString(), editTextPassword.getText().toString());
+                    fileManager.saveObject(user, User.NAMEFILE);
 
-                    setting.saveLogin(login);
-                    databaseService.login(login, BROADCAST_REQUEST_CODE_MASTER);
+                    databaseService.login(user, LoginActivity.class.getSimpleName());
                 } else {
-                    toast.makeToastBlack(R.drawable.ic_baseline_error_24, getString(R.string.toastIncorrectUsernamePassword));
+                    generalToast.make(R.drawable.ic_error, getString(R.string.toastIncorrectUsernamePassword));
                 }
 
                 break;
@@ -134,50 +162,56 @@ public class LoginActivity extends AppCompatActivity implements TextWatcherField
     }
 
     @Override
-    public boolean checkAuthEditText(EditText editText) {
-        TextView errorTextView = null;
-        String errorMessage = "";
+    public boolean checkSyntaxEditText(EditText editText) {
+        TextView textViewMessage = null;
+        String message = "";
 
-        boolean errorSyntax = false;
+        boolean wrongSyntax = false;
 
         switch (editText.getId()) {
             case R.id.editTextUsername:
-                errorTextView = textViewUsername;
-                errorMessage = getString(R.string.errorUsername);
+                textViewMessage = textViewUsernameMessage;
+                message = getString(R.string.emptyFieldUsername);
 
+                /* Checking the username syntax and will be reported to the user if is wrong, in the next and final check. */
                 if (!checkUsername(editText) && !editText.getText().toString().isEmpty()) {
-                    errorSyntax = true;
-                    errorMessage = getString(R.string.noticeUsername);
+                    wrongSyntax = true;
+                    message = getString(R.string.wrongSyntaxUsername);
+
+                    break;
                 }
 
                 break;
 
             case R.id.editTextPassword:
-                errorTextView = textViewPassword;
-                errorMessage = getString(R.string.errorPassowrd);
+                textViewMessage = textViewPasswordMessage;
+                message = getString(R.string.emptyFieldPassword);
 
+                /* Checking the password syntax and will be reported to the user if is wrong, in the next and final check. */
                 if (!checkPassword(editText) && !editText.getText().toString().isEmpty()) {
-                    errorSyntax = true;
-                    errorMessage = getString(R.string.noticePassword);
+                    wrongSyntax = true;
+                    message = getString(R.string.wrongSyntaxPassword);
+
+                    break;
                 }
 
                 break;
         }
 
-        if (editText.getText().toString().length() != 0 && !errorSyntax) {
-            errorTextView.setVisibility(View.GONE);
-
-            return true;
-        } else {
-            errorTextView.setVisibility(View.VISIBLE);
-            errorTextView.setText(errorMessage);
+        /* Checking the actual field and will be reported to the user if is empty or if there is an error of syntax. */
+        if (editText.getText().length() == 0 || wrongSyntax) {
+            textViewMessage.setVisibility(View.VISIBLE);
+            textViewMessage.setText(message);
 
             return false;
+        } else {
+            textViewMessage.setVisibility(View.GONE);
+
+            return true;
         }
     }
 
-    public DatabaseService databaseService;
-    public ServiceConnection serviceConnection = new ServiceConnection() {
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
@@ -189,16 +223,17 @@ public class LoginActivity extends AppCompatActivity implements TextWatcherField
         }
     };
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context contextFrom, Intent intentFrom) {
         if (intentFrom != null) {
-            if (intentFrom.hasExtra(REQUEST_CODE_SERVICE) && intentFrom.hasExtra(STATUS_CODE_SERVICE)) {
-                if (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(BROADCAST_REQUEST_CODE_MASTER) == 0) {
-                    int statusCode = intentFrom.getIntExtra(STATUS_CODE_SERVICE, 0);
+            if (intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) && intentFrom.hasExtra(SERVICE_STATUS_CODE)) {
+                if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(LoginActivity.class.getSimpleName()) == 0) {
+                    int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                     switch (statusCode) {
                         case 200:
-                            setting.saveToken(intentFrom.getStringExtra(NAMEPREFERENCE_TOKEN));
+                            user = (User) intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                            fileManager.saveObject(user, User.NAMEFILE);
 
                             Intent intentTo = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intentTo);
@@ -206,17 +241,19 @@ public class LoginActivity extends AppCompatActivity implements TextWatcherField
 
                             break;
                         case 204:
-                            toast.makeToastBlack(R.drawable.ic_baseline_error_24, getString(R.string.toastUserNotValidated));
+                            generalToast.make(R.drawable.ic_error, getString(R.string.toastUserNotValidated));
                             break;
                         case 401:
-                            toast.makeToastBlack(R.drawable.ic_baseline_error_24, getString(R.string.toastIncorrectUsernamePassword));
+                            generalToast.make(R.drawable.ic_error, getString(R.string.toastIncorrectUsernamePassword));
                             break;
                         case 422:
-                            toast.makeToastBlack(R.drawable.ic_baseline_error_24, getString(R.string.toastErrorField));
+                            generalToast.make(R.drawable.ic_error, getString(R.string.toastErrorField));
                             break;
                         case 404:
                         case 500:
-                            toast.makeToastBlack(R.drawable.ic_baseline_error_24, getString(R.string.toastServerOffline));
+                            generalToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
+                            break;
+                        default:
                             break;
                     }
                 }

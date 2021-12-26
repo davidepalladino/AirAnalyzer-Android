@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:elevation="4dp"
+    android:paddingVertical="15dp"
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp"
+    android:orientation="horizontal" >
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:rowCount="1"
+        android:columnCount="2" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_row="0"
+            android:layout_column="0" >
+
+            <TextView
+                android:id="@+id/textViewID_ManageRoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                tools:text="5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="10dp"
+                android:textSize="18sp"
+                android:text="@string/textViewSeparator" />
+
+            <TextView
+                android:id="@+id/textViewRoom_ManageRoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                tools:text="Stanzetta" />
+
+            <EditText
+                android:id="@+id/editTextRoom"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:visibility="gone"
+                android:inputType="text"
+                android:maxLines="1"
+                android:maxLength="25" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:layout_gravity="end"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/imageViewEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/ic_mode_edit"
+                android:background="@color/primaryColor" />
+
+            <ImageButton
+                android:id="@+id/imageViewRemove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:src="@drawable/ic_delete"
+                android:background="@color/primaryColor"/>
+
+            <ImageButton
+                android:id="@+id/imageViewAccept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/ic_check"
+                android:background="@color/primaryColor"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/imageViewDiscard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:src="@drawable/ic_clear"
+                android:background="@color/primaryColor"
+                android:visibility="gone" />
+        </LinearLayout>
+    </GridLayout>
+</LinearLayout>

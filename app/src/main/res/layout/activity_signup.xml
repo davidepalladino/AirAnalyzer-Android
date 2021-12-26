@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.activity.SignupActivity"
-    android:background="@color/primaryColor" >
+    android:background="@color/background"
+    tools:context=".view.activity.SignupActivity" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,20 +18,19 @@
             android:layout_width="335dp"
             android:layout_height="wrap_content"
             android:text="@string/textViewSignup"
-            android:textColor="@color/primaryTextDarkColor1"
             android:textSize="50sp"
             android:layout_gravity="center"
             android:layout_marginTop="100dp" />
 
         <!-- Username -->
         <com.google.android.material.textfield.TextInputLayout
+            android:theme="@style/TextInputEditText.Outlined"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:boxBackgroundColor="@color/primaryColor"
-            android:textColorHint="@color/primaryTextDarkColor2"
-            app:hintTextColor="@color/primaryTextDarkColor2"
-            app:boxStrokeColor="@color/primaryTextDarkColor2"
+            app:boxBackgroundColor="@color/background"
+            app:hintTextColor="@color/secondaryColor"
+            app:boxStrokeColor="@color/secondaryColor"
             android:layout_marginTop="25dp">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -41,13 +40,12 @@
                 android:inputType="textPersonName"
                 android:hint="@string/editTextUsername"
                 android:textSize="15sp"
-                android:textColor="@color/primaryTextDarkColor1"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            android:id="@+id/textViewUsername"
+            android:id="@+id/textViewUsernameMessage"
             android:layout_width="324dp"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -59,14 +57,14 @@
 
         <!-- Password -->
         <com.google.android.material.textfield.TextInputLayout
+            android:theme="@style/TextInputEditText.Outlined"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             app:passwordToggleEnabled="true"
-            app:boxBackgroundColor="@color/primaryColor"
-            android:textColorHint="@color/primaryTextDarkColor2"
-            app:hintTextColor="@color/primaryTextDarkColor2"
-            app:boxStrokeColor="@color/primaryTextDarkColor2" >
+            app:boxBackgroundColor="@color/background"
+            app:hintTextColor="@color/secondaryColor"
+            app:boxStrokeColor="@color/secondaryColor" >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextPassword"
@@ -75,13 +73,12 @@
                 android:inputType="textPassword"
                 android:hint="@string/editTextPassword"
                 android:textSize="15sp"
-                android:textColor="@color/primaryTextDarkColor1"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            android:id="@+id/textViewPassword"
+            android:id="@+id/textViewPasswordMessage"
             android:layout_width="324dp"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -99,15 +96,15 @@
 
             <!-- Name -->
             <com.google.android.material.textfield.TextInputLayout
+                android:theme="@style/TextInputEditText.Outlined"
                 android:id="@+id/textInputLayoutName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="start"
-                android:textColorHint="@color/primaryTextDarkColor2"
-                app:boxBackgroundColor="@color/primaryColor"
-                app:boxStrokeColor="@color/primaryTextDarkColor2"
-                app:hintTextColor="@color/primaryTextDarkColor2"
+                app:boxBackgroundColor="@color/background"
+                app:hintTextColor="@color/secondaryColor"
+                app:boxStrokeColor="@color/secondaryColor"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -119,12 +116,11 @@
                     android:inputType="textPersonName"
                     android:paddingStart="0dp"
                     android:paddingEnd="0dp"
-                    android:textColor="@color/primaryTextDarkColor1"
                     android:textSize="15sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
-                android:id="@+id/textViewName"
+                android:id="@+id/textViewNameMessage"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:textColor="@color/error"
@@ -135,15 +131,15 @@
 
             <!-- Surname -->
             <com.google.android.material.textfield.TextInputLayout
+                android:theme="@style/TextInputEditText.Outlined"
                 android:id="@+id/textInputLayoutSurname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="end"
-                android:textColorHint="@color/primaryTextDarkColor2"
-                app:boxBackgroundColor="@color/primaryColor"
-                app:boxStrokeColor="@color/primaryTextDarkColor2"
-                app:hintTextColor="@color/primaryTextDarkColor2"
+                app:boxBackgroundColor="@color/background"
+                app:hintTextColor="@color/secondaryColor"
+                app:boxStrokeColor="@color/secondaryColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -155,12 +151,11 @@
                     android:inputType="textPersonName"
                     android:paddingStart="0dp"
                     android:paddingEnd="0dp"
-                    android:textColor="@color/primaryTextDarkColor1"
                     android:textSize="15sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
-                android:id="@+id/textViewSurname"
+                android:id="@+id/textViewSurnameMessage"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:textColor="@color/error"
@@ -172,13 +167,13 @@
 
         <!-- Email -->
         <com.google.android.material.textfield.TextInputLayout
+            android:theme="@style/TextInputEditText.Outlined"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:boxBackgroundColor="@color/primaryColor"
-            android:textColorHint="@color/primaryTextDarkColor2"
-            app:hintTextColor="@color/primaryTextDarkColor2"
-            app:boxStrokeColor="@color/primaryTextDarkColor2" >
+            app:boxBackgroundColor="@color/background"
+            app:hintTextColor="@color/secondaryColor"
+            app:boxStrokeColor="@color/secondaryColor" >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextEmail"
@@ -187,13 +182,12 @@
                 android:inputType="textEmailAddress"
                 android:hint="@string/editTextEmail"
                 android:textSize="15sp"
-                android:textColor="@color/primaryTextDarkColor1"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            android:id="@+id/textViewEmail"
+            android:id="@+id/textViewEmailMessage"
             android:layout_width="324dp"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -203,7 +197,7 @@
             android:layout_marginTop="1dp"
             android:layout_marginBottom="5dp" />
 
-        <!-- Qeustion 1 -->
+        <!-- Question 1 -->
         <Spinner
             android:id="@+id/spinnerQuestions1"
             android:layout_width="330dp"
@@ -212,13 +206,13 @@
             android:layout_marginTop="50dp" />
 
         <com.google.android.material.textfield.TextInputLayout
+            android:theme="@style/TextInputEditText.Outlined"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:boxBackgroundColor="@color/primaryColor"
-            android:textColorHint="@color/primaryTextDarkColor2"
-            app:hintTextColor="@color/primaryTextDarkColor2"
-            app:boxStrokeColor="@color/primaryTextDarkColor2" >
+            app:boxBackgroundColor="@color/background"
+            app:hintTextColor="@color/secondaryColor"
+            app:boxStrokeColor="@color/secondaryColor" >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextAnswer1"
@@ -227,13 +221,12 @@
                 android:inputType="textPersonName"
                 android:hint="@string/editTextAnswer"
                 android:textSize="15sp"
-                android:textColor="@color/primaryTextDarkColor1"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            android:id="@+id/textViewAnswer1"
+            android:id="@+id/textViewAnswer1Message"
             android:layout_width="324dp"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -243,7 +236,7 @@
             android:layout_marginTop="1dp"
             android:layout_marginBottom="5dp" />
 
-        <!-- Qeustion 2 -->
+        <!-- Question 2 -->
         <Spinner
             android:id="@+id/spinnerQuestions2"
             android:layout_width="330dp"
@@ -252,13 +245,13 @@
             android:layout_marginTop="15dp" />
 
         <com.google.android.material.textfield.TextInputLayout
+            android:theme="@style/TextInputEditText.Outlined"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:boxBackgroundColor="@color/primaryColor"
-            android:textColorHint="@color/primaryTextDarkColor2"
-            app:hintTextColor="@color/primaryTextDarkColor2"
-            app:boxStrokeColor="@color/primaryTextDarkColor2" >
+            app:boxBackgroundColor="@color/background"
+            app:hintTextColor="@color/secondaryColor"
+            app:boxStrokeColor="@color/secondaryColor" >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextAnswer2"
@@ -267,13 +260,12 @@
                 android:inputType="textPersonName"
                 android:hint="@string/editTextAnswer"
                 android:textSize="15sp"
-                android:textColor="@color/primaryTextDarkColor1"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            android:id="@+id/textViewAnswer2"
+            android:id="@+id/textViewAnswer2Message"
             android:layout_width="324dp"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -283,7 +275,7 @@
             android:layout_marginTop="1dp"
             android:layout_marginBottom="5dp" />
 
-        <!-- Qeustion 3 -->
+        <!-- Question 3 -->
         <Spinner
             android:id="@+id/spinnerQuestions3"
             android:layout_width="330dp"
@@ -292,13 +284,13 @@
             android:layout_marginTop="15dp" />
 
         <com.google.android.material.textfield.TextInputLayout
+            android:theme="@style/TextInputEditText.Outlined"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:boxBackgroundColor="@color/primaryColor"
-            android:textColorHint="@color/primaryTextDarkColor2"
-            app:hintTextColor="@color/primaryTextDarkColor2"
-            app:boxStrokeColor="@color/primaryTextDarkColor2" >
+            app:boxBackgroundColor="@color/background"
+            app:hintTextColor="@color/secondaryColor"
+            app:boxStrokeColor="@color/secondaryColor" >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextAnswer3"
@@ -307,13 +299,12 @@
                 android:inputType="textPersonName"
                 android:hint="@string/editTextAnswer"
                 android:textSize="15sp"
-                android:textColor="@color/primaryTextDarkColor1"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            android:id="@+id/textViewAnswer3"
+            android:id="@+id/textViewAnswer3Message"
             android:layout_width="324dp"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -328,8 +319,8 @@
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="@drawable/button_shape"
-            android:textColor="@color/primaryTextDarkColor1"
+            android:background="@drawable/shape_button"
+            android:textColor="@color/secondaryTextColor"
             android:textSize="12sp"
             android:text="@string/buttonContinue"
             android:layout_marginTop="60dp"

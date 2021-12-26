@@ -1,36 +1,65 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme -->
     <style name="Theme.AirAnalyzer" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Primary brand color. -->
+        <!-- Primary brand color -->
         <item name="colorPrimary">@color/primaryColor</item>
-        <item name="colorPrimaryVariant">@color/primaryLightColor</item>
+        <item name="colorPrimaryVariant">@color/primaryColor</item>
         <item name="colorOnPrimary">@color/primaryTextColor</item>
 
-        <!-- Secondary brand color. -->
+        <!-- Secondary brand color -->
         <item name="colorSecondary">@color/secondaryColor</item>
         <item name="colorSecondaryVariant">@color/secondaryColor</item>
-        <item name="colorOnSecondary">@color/primaryTextColor</item>
+        <item name="colorOnSecondary">@color/secondaryTextColor</item>
 
-        <!-- Status bar color. -->
+        <!-- Status bar color -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-
-        <item name="actionOverflowButtonStyle">@style/overflowButtonStyle</item>
-
+        <item name="android:windowLightStatusBar">true</item>
         <item name="android:forceDarkAllowed">false</item>
     </style>
 
-    <!-- Floating Action Button. -->
+    <!-- Floating Action Button -->
     <style name="overflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
-        <item name="android:tint">@color/primaryTextDarkColor1</item>
+        <item name="android:tint">@color/primaryColor</item>
     </style>
 
+    <!-- Date Picker -->
+    <style name="DatePicker.ButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/secondaryColor</item>
+    </style>
+    <style name="DatePickerMain" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="colorPrimary">@color/secondaryColor</item>
+        <item name="colorPrimaryDark">@color/secondaryColor</item>
+        <item name="colorAccent">@color/secondaryColor</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/DatePicker.ButtonStyle</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/DatePicker.ButtonStyle</item>
+    </style>
 
-    <!-- TabLayout. -->
+    <!-- Dialog -->
+    <style name="AlertDialog.ButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/secondaryColor</item>
+    </style>
+    <style name="DialogeTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:buttonBarNegativeButtonStyle">@style/AlertDialog.ButtonStyle</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/AlertDialog.ButtonStyle</item>
+    </style>
+
+    <!-- TabLayout -->
     <style name="TabLayoutMain" parent="Widget.Design.TabLayout">
-        <item name="android:background">@color/primaryColor</item>
-        <item name="tabTextColor">@color/secondaryTextDarkColor2</item>
-        <item name="tabSelectedTextColor">@color/secondaryTextDarkColor1</item>
-        <item name="tabIndicatorColor">@color/secondaryTextDarkColor1</item>
+        <item name="android:background">@color/secondaryColor</item>
+        <item name="tabTextColor">@color/buttonTab</item>
+        <item name="tabSelectedTextColor">@color/buttonTab</item>
+        <item name="tabIndicatorColor">@color/buttonTab</item>
         <item name="tabIndicatorHeight">3dp</item>
+    </style>
+
+    <!-- Cursor -->
+    <style name="TextInputEditText.Outlined" parent="">
+        <item name="colorPrimary">@color/secondaryColor</item>
+    </style>
+
+    <!-- ActionBar -->
+    <style name="Theme.AirAnalyzer.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 </resources>

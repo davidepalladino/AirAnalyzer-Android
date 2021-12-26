@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Air Analyzer</string>
+    <string name="appName">Air Analyzer</string>
+    <string name="appDeveloperEmail">me@davidepalladino.com</string>
+
     <string name="addDevice">Aggiungi dispositivo</string>
     <string name="temperature">Temperatura</string>
     <string name="humidity">Umidità</string>
     <string name="dateSeparator">/</string>
-    <string name="roomNoName"><![CDATA[\ | <NO NAME>\]]></string>
     <string name="time">Ora</string>
+    <string name="latestTime">Ultima ora</string>
 
     <string name="editTextSignIn">Registrati</string>
     <string name="editTextUsername">Username</string>
@@ -22,42 +24,65 @@
     <string name="textViewQuestion3">Domanda #3</string>
     <string name="textViewNew">Sei nuovo?\u0020</string>
     <string name="textViewSignup">Registrati</string>
-    <string name="textViewLogin">Login</string>
+    <string name="textViewLogin">Entra</string>
     <string name="textViewForgotPassword">Password dimenticata</string>
-    <string name="textViewSeparator">|</string>
-    <string name="textViewLatestMeasurement">Ultima misurazione</string>
     <string name="textViewSignupComplete">Registrazione completata</string>
+    <string name="textViewWelcomeGoodMorning">Buongiorno</string>
+    <string name="textViewWelcomeGoodAfternoon">Buon pomeriggio</string>
+    <string name="textViewWelcomeGoodEvening">Buonasera</string>
+    <string name="textViewNoMeasures">Nessuna misurazione ancora registrata</string>
+    <string name="textViewNoRoom">Nessuna stanza ancora attiva</string>
+    <string name="textViewNoNotification">Nessuna notifica</string>
     <string name="textViewNone">None</string>
-    <string name="textViewLatestMeasurementAt">alle\u0020</string>
+    <string name="textViewLatestMeasurement">Ultima misurazione</string>
     <string name="textViewDateSelected">Data selezionata</string>
     <string name="textViewAddRoom">Aggiungi stanza</string>
+    <string name="textViewRemoveRoom">Vuoi rimuovere</string>
     <string name="textViewAddRoomDescription">Per aggiungere una stanza, selezionane una dalla lista e premi \'OK\' per confermare.</string>
     <string name="textViewAddDeviceDescription">Per aggiungere un nuovo dispositivo, segui prima l\'installazione su di esso e quando verrà visualizzato l\'IP locale (ad esempio 192.168.0.100), copialo in questo campo e premi \'OK\' per confermare.</string>
     <string name="textViewAddDeviceRemember">Ricorda: i dispositivi devono essere connessi sulla stessa rete locale.</string>
+    <string name="textViewNotificationDevice">Il dispositivo</string>
+    <string name="textViewErrorsDevice">Errori del dispositivo</string>
+    <string name="textViewCategoryNotification">Notifiche</string>
+    <string name="textViewCategoryInformation">Informazioni</string>
+    <string name="textViewVersion">Versione</string>
+    <string name="textViewDeveloper">Sviluppatore</string>
+    <string name="textViewSeparator">|</string>
 
     <string name="buttonLogin">Login</string>
     <string name="buttonContinue">Continua</string>
     <string name="buttonOk">OK</string>
     <string name="buttonCancel">Annulla</string>
+    <string name="buttonAdd">Aggiungi</string>
 
-    <string name="question1">Il primo animale domestico di un tuo genitore?</string>
-    <string name="question2">In quale città si sono conosciuti i tuoi nonni?</string>
-    <string name="question3">Il primo lavoro di tuo\o nonno\a?</string>
-    <string name="question4">Qual\'è stato il primo viaggio di un tuo parente?</string>
-    <string name="question5">Come si chiama il primo amico del cuore di tuo padre?</string>
-    <string name="question6">Qual\'è il primo insegnante che ti ha dato il massimo dei voti?</string>
-    <string name="question7">Qual\'è il tempo libero di tuo zio?</string>
-    <string name="question8">In quale città si trovava la prima casa dei tuoi nonni?</string>
-    <string name="question9">Chi è il primo laureato in famiglia?</string>
-    <string name="question10">In quale nazione si voleva trasferire un tuo parente?</string>
-    <string name="question11">Qual\'è stata la vacanza più interessante di un tuo conoscente?</string>
-    <string name="question12">In quale anno un tuo parente ha avuto la patente?</string>
-    <string name="question13">Come si chiama la prima amica del cuore di tua madre?</string>
-    <string name="question14">In quale occasione un tuo genitore ha ricevuto la prima multa?</string>
-    <string name="question15">Qual\'è la prima auto di un tuo parente?</string>
+    <string name="spinnerSignupQuestion1">Il primo animale domestico di un tuo genitore?</string>
+    <string name="spinnerSignupQuestion2">In quale città si sono conosciuti i tuoi nonni?</string>
+    <string name="spinnerSignupQuestion3">Il primo lavoro di tuo\o nonno\a?</string>
+    <string name="spinnerSignupQuestion4">Qual\'è stato il primo viaggio di un tuo parente?</string>
+    <string name="spinnerSignupQuestion5">Come si chiama il primo amico del cuore di tuo padre?</string>
+    <string name="spinnerSignupQuestion6">Qual\'è il primo insegnante che ti ha dato il massimo dei voti?</string>
+    <string name="spinnerSignupQuestion7">Qual\'è il tempo libero di tuo zio?</string>
+    <string name="spinnerSignupQuestion8">In quale città si trovava la prima casa dei tuoi nonni?</string>
+    <string name="spinnerSignupQuestion9">Chi è il primo laureato in famiglia?</string>
+    <string name="spinnerSignupQuestion10">In quale nazione si voleva trasferire un tuo parente?</string>
+    <string name="spinnerSignupQuestion11">Qual\'è stata la vacanza più interessante di un tuo conoscente?</string>
+    <string name="spinnerSignupQuestion12">In quale anno un tuo parente ha avuto la patente?</string>
+    <string name="spinnerSignupQuestion13">Come si chiama la prima amica del cuore di tua madre?</string>
+    <string name="spinnerSignupQuestion14">In quale occasione un tuo genitore ha ricevuto la prima multa?</string>
+    <string name="spinnerSignupQuestion15">Qual\'è la prima auto di un tuo parente?</string>
 
-    <string name="errorUsername">Inserisci l\'username</string>
-    <string name="errorPassowrd">Inserisci la password</string>
+    <string name="spinnerNotificationErrorsTime1">15 minuti</string>
+    <string name="spinnerNotificationErrorsTime2">30 minuti</string>
+    <string name="spinnerNotificationErrorsTime3">1 ora</string>
+    <string name="spinnerNotificationErrorsTime4">2 ore</string>
+    <string name="spinnerNotificationErrorsTime5">4 ore</string>
+
+    <string name="chipRoomDateToday">Oggi</string>
+    <string name="chipRoomDateYesterday">Ieri</string>
+    <string name="chipRoomDateCustom">Custom</string>
+
+    <string name="emptyFieldUsername">Inserisci l\'username</string>
+    <string name="emptyFieldPassword">Inserisci la password</string>
     <string name="errorEmail">Inserisci la email</string>
     <string name="errorName">Inserisci il nome</string>
     <string name="errorSurname">Inserisci il cognome</string>
@@ -65,8 +90,8 @@
     <string name="existsUsername">Quest\'username esiste già. Provane un altro!</string>
     <string name="existsEmail">Questa email esiste già. Provane un\'altra!</string>
 
-    <string name="noticeUsername">L\'username deve contenere tra i 5 e 20 caratteri, e può avere \"-\" e \"_\" come caratteri speciali.</string>
-    <string name="noticePassword">La password deve contenere tra i 16 ed i 24 caratteri, deve avere almeno una lettera maiuscola, un numero ed un carattere speciale (@$!%*?&amp;.#).</string>
+    <string name="wrongSyntaxUsername">L\'username deve contenere tra i 5 e 20 caratteri, e può avere \"-\" e \"_\" come caratteri speciali.</string>
+    <string name="wrongSyntaxPassword">La password deve contenere tra i 16 ed i 24 caratteri, deve avere almeno una lettera maiuscola, un numero ed un carattere speciale (@$!%*?&amp;.#).</string>
     <string name="noticeEmail">Inserisci una email corretta</string>
     <string name="noticeGraphTryAgain">Riprova alle\u0020</string>
     <string name="noticeGraphNoMeasure">Nessuna misura per questa data</string>
@@ -79,39 +104,66 @@
     <string name="toastErrorService">Il servizio è disabilitato</string>
     <string name="toastErrorConnectionDevice">Errore di connessione con il dispositivo</string>
     <string name="toastErrorLocalNetwork">Devi essere sulla stessa rete locale</string>
+    <string name="toastEmptyFieldLocalNetwork">Devi inserire un indirizzo IP valido per completare la richiesta</string>
+    <string name="toastAtThe">alle ore</string>
+    <string name="toastRoomRemoved">La stanza è stata rimossa</string>
+    <string name="toastRoomRenamed">La stanza è stata rinominata</string>
+    <string name="toastRoomAdded">La stanza è stata aggiunta</string>
+    <string name="toastDeviceAdded">Il dispositivo è stato aggiunto</string>
 
     <string name="dialogSignup">La tua registrazione è quasi completa. Controlla la email per verificarla.</string>
     <string name="dialogRenameRoom">Scrivi il nuovo nome per questa stanza. Il campo vuoto non applicherà alcun cambiamento.</string>
     <string name="dialogRemoveRoom">Sei sicuro di voler rimuovere questa stanza? Questa operazione non cancellerà tutte le misure rilevate.</string>
-    <string name="dialogSettingNewDevice">Impostando il nuovo dispositivo…</string>
+    <string name="dialogSettingNewDevice">Impostazione del nuovo dispositivo. L\'operazione durerà circa 30 secondi…</string>
 
-    <string name="menuItemRenameThisRoom">Rinomina questa stanza</string>
-    <string name="menuItemRemoveThisRoom">Rimuovi questa stanza</string>
-    <string name="menuItemLogout">Logout</string>
+    <string name="menuItemHome">Home</string>
+    <string name="menuItemRoom">Stanze</string>
+    <string name="menuItemNotifications">Notifiche</string>
+    <string name="menuItemSettings">Impostazioni</string>
+    <string name="menuItemManageRoom">Gestisci stanze</string>
+    <string name="menuItemAddRoom">Aggungi stanza</string>
+    <string name="menuItemMarkAllRead">Segna tutte come lette</string>
+    <string name="menuItemLogout">Esci</string>
 
-    <array name="Questions1">
-        <item name="a">@string/question1</item>
-        <item>@string/question2</item>
-        <item>@string/question3</item>
-        <item>@string/question4</item>
-        <item>@string/question5</item>
+    <string name="notificationErrorChannelName">Errori</string>
+    <string name="notificationErrorChannelDescription">Errori di connessione o misura dal dispositivo.</string>
+    <string name="notificationErrorTypeNotUpdated">Errore connessione dispositivo</string>
+    <string name="notificationErrorTypeMeasure">Errore misurazione</string>
+    <string name="notificationErrorMessageNotUpdated">non sta registrando alcuna misura. Si prega di verificare.</string>
+    <string name="notificationErrorMessageMeasure">ha rilevato una strana misurazione.</string>
+
+    <array name="spinnerSignupQuestions1">
+        <item>@string/spinnerSignupQuestion1</item>
+        <item>@string/spinnerSignupQuestion2</item>
+        <item>@string/spinnerSignupQuestion3</item>
+        <item>@string/spinnerSignupQuestion4</item>
+        <item>@string/spinnerSignupQuestion5</item>
     </array>
 
-    <array name="Questions2">
-        <item>@string/question6</item>
-        <item>@string/question7</item>
-        <item>@string/question8</item>
-        <item>@string/question9</item>
-        <item>@string/question10</item>
+    <array name="spinnerSignupQuestions2">
+        <item>@string/spinnerSignupQuestion6</item>
+        <item>@string/spinnerSignupQuestion7</item>
+        <item>@string/spinnerSignupQuestion8</item>
+        <item>@string/spinnerSignupQuestion9</item>
+        <item>@string/spinnerSignupQuestion10</item>
     </array>
 
-    <array name="Questions3">
-        <item>@string/question11</item>
-        <item>@string/question12</item>
-        <item>@string/question13</item>
-        <item>@string/question14</item>
-        <item>@string/question15</item>
+    <array name="spinnerSignupQuestions3">
+        <item>@string/spinnerSignupQuestion11</item>
+        <item>@string/spinnerSignupQuestion12</item>
+        <item>@string/spinnerSignupQuestion13</item>
+        <item>@string/spinnerSignupQuestion14</item>
+        <item>@string/spinnerSignupQuestion15</item>
     </array>
 
-    <string name="formatDate">dd/MM/yyyy</string>
+    <array name="spinnerNotificationErrors">
+        <item>@string/spinnerNotificationErrorsTime1</item>
+        <item>@string/spinnerNotificationErrorsTime2</item>
+        <item>@string/spinnerNotificationErrorsTime3</item>
+        <item>@string/spinnerNotificationErrorsTime4</item>
+        <item>@string/spinnerNotificationErrorsTime5</item>
+    </array>
+
+    <string name="localFormatDate">dd/MM/yyyy</string>
+    <string name="timestamp">yyyy-MM-dd</string>
 </resources>

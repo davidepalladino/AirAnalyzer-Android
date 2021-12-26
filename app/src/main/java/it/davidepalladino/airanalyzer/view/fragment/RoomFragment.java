@@ -1,19 +1,57 @@
+/*
+ * This view class provides to show a screen, where the user can see the several measures about a specific room.
+ *
+ * Copyright (c) 2020 Davide Palladino.
+ * All right reserved.
+ *
+ * @author Davide Palladino
+ * @contact me@davidepalladino.com
+ * @website www.davidepalladino.com
+ * @version 2.0.0
+ * @date 26th December, 2021
+ *
+ * This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 3.0 of the License, or (at your option) any later version
+ *
+ * This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Lesser General Public License for more details.
+ *
+ */
+
 package it.davidepalladino.airanalyzer.view.fragment;
 
+import android.app.DatePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.os.Handler;
 import android.os.IBinder;
+import android.util.MutableBoolean;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -25,188 +63,444 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
-import java.text.SimpleDateFormat;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.DatabaseService;
-import it.davidepalladino.airanalyzer.controller.Setting;
-import it.davidepalladino.airanalyzer.model.MeasureAverage;
-import it.davidepalladino.airanalyzer.model.MeasureFull;
+import it.davidepalladino.airanalyzer.controller.ManageDatetime;
+import it.davidepalladino.airanalyzer.controller.FileManager;
+import it.davidepalladino.airanalyzer.model.MeasuresDateAverage;
+import it.davidepalladino.airanalyzer.model.MeasuresDateLatest;
 import it.davidepalladino.airanalyzer.model.Room;
-import it.davidepalladino.airanalyzer.view.widget.Toast;
+import it.davidepalladino.airanalyzer.model.User;
+import it.davidepalladino.airanalyzer.view.activity.AddRoomActivity;
+import it.davidepalladino.airanalyzer.view.activity.LoginActivity;
+import it.davidepalladino.airanalyzer.view.activity.ManageRoomActivity;
+import it.davidepalladino.airanalyzer.view.widget.GeneralToast;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 import static android.graphics.Typeface.ITALIC;
 import static android.graphics.Typeface.NORMAL;
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.REQUEST_CODE_SERVICE;
-import static it.davidepalladino.airanalyzer.controller.IntentConst.INTENT_BROADCAST;
-import static it.davidepalladino.airanalyzer.controller.IntentConst.INTENT_MEASURE;
+import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
+import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
+import static it.davidepalladino.airanalyzer.controller.consts.Consts.*;
+import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
 
-public class RoomFragment extends Fragment {
-    private static final String BROADCAST_REQUEST_CODE_MASTER = "RoomFragment";
-    private static final String BROADCAST_REQUEST_CODE_EXTENSION_GET_DATE_LAST = "GetDateLast";
-    private static final String BROADCAST_REQUEST_CODE_EXTENSION_GET_DATE_AVERAGE = "GetDateAverage";
-    public static final String BUNDLE_ROOM = "ROOM";
-    public static final String BUNDLE_DATE_RAW = "DATE_RAW";
-
-    private BarChart graphTemperature;
-    private BarChart graphHumidity;
-
-    private TextView textViewDate;
-    private TextView textViewLatestTemperature;
-    private TextView textViewLatestHumidity;
-    private TextView textViewLatestTime;
+public class RoomFragment extends Fragment implements View.OnClickListener {
+    private Toolbar toolbar;
+    private LinearLayout linearLayoutChipRoom;
+    private LinearLayout linearLayoutChipDate;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private LinearLayout linearLayoutNoRoom;
+    private NestedScrollView nestedScrollView;
+    private ChipGroup chipGroupRoom;
+    private ArrayList<Chip> chipRoom = new ArrayList<>();
+    private ImageView imageViewArrowDate;
+    private ImageView imageViewArrowRoom;
+    private TextView textViewRoomSelected;
+    private TextView textViewDateSelected;
+    private TextView textViewRoomLatestTime;
+    private TextView textViewRoomLatestTemperature;
+    private TextView textViewRoomLatestHumidityMeasure;
     private TextView textViewNoticeTemperatureGraph;
     private TextView textViewNoticeHumidityGraph;
 
-    private Toast toast;
-    private Setting setting;
-    private Room room;
-    private Calendar calendarSelected;
-    private MeasureFull lastMeasureDate;
-    private ArrayList<MeasureAverage> listMeasuresDateAverage;
+    private DatePickerDialog datePickerDialog;
 
-    public static RoomFragment newInstance(Room room, Long dateRaw) {
-        RoomFragment fragment = new RoomFragment();
+    private BarChart barChartTemperature;
+    private BarChart barChartHumidity;
 
-        Bundle args = new Bundle();
-        args.putParcelable(BUNDLE_ROOM, room);
-        args.putLong(BUNDLE_DATE_RAW, dateRaw);
-        fragment.setArguments(args);
+    private GeneralToast generalToast;
 
-        return fragment;
-    }
+    private Calendar date;
+    private int utc;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            room = getArguments().getParcelable(BUNDLE_ROOM);
-            calendarSelected = Calendar.getInstance();
-            calendarSelected.setTimeInMillis(getArguments().getLong(BUNDLE_DATE_RAW));
-        }
+    private FileManager fileManager;
+    private User user;
+    private Room roomSelected;
+    private ArrayList<Room> arrayListRoom;
+    private ArrayList<MeasuresDateAverage> arrayListMeasuresDateAverage;
+
+    private DatabaseService databaseService;
+
+    private DecimalFormat decimalFormat;
+    private final MutableBoolean isOpenedMenuDate = new MutableBoolean(false);
+    private final MutableBoolean isOpenedMenuRoom = new MutableBoolean(false);
+
+    private byte attemptsLogin = 1;
+
+    public static RoomFragment newInstance() {
+        return new RoomFragment();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        toast = new Toast(getActivity(), getLayoutInflater());
-        setting = new Setting(getContext());
+
+        generalToast = new GeneralToast(getActivity(), getLayoutInflater());
+
+        fileManager = new FileManager(getContext());
+        user = (User) fileManager.readObject(User.NAMEFILE);
+        roomSelected = (Room) fileManager.readObject(Room.NAMEFILE);
+
+        date = Calendar.getInstance();
+        utc = ManageDatetime.getUTC(date);
+
+        /* Setting the float format for the values of graphs. */
+        decimalFormat = new DecimalFormat("##.0");
+        decimalFormat.setRoundingMode(RoundingMode.CEILING);
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        getActivity().registerReceiver(broadcastReceiver, new IntentFilter(INTENT_BROADCAST));
+        requireActivity().registerReceiver(broadcastReceiver, new IntentFilter(INTENT_BROADCAST));
 
         Intent intentDatabaseService = new Intent(getActivity(), DatabaseService.class);
-        getActivity().bindService(intentDatabaseService, serviceConnection, BIND_AUTO_CREATE);
+        requireActivity().bindService(intentDatabaseService, serviceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        getActivity().unbindService(serviceConnection);
-        getActivity().unregisterReceiver(broadcastReceiver);
+        requireActivity().unbindService(serviceConnection);
+        requireActivity().unregisterReceiver(broadcastReceiver);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View layoutFragment = inflater.inflate(R.layout.fragment_room, container, false);
 
-        graphTemperature = (BarChart) layoutFragment.findViewById(R.id.graphTemperature);
-        graphHumidity = (BarChart) layoutFragment.findViewById(R.id.graphHumidity);
+        toolbar = layoutFragment.findViewById(R.id.toolbar);
+        toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
+        toolbar.inflateMenu(R.menu.menu_room);
 
-        textViewDate = (TextView) layoutFragment.findViewById(R.id.textViewDate);
-        textViewLatestTemperature = (TextView) layoutFragment.findViewById(R.id.textViewLatestTemperature);
-        textViewLatestHumidity = (TextView) layoutFragment.findViewById(R.id.textViewLatestHumidity);
-        textViewLatestTime = (TextView) layoutFragment.findViewById(R.id.textViewLatestTime);
-        textViewNoticeTemperatureGraph = (TextView) layoutFragment.findViewById(R.id.textViewNoticeTemperatureGraph);
-        textViewNoticeHumidityGraph = (TextView) layoutFragment.findViewById(R.id.textViewNoticeHumidityGraph);
+        linearLayoutChipDate = layoutFragment.findViewById(R.id.linearLayoutChipDate);
+        linearLayoutChipRoom = layoutFragment.findViewById(R.id.linearLayoutChipRoom);
+        linearLayoutNoRoom = layoutFragment.findViewById(R.id.linearLayoutNoRoom);
 
-        graphTemperature.setNoDataText("");
-        graphHumidity.setNoDataText("");
+        swipeRefreshLayout = layoutFragment.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                databaseService.getRooms(user.getAuthorization(), true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
+            }
+        });
 
-        textViewDate.setText(getFormattedDate(calendarSelected));
+        nestedScrollView = layoutFragment.findViewById(R.id.nestedScrollView);
+
+        chipGroupRoom = layoutFragment.findViewById(R.id.chipGroupRoom);
+        Chip chipDateToday = layoutFragment.findViewById(R.id.chipDateToday);
+        chipDateToday.setOnClickListener(this);
+        Chip chipDateYesterday = layoutFragment.findViewById(R.id.chipDateYesterday);
+        chipDateYesterday.setOnClickListener(this);
+        Chip chipDateCustom = layoutFragment.findViewById(R.id.chipDateCustom);
+        chipDateCustom.setOnClickListener(this);
+
+        imageViewArrowRoom = layoutFragment.findViewById(R.id.imageViewArrowRoom);
+        imageViewArrowRoom.setImageDrawable(AppCompatResources.getDrawable(requireActivity(), R.drawable.ic_arrow_drop_down));
+        imageViewArrowRoom.setOnClickListener(this);
+        imageViewArrowDate = layoutFragment.findViewById(R.id.imageViewArrowDate);
+        imageViewArrowDate.setImageDrawable(AppCompatResources.getDrawable(requireActivity(), R.drawable.ic_arrow_drop_down));
+        imageViewArrowDate.setOnClickListener(this);
+
+        textViewRoomSelected = layoutFragment.findViewById(R.id.textViewRoom);
+        textViewRoomSelected.setOnClickListener(this);
+        textViewDateSelected = layoutFragment.findViewById(R.id.textViewDate);
+        textViewDateSelected.setOnClickListener(this);
+        textViewRoomLatestTime = layoutFragment.findViewById(R.id.textViewLatestTime);
+        textViewRoomLatestTemperature = layoutFragment.findViewById(R.id.textViewLatestTemperature);
+        textViewRoomLatestHumidityMeasure = layoutFragment.findViewById(R.id.textViewLatestHumidityMeasure);
+        textViewNoticeTemperatureGraph = layoutFragment.findViewById(R.id.textViewGraphTemperature);
+        textViewNoticeHumidityGraph = layoutFragment.findViewById(R.id.textViewGraphHumidity);
+
+        Button buttonAdd = layoutFragment.findViewById(R.id.buttonAdd);
+        buttonAdd.setOnClickListener(this);
+
+        barChartTemperature = layoutFragment.findViewById(R.id.barChartTemperature);
+        barChartHumidity = layoutFragment.findViewById(R.id.barChartHumidity);
+
+        barChartTemperature.setNoDataText("");
+        barChartHumidity.setNoDataText("");
+
+        DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                date.set(Calendar.YEAR, year);
+                date.set(Calendar.MONTH, month);
+                date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                utc = ManageDatetime.getUTC(date);
+
+                textViewDateSelected.setText(ManageDatetime.createDateFormat(date, getString(R.string.localFormatDate)));
+
+                updateMeasures();
+            }
+        };
+
+        if (Build.VERSION.SDK_INT > 23) {
+            datePickerDialog = new DatePickerDialog(getActivity(), R.style.DatePickerMain);
+            datePickerDialog.setOnDateSetListener(onDateSetListener);
+        } else {
+            datePickerDialog = new DatePickerDialog(
+                    getContext(),
+                    R.style.DatePickerMain,
+                    onDateSetListener ,
+                    Calendar.getInstance().get(Calendar.YEAR),
+                    Calendar.getInstance().get(Calendar.MONTH),
+                    Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+            );
+        }
+        datePickerDialog.getDatePicker().setMaxDate(Calendar.getInstance().getTimeInMillis());
+
+        /* Setting the current date. */
+        textViewDateSelected.setText(ManageDatetime.createDateFormat(Calendar.getInstance(), getString(R.string.localFormatDate)));
 
         return layoutFragment;
     }
 
-    private String getFormattedDate(Calendar calendarSelected) {
-        SimpleDateFormat formatter = new SimpleDateFormat(getString(R.string.formatDate));
-        String date = formatter.format(calendarSelected.getTime());
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
 
-        return date;
-    }
-
-    private void generateBarGraph(ArrayList<MeasureAverage> listMeasures) {
-        /* Temeperature */
-        List<BarEntry> measuresTemperature = new ArrayList<BarEntry>();
-        for (MeasureAverage measure : listMeasures) {
-            measuresTemperature.add(new BarEntry(Integer.parseInt(measure.getHour()), measure.getTemperature()));
+        // MANAGE ROOM
+        if (id == R.id.menuItemManageRoom) {
+            Intent intentTo = new Intent(getActivity(), ManageRoomActivity.class);
+            startActivity(intentTo);
         }
 
-        BarDataSet dataSetTemperature = new BarDataSet(measuresTemperature, "Temperature");
-        dataSetTemperature.setColor(getResources().getColor(R.color.primaryColor));
-        dataSetTemperature.setDrawValues(false);
+        return super.onOptionsItemSelected(item);
+    }
 
-        graphTemperature.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+
+        // BUTTON ADD
+        if (id == R.id.buttonAdd) {
+            Intent intentTo = new Intent(getActivity(), AddRoomActivity.class);
+            startActivity(intentTo);
+
+        // MENU ROOM
+        } else if (id == R.id.textViewRoom || id == R.id.imageViewArrowRoom) {
+            if (isOpenedMenuRoom.value) {
+                /* Closing the menu room. */
+                hideMenu(imageViewArrowRoom, linearLayoutChipRoom, isOpenedMenuRoom);
+            } else {
+                /* Closing the menu date, if is previously opened. */
+                if (isOpenedMenuDate.value) {
+                    hideMenu(imageViewArrowDate, linearLayoutChipDate, isOpenedMenuDate);
+                }
+
+                /* Opening the menu room.  */
+                showMenu(imageViewArrowRoom, linearLayoutChipRoom, isOpenedMenuRoom);
+            }
+
+        // MENU DATE
+        } else if (id == R.id.textViewDate || id == R.id.imageViewArrowDate) {
+            if (isOpenedMenuDate.value) {
+                /* Closing the menu date. */
+                hideMenu(imageViewArrowDate, linearLayoutChipDate, isOpenedMenuDate);
+            } else {
+                /* Closing the menu room, if is previously opened. */
+                if (isOpenedMenuRoom.value) {
+                    hideMenu(imageViewArrowRoom, linearLayoutChipRoom, isOpenedMenuRoom);
+                }
+
+                /* Opening the menu date.  */
+                showMenu(imageViewArrowDate, linearLayoutChipDate, isOpenedMenuDate);
+            }
+
+        // CHIP DATE TODAY
+        } else if (id == R.id.chipDateToday) {
+            date = Calendar.getInstance();
+            utc = ManageDatetime.getUTC(date);
+
+            updateMeasures();
+
+            textViewDateSelected.setText(ManageDatetime.createDateFormat(date, getString(R.string.localFormatDate)));
+
+        // CHIP DATE YESTERDAY
+        } else if (id == R.id.chipDateYesterday) {
+            date = Calendar.getInstance();
+            date.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH) - 1);
+            utc = ManageDatetime.getUTC(date);
+
+            updateMeasures();
+
+            textViewDateSelected.setText(ManageDatetime.createDateFormat(date, getString(R.string.localFormatDate)));
+
+        // CHIP DATE CUSTOM
+        } else if (id == R.id.chipDateCustom) {
+            datePickerDialog.updateDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH));
+            datePickerDialog.show();
+        }
+
+        // CHIP ROOM
+        for (Room room:arrayListRoom) {
+            if (id == room.id) {
+                /* Saving the room selected. */
+                roomSelected = room;
+                fileManager.saveObject(roomSelected, Room.NAMEFILE);
+
+                makeTextChipRoom(room);
+                updateMeasures();
+
+                break;
+            }
+        }
+    }
+
+    /**
+     * @brief This method provides to update the measures.
+     */
+    public void updateMeasures() {
+        /* Clearing the BarChart objects. */
+        barChartTemperature.clear();
+        barChartHumidity.clear();
+
+        String timestamp = ManageDatetime.createDateFormat(date, getString(R.string.timestamp));
+
+        databaseService.getMeasuresDateLatest(user.getAuthorization(), roomSelected.id, timestamp, utc, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_LATEST + roomSelected.id);
+        databaseService.getMeasuresDateAverage(user.getAuthorization(), roomSelected.id, timestamp, utc, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.id);
+    }
+
+    /**
+     * @brief This method provides to create and set the String of room for the Chip.
+     * @param room Room object where will be taken the String.
+     */
+    private void makeTextChipRoom(Room room) {
+        if (room.toString().length() > 10) {
+            textViewRoomSelected.setText(String.format("%s...", room.toString().substring(0, 9)));
+        } else {
+            textViewRoomSelected.setText(room.toString());
+        }
+    }
+
+    /**
+     * @brief This method provides to show a specific menu when the Room Fragment is active.
+     * @param imageView Image of arrow to change.
+     * @param linearLayout Layout of contents where will be changed the status to visible.
+     * @param isOpenedMenu Boolean object that will be changed to "true" value.
+     */
+    private void showMenu(ImageView imageView, LinearLayout linearLayout, MutableBoolean isOpenedMenu) {
+        imageView.setImageDrawable(AppCompatResources.getDrawable(requireActivity(), R.drawable.ic_arrow_drop_up));
+        linearLayout.setVisibility(View.VISIBLE);
+
+        isOpenedMenu.value = true;
+    }
+
+    /**
+     * @brief This method provides to hide a specific menu when the Room Fragment is active.
+     * @param imageView Image of arrow to change.
+     * @param linearLayout Layout of contents where will be changed the status to gone.
+     * @param isOpenedMenu Boolean object that will be changed to "false" value.
+     */
+    private void hideMenu(ImageView imageView, LinearLayout linearLayout, MutableBoolean isOpenedMenu) {
+        imageView.setImageDrawable(AppCompatResources.getDrawable(requireActivity(), R.drawable.ic_arrow_drop_down));
+        linearLayout.setVisibility(View.GONE);
+
+        isOpenedMenu.value = false;
+    }
+
+    /**
+     * @brief This method provides to launch the Login Activity, if the credentials are bad or if
+     *  there is a logout request.
+     * @param toastMessage A message for Toast. The value can be "null", if you wish; in this case
+     *  there will be not any Toast.
+     */
+    private void goToLogin(String toastMessage) {
+        /* Deleting the information for the login. */
+        user.password = "";
+        user.token = "";
+        fileManager.saveObject(user, User.NAMEFILE);
+
+        Intent intentTo = new Intent(getActivity(), LoginActivity.class);
+
+        if (toastMessage != null) {
+            intentTo.putExtra(INTENT_TOAST_MESSAGE, getString(R.string.toastUserError));
+        }
+
+        /* Starting the Login Activity and finishing the hosting Activity for this fragment. */
+        startActivity(intentTo);
+        if (getActivity() != null) {
+            getActivity().finish();
+        }
+    }
+
+    /**
+     * @brief This method provides to generate a Bar Graph for the temperature.
+     * @param listMeasures List of measures required for creating the graph.
+     */
+    private void generateBarGraphTemperature(ArrayList<MeasuresDateAverage> listMeasures) {
+        List<BarEntry> measuresTemperatureBarEntry = new ArrayList<BarEntry>();
+        for (MeasuresDateAverage measuresDateLatestRoom : listMeasures) {
+            measuresTemperatureBarEntry.add(new BarEntry(measuresDateLatestRoom.hour, measuresDateLatestRoom.temperature));
+        }
+
+        BarDataSet temperatureBarDataSet = new BarDataSet(measuresTemperatureBarEntry, "Temperature");
+        temperatureBarDataSet.setColor(getResources().getColor(R.color.secondaryColor));
+        temperatureBarDataSet.setDrawValues(false);
+
+        /* Set a listener for a selected value. In this case will be launched a Toast with the enclosed measures. */
+        barChartTemperature.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
-                toast.makeToastBlueMeasure(
-                        R.drawable.ic_outline_info_24_toast,
-                        getString(R.string.time),
-                        String.format("%02.0f:00", e.getX()),
-                        getString(R.string.temperature),
-                        String.format("%.2f", e.getY()) + " °C"
-                );
+                generalToast.make(R.drawable.ic_info, String.format("%s°C %s %02.0f:00", decimalFormat.format(e.getY()), getString(R.string.toastAtThe), e.getX()));
+                resetColorBarGraph(barChartTemperature);
             }
 
             @Override
             public void onNothingSelected() {
-
             }
         });
 
-        drawBarGraph(graphTemperature, new BarData((dataSetTemperature)));
+        drawBarGraph(barChartTemperature, new BarData((temperatureBarDataSet)));
+    }
 
-        /* Humidity */
-        List<BarEntry> measuresHumidity = new ArrayList<BarEntry>();
-        for (MeasureAverage measure : listMeasures) {
-            measuresHumidity.add(new BarEntry(Integer.parseInt(measure.getHour()), measure.getHumidity()));
+    /**
+     * @brief This method provides to generate a Bar Graph for the humidity.
+     * @param listMeasures List of measures required for creating the graph.
+     */
+    private void generateBarGraphHumidity(ArrayList<MeasuresDateAverage> listMeasures) {
+        List<BarEntry> measuresHumidityBarEntry = new ArrayList<BarEntry>();
+        for (MeasuresDateAverage measure : listMeasures) {
+            measuresHumidityBarEntry.add(new BarEntry(measure.hour, measure.humidity));
         }
 
-        BarDataSet dataSetHumidity = new BarDataSet(measuresHumidity, "Humidity");
-        dataSetHumidity.setColor(getResources().getColor(R.color.primaryColor));
-        dataSetHumidity.setDrawValues(false);
+        BarDataSet humidityBarDataSet = new BarDataSet(measuresHumidityBarEntry, "Humidity");
+        humidityBarDataSet.setColor(getResources().getColor(R.color.secondaryColor));
+        humidityBarDataSet.setDrawValues(false);
 
-        graphHumidity.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+        /* Set a listener for a selected value. In this case will be launched a Toast with the enclosed measures. */
+        barChartHumidity.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
-                toast.makeToastBlueMeasure(
-                        R.drawable.ic_outline_info_24_toast,
-                        getString(R.string.time),
-                        String.format("%02.0f:00", e.getX()),
-                        getString(R.string.humidity),
-                        String.format("%.2f", e.getY()) + " %"
-                );
+                generalToast.make(R.drawable.ic_info, String.format("%s%% %s %02.0f:00", decimalFormat.format(e.getY()), getString(R.string.toastAtThe), e.getX()));
+                resetColorBarGraph(barChartHumidity);
             }
 
             @Override
             public void onNothingSelected() {
-
             }
         });
 
-        drawBarGraph(graphHumidity, new BarData((dataSetHumidity)));
+        drawBarGraph(barChartHumidity, new BarData((humidityBarDataSet)));
     }
 
+    /**
+     * @brief This method provides to draw the graph.
+     * @param graph Graph that will be drawn.
+     * @param data Data necessary for drawing.
+     */
     private void drawBarGraph(BarChart graph, BarData data) {
         graph.setData(data);
 
@@ -220,6 +514,7 @@ public class RoomFragment extends Fragment {
         graph.getXAxis().setGranularity(1);
         graph.getXAxis().setAxisMinimum(-1);
         graph.getXAxis().setAxisMaximum(24);
+        //graph.getXAxis().setAxisMaximum(arrayListMeasuresDateAverage.get(arrayListMeasuresDateAverage.size() - 1).hour + 1);
         graph.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
             public String getAxisLabel(float value, AxisBase axis) {
@@ -234,15 +529,27 @@ public class RoomFragment extends Fragment {
         graph.invalidate();
     }
 
-    public DatabaseService databaseService;
-    public ServiceConnection serviceConnection = new ServiceConnection() {
+    /**
+     * @brief This method provides to reset the color of item select on the specific BarGraph after certain seconds.
+     * @param barChart BarGraph where reset the color.
+     */
+    private void resetColorBarGraph(BarChart barChart) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                barChart.highlightValue(null);
+                //barDataSet.setHighLightColor(getResources().getColor(R.color.secondaryColor));
+            }
+        }, TIME_RESET_COLOR_BAR_GRAPH);
+    }
+
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
             databaseService = localBinder.getService();
 
-            databaseService.getMeasureDateLatest(setting.readToken(), room.getId(), calendarSelected, BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_GET_DATE_LAST + room.getId());
-            databaseService.getMeasuresDateAverage(setting.readToken(), room.getId(), calendarSelected, BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_GET_DATE_AVERAGE + room.getId());
+            databaseService.getRooms(user.getAuthorization(), true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
         }
 
         @Override
@@ -250,60 +557,130 @@ public class RoomFragment extends Fragment {
         }
     };
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context contextFrom, Intent intentFrom) {
             if (intentFrom != null) {
-                if (intentFrom.hasExtra(REQUEST_CODE_SERVICE) && intentFrom.hasExtra(DatabaseService.STATUS_CODE_SERVICE)) {
-                    int statusCode = intentFrom.getIntExtra(DatabaseService.STATUS_CODE_SERVICE, 0);
+                if (intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) && intentFrom.hasExtra(SERVICE_STATUS_CODE)) {
+                    int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                     switch (statusCode) {
                         case 200:
-                            // GET DATE LAST BROADCAST
-                            if (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_GET_DATE_LAST + room.getId()) == 0) {
-                                lastMeasureDate = intentFrom.getParcelableExtra(INTENT_MEASURE);
+                            // GET ACTIVE ROOMS BROADCAST
+                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS) == 0) {
+                                swipeRefreshLayout.setRefreshing(false);
 
-                                textViewLatestTemperature.setTypeface(null, NORMAL);
-                                textViewLatestHumidity.setTypeface(null, NORMAL);
+                                arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE);
 
-                                textViewLatestTemperature.setText(
-                                        String.valueOf(lastMeasureDate.getTemperature()) +
-                                        " °C"
-                                );
+                                /* Checking if there is at least one room, to create the Chips object. */
+                                if (arrayListRoom.isEmpty()) {
+                                    /*
+                                     * Hiding the Toolbar, the menus and the report boxes;
+                                     *  showing only a message and a button to add a Room.
+                                     */
+                                    toolbar.setVisibility(View.GONE);
 
-                                textViewLatestHumidity.setText(
-                                        String.valueOf(lastMeasureDate.getHumidity()) +
-                                        " %"
-                                );
+                                    linearLayoutChipRoom.setVisibility(View.GONE);
+                                    linearLayoutChipDate.setVisibility(View.GONE);
+                                    linearLayoutNoRoom.setVisibility(View.VISIBLE);
 
-                                textViewLatestTime.setText(getString(R.string.textViewLatestMeasurementAt) + lastMeasureDate.getDateAndTime().substring(11, 16));
+                                    nestedScrollView.setVisibility(View.GONE);
+                                } else {
+                                    /* Showing the Toolbar, the menus and the report boxes. */
+                                    toolbar.setVisibility(View.VISIBLE);
+                                    linearLayoutNoRoom.setVisibility(View.GONE);
+                                    nestedScrollView.setVisibility(View.VISIBLE);
 
-                            // GET DATE AVERAGE BROADCAST
-                            } else if (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_GET_DATE_AVERAGE + room.getId()) == 0) {
-                                listMeasuresDateAverage = intentFrom.getParcelableArrayListExtra(INTENT_MEASURE);
+                                    chipGroupRoom.removeAllViews();
+                                    chipRoom.clear();
 
-                                graphTemperature.setVisibility(View.VISIBLE);
-                                graphHumidity.setVisibility(View.VISIBLE);
+                                    for (Room room:arrayListRoom) {
+                                        Chip newChip = new Chip(requireContext());
+                                        newChip.setId(room.id);
+                                        newChip.setText(room.toString());
+                                        newChip.setChipBackgroundColorResource(R.color.secondaryColor);
+                                        newChip.setTextColor(getResources().getColor(R.color.secondaryTextColor));
+                                        newChip.setTextSize(14);
+                                        newChip.setOnClickListener(RoomFragment.this);
+
+                                        chipGroupRoom.addView(newChip);
+                                        chipRoom.add(newChip);
+                                    }
+                                    /* Restoring the latest room selected, or select and set the first and previous room into the list. */
+                                    int selected = 0;
+                                    if (roomSelected != null) {
+                                        /*
+                                         * If the ID of room previously selected is contained into some Chip, will be set the TextView dedicated;
+                                         *  else, will be select and set a previous room.
+                                         */
+                                        for (int c = (chipRoom.size() - 1); c >= 0; c--) {
+                                            selected = c;
+                                            int chipID = chipRoom.get(c).getId();
+
+                                            if (chipID == roomSelected.id) {
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    makeTextChipRoom(arrayListRoom.get(selected));
+
+                                    /* Saving the room selected. */
+                                    roomSelected = arrayListRoom.get(selected);
+                                    fileManager.saveObject(roomSelected, Room.NAMEFILE);
+
+                                    updateMeasures();
+                                }
+                            }
+
+                            // MEASURES DATE LATEST BROADCAST
+                            else if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_LATEST + roomSelected.id) == 0) {
+                                MeasuresDateLatest measuresDateLatest = intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+
+                                textViewRoomLatestTime.setTypeface(null, NORMAL);
+                                textViewRoomLatestTemperature.setTypeface(null, NORMAL);
+                                textViewRoomLatestHumidityMeasure.setTypeface(null, NORMAL);
+
+                                textViewRoomLatestTime.setText(measuresDateLatest.time);
+                                textViewRoomLatestTemperature.setText(String.format("%s °C", decimalFormat.format(measuresDateLatest.temperature)));
+                                textViewRoomLatestHumidityMeasure.setText(String.format("%s %%", decimalFormat.format(measuresDateLatest.humidity)));
+
+                            // MEASURES DATE AVERAGE BROADCAST
+                            } else if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.id) == 0) {
+                                arrayListMeasuresDateAverage = intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE);
+
+                                barChartTemperature.setVisibility(View.VISIBLE);
+                                barChartHumidity.setVisibility(View.VISIBLE);
 
                                 textViewNoticeTemperatureGraph.setVisibility(View.GONE);
                                 textViewNoticeHumidityGraph.setVisibility(View.GONE);
 
-                                generateBarGraph(listMeasuresDateAverage);
+                                generateBarGraphTemperature(arrayListMeasuresDateAverage);
+                                generateBarGraphHumidity(arrayListMeasuresDateAverage);
+
+                            // LOGIN BROADCAST
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
+                                user = intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                fileManager.saveObject(user, User.NAMEFILE);
+
+                                attemptsLogin = 1;
                             }
 
                             break;
                         case 204:
-                            // GET DATE LAST BROADCAST
-                            if (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_GET_DATE_LAST + room.getId()) == 0) {
-                                textViewLatestTemperature.setTypeface(null, ITALIC);
-                                textViewLatestHumidity.setTypeface(null, ITALIC);
+                            // MEASURES DATE LATEST BROADCAST
+                            if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_LATEST + roomSelected.id) == 0) {
+                                textViewRoomLatestTime.setTypeface(null, ITALIC);
+                                textViewRoomLatestTemperature.setTypeface(null, ITALIC);
+                                textViewRoomLatestHumidityMeasure.setTypeface(null, ITALIC);
 
-                                textViewLatestTemperature.setText(getString(R.string.textViewNone));
-                                textViewLatestHumidity.setText(getString(R.string.textViewNone));
+                                textViewRoomLatestTime.setText(getString(R.string.textViewNone));
+                                textViewRoomLatestTemperature.setText(getString(R.string.textViewNone));
+                                textViewRoomLatestHumidityMeasure.setText(getString(R.string.textViewNone));
 
-                            // GET DATE AVERAGE BROADCAST
-                            } else if (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_GET_DATE_AVERAGE + room.getId()) == 0) {
-                                graphTemperature.setVisibility(View.GONE);
-                                graphHumidity.setVisibility(View.GONE);
+                            // MEASURES DATE AVERAGE BROADCAST
+                            } else if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.id) == 0) {
+                                barChartTemperature.setVisibility(View.GONE);
+                                barChartHumidity.setVisibility(View.GONE);
 
                                 textViewNoticeTemperatureGraph.setVisibility(View.VISIBLE);
                                 textViewNoticeTemperatureGraph.setText(R.string.noticeGraphNoMeasure);
@@ -311,6 +688,29 @@ public class RoomFragment extends Fragment {
                                 textViewNoticeHumidityGraph.setText(R.string.noticeGraphNoMeasure);
                             }
 
+                            break;
+
+                        // LOGIN BROADCAST
+                        case 401:
+                            /* Checking the attempts for executing another login, or for launching the Login Activity. */
+                            if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        databaseService.login(user, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                        attemptsLogin++;
+                                    }
+                                }, TIME_LOGIN_TIMEOUT);
+                            } else {
+                                goToLogin(getString(R.string.toastUserError));
+                            }
+
+                            break;
+                        case 404:
+                        case 500:
+                            generalToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
+                            break;
+                        default:
                             break;
                     }
                 }

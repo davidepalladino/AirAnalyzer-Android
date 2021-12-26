@@ -1,3 +1,27 @@
+/*
+ * This model class provides to store the information about the room, get from an API request.
+ *
+ * Copyright (c) 2020 Davide Palladino.
+ * All right reserved.
+ *
+ * @author Davide Palladino
+ * @contact me@davidepalladino.com
+ * @website www.davidepalladino.com
+ * @version 2.0.0
+ * @date 16th October, 2021
+ *
+ * This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 3.0 of the License, or (at your option) any later version
+ *
+ * This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Lesser General Public License for more details.
+ *
+ */
+
 package it.davidepalladino.airanalyzer.model;
 
 import android.os.Parcel;
@@ -5,50 +29,25 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Room implements Parcelable {
+import java.io.Serializable;
+
+public class Room implements Parcelable, Serializable {
+    public static final String NAMEFILE = "room.dat";
+
     @SerializedName("ID")
-    private String id;
+    public byte id;
     @SerializedName("Name")
-    private String name;
+    public String name;
+    @SerializedName("LocalIP")
+    public String localIP;
 
-    public Room() {
-    }
+    public Room() {}
 
-    public Room(String id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
+    // PARCELIZATION
     protected Room(Parcel in) {
-        id = in.readString();
+        id = in.readByte();
         name = in.readString();
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        String returnString = id;
-
-        if (name != null) {
-            returnString += " - " + name;
-        }
-
-        return returnString;
+        localIP = in.readString();
     }
 
     public static final Creator<Room> CREATOR = new Creator<Room>() {
@@ -63,37 +62,28 @@ public class Room implements Parcelable {
         }
     };
 
-    /**
-     * Describe the kinds of special objects contained in this Parcelable
-     * instance's marshaled representation. For example, if the object will
-     * include a file descriptor in the output of {@link #writeToParcel(Parcel, int)},
-     * the return value of this method must include the
-     * {@link #CONTENTS_FILE_DESCRIPTOR} bit.
-     *
-     * @return a bitmask indicating the set of special object types marshaled
-     * by this Parcelable object instance.
-     */
+    @Override
+    public String toString() {
+        String idToString = Byte.toString(id);
+
+        if (name != null) {
+            idToString += " | " + name;
+        } else {
+            idToString += " | <No name>";
+        }
+
+        return idToString;
+    }
+
     @Override
     public int describeContents() {
         return 0;
     }
 
-    /**
-     * Flatten this object in to a Parcel.
-     *
-     * @param dest  The Parcel in which the object should be written.
-     * @param flags Additional flags about how the object should be written.
-     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
-     */
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(name);
-    }
-
-
-    public class NoResponse {
-        public NoResponse() {
-        }
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeByte(id);
+        parcel.writeString(name);
+        parcel.writeString(localIP);
     }
 }

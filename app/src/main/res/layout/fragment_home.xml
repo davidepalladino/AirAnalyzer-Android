@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background"
+    tools:context=".view.fragment.HomeFragment" >
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primaryColor"
+        app:contentInsetStartWithNavigation="0dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:titleTextColor="@color/primaryTextColor"
+        app:subtitleTextColor="@color/primaryTextColor"
+        app:title="@string/appName"/>
+
+    <View
+        android:background="#808080"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/textViewWelcome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="45dp"
+                android:paddingLeft="30dp"
+                android:textSize="40sp"
+                tools:text="@string/textViewWelcomeGoodMorning" />
+
+            <TextView
+                android:id="@+id/textViewNameSurname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="30dp"
+                android:paddingBottom="30dp"
+                android:textSize="20sp"
+                tools:text="Davide Palladino" />
+
+            <TextView
+                android:id="@+id/textViewNoMeasures"
+                android:text="@string/textViewNoMeasures"
+                android:paddingTop="50dp"
+                android:textStyle="italic"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <ListView
+                android:id="@+id/listViewMeasuresToday"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="20dp"
+                android:paddingBottom="56dp"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="15.0sp"
+                android:visibility="gone"
+                android:nestedScrollingEnabled="true"
+                tools:visibility="visible" />
+        </LinearLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</LinearLayout>

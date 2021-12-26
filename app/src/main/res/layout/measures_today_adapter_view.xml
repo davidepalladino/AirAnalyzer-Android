@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_card_home"
+    android:elevation="4dp"
+    android:paddingVertical="15dp"
+    android:paddingStart="25dp"
+    android:paddingEnd="15dp"
+    android:orientation="horizontal" >
+
+    <TextView
+        android:id="@+id/textViewID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_horizontal"
+        android:background="@drawable/shape_home_id"
+        android:textColor="@color/secondaryTextColor"
+        android:textSize="40sp"
+        tools:text="1" />
+
+        <TableLayout
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingStart="15dp" >
+
+            <TableRow>
+                <LinearLayout
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal" >
+                        <TextView
+                            android:id="@+id/textViewName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/secondaryTextColor"
+                            android:textSize="16sp"
+                            tools:text="Cucina" />
+
+                        <TextView
+                            android:id="@+id/textViewTime_MeasuresToday"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="textEnd"
+                            android:textColor="@color/secondaryTextColor"
+                            android:textSize="11sp"
+                            tools:text="21:12" />
+                </LinearLayout>
+            </TableRow>
+
+            <TableRow>
+                <LinearLayout
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:id="@+id/textViewTemperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/secondaryTextColor"
+                        android:textSize="25sp"
+                        tools:text="24.0 °C" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="15dp"
+                        android:textColor="@color/secondaryTextColor"
+                        android:textSize="25sp"
+                        android:text="@string/textViewSeparator" />
+
+                    <TextView
+                        android:id="@+id/textViewHumidity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/secondaryTextColor"
+                        android:textSize="25sp"
+                        tools:text="59,7 %" />
+                </LinearLayout>
+            </TableRow>
+        </TableLayout>
+</LinearLayout>

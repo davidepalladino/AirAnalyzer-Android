@@ -1,3 +1,27 @@
+/*
+ * This view class provides to show a screen, where the user will be able to sign up.
+ *
+ * Copyright (c) 2020 Davide Palladino.
+ * All right reserved.
+ *
+ * @author Davide Palladino
+ * @contact me@davidepalladino.com
+ * @website www.davidepalladino.com
+ * @version 2.0.0
+ * @date 24th November, 2021
+ *
+ * This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 3.0 of the License, or (at your option) any later version
+ *
+ * This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Lesser General Public License for more details.
+ *
+ */
+
 package it.davidepalladino.airanalyzer.view.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,23 +45,18 @@ import android.widget.TextView;
 
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.DatabaseService;
-import it.davidepalladino.airanalyzer.controller.Setting;
+import it.davidepalladino.airanalyzer.controller.FileManager;
+import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.widget.TextWatcherField;
-import it.davidepalladino.airanalyzer.model.Signup;
 import it.davidepalladino.airanalyzer.view.dialog.SignupDialog;
-import it.davidepalladino.airanalyzer.view.widget.Toast;
+import it.davidepalladino.airanalyzer.view.widget.GeneralToast;
 
 import static it.davidepalladino.airanalyzer.controller.CheckField.*;
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.REQUEST_CODE_SERVICE;
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.STATUS_CODE_SERVICE;
-import static it.davidepalladino.airanalyzer.controller.IntentConst.INTENT_BROADCAST;
+import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
+import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
+import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 
 public class SignupActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, TextWatcherField.AuthTextWatcherCallback {
-    private static final String BROADCAST_REQUEST_CODE_MASTER = "SignupActivity";
-    private static final String BROADCAST_REQUEST_CODE_EXTENSION_CHECK_USERNAME = "CheckUsername";
-    private static final String BROADCAST_REQUEST_CODE_EXTENSION_CHECK_EMAIL = "CheckEmail";
-    private static final String BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP = "Signup";
-
     private EditText editTextUsername;
     private EditText editTextPassword;
     private EditText editTextEmail;
@@ -47,14 +66,14 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
     private EditText editTextAnswer2;
     private EditText editTextAnswer3;
 
-    private TextView textViewUsername;
-    private TextView textViewPassword;
-    private TextView textViewEmail;
-    private TextView textViewName;
-    private TextView textViewSurname;
-    private TextView textViewAnswer1;
-    private TextView textViewAnswer2;
-    private TextView textViewAnswer3;
+    private TextView textViewUsernameMessage;
+    private TextView textViewPasswordMessage;
+    private TextView textViewEmailMessage;
+    private TextView textViewNameMessage;
+    private TextView textViewSurnameMessage;
+    private TextView textViewAnswer1Message;
+    private TextView textViewAnswer2Message;
+    private TextView textViewAnswer3Message;
 
     private Spinner spinnerQuestions1;
     private Spinner spinnerQuestions2;
@@ -66,38 +85,40 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
     private String questionSelected2;
     private String questionSelected3;
 
-    private Toast toast;
-    private Setting setting;
-    private Signup signup;
+    private GeneralToast generalToast;
+    private FileManager fileManager;
+    private User user;
+
+    private DatabaseService databaseService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        editTextUsername = (EditText) findViewById(R.id.editTextUsername);
-        editTextPassword = (EditText) findViewById(R.id.editTextPassword);
-        editTextEmail = (EditText) findViewById(R.id.editTextEmail);
-        editTextName = (EditText) findViewById(R.id.editTextName);
-        editTextSurname = (EditText) findViewById(R.id.editTextSurname);
-        editTextAnswer1 = (EditText) findViewById(R.id.editTextAnswer1);
-        editTextAnswer2 = (EditText) findViewById(R.id.editTextAnswer2);
-        editTextAnswer3 = (EditText) findViewById(R.id.editTextAnswer3);
+        editTextUsername = findViewById(R.id.editTextUsername);
+        editTextPassword = findViewById(R.id.editTextPassword);
+        editTextEmail = findViewById(R.id.editTextEmail);
+        editTextName = findViewById(R.id.editTextName);
+        editTextSurname = findViewById(R.id.editTextSurname);
+        editTextAnswer1 = findViewById(R.id.editTextAnswer1);
+        editTextAnswer2 = findViewById(R.id.editTextAnswer2);
+        editTextAnswer3 = findViewById(R.id.editTextAnswer3);
 
-        textViewUsername = (TextView) findViewById(R.id.textViewUsername);
-        textViewPassword = (TextView) findViewById(R.id.textViewPassword);
-        textViewEmail = (TextView) findViewById(R.id.textViewEmail);
-        textViewName = (TextView) findViewById(R.id.textViewName);
-        textViewSurname = (TextView) findViewById(R.id.textViewSurname);
-        textViewAnswer1 = (TextView) findViewById(R.id.textViewAnswer1);
-        textViewAnswer2 = (TextView) findViewById(R.id.textViewAnswer2);
-        textViewAnswer3 = (TextView) findViewById(R.id.textViewAnswer3);
+        textViewUsernameMessage = findViewById(R.id.textViewUsernameMessage);
+        textViewPasswordMessage = findViewById(R.id.textViewPasswordMessage);
+        textViewEmailMessage = findViewById(R.id.textViewEmailMessage);
+        textViewNameMessage = findViewById(R.id.textViewNameMessage);
+        textViewSurnameMessage = findViewById(R.id.textViewSurnameMessage);
+        textViewAnswer1Message = findViewById(R.id.textViewAnswer1Message);
+        textViewAnswer2Message = findViewById(R.id.textViewAnswer2Message);
+        textViewAnswer3Message = findViewById(R.id.textViewAnswer3Message);
 
-        spinnerQuestions1 = (Spinner) findViewById(R.id.spinnerQuestions1);
-        spinnerQuestions2 = (Spinner) findViewById(R.id.spinnerQuestions2);
-        spinnerQuestions3 = (Spinner) findViewById(R.id.spinnerQuestions3);
+        spinnerQuestions1 = findViewById(R.id.spinnerQuestions1);
+        spinnerQuestions2 = findViewById(R.id.spinnerQuestions2);
+        spinnerQuestions3 = findViewById(R.id.spinnerQuestions3);
 
-        buttonContinue = (Button) findViewById(R.id.buttonContinue);
+        buttonContinue = findViewById(R.id.buttonContinue);
 
         editTextUsername.addTextChangedListener(new TextWatcherField(this, editTextUsername));
         editTextPassword.addTextChangedListener(new TextWatcherField(this, editTextPassword));
@@ -108,15 +129,15 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
         editTextAnswer2.addTextChangedListener(new TextWatcherField(this, editTextAnswer2));
         editTextAnswer3.addTextChangedListener(new TextWatcherField(this, editTextAnswer3));
 
-        ArrayAdapter<String> adapterQuestions1 = new ArrayAdapter<String>(this, R.layout.item_spinner, getResources().getStringArray(R.array.Questions1));
+        ArrayAdapter<String> adapterQuestions1 = new ArrayAdapter<String>(this, R.layout.item_spinner, getResources().getStringArray(R.array.spinnerSignupQuestions1));
         adapterQuestions1.setDropDownViewResource(R.layout.item_spinner_dropdown);
         spinnerQuestions1.setAdapter(adapterQuestions1);
 
-        ArrayAdapter<String> adapterQuestions2 = new ArrayAdapter<String>(this, R.layout.item_spinner, getResources().getStringArray(R.array.Questions2));
+        ArrayAdapter<String> adapterQuestions2 = new ArrayAdapter<String>(this, R.layout.item_spinner, getResources().getStringArray(R.array.spinnerSignupQuestions2));
         adapterQuestions2.setDropDownViewResource(R.layout.item_spinner_dropdown);
         spinnerQuestions2.setAdapter(adapterQuestions2);
 
-        ArrayAdapter<String> adapterQuestions3 = new ArrayAdapter<String>(this, R.layout.item_spinner, getResources().getStringArray(R.array.Questions3));
+        ArrayAdapter<String> adapterQuestions3 = new ArrayAdapter<String>(this, R.layout.item_spinner, getResources().getStringArray(R.array.spinnerSignupQuestions3));
         adapterQuestions3.setDropDownViewResource(R.layout.item_spinner_dropdown);
         spinnerQuestions3.setAdapter(adapterQuestions3);
 
@@ -129,61 +150,42 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
             public void onClick(View v) {
                 boolean errorField = false;
 
-                if (!checkAuthEditText(editTextUsername)) {
+                /* Checking the text for every fields. */
+                if (
+                        !checkSyntaxEditText(editTextUsername) ||
+                        !checkSyntaxEditText(editTextPassword) ||
+                        !checkSyntaxEditText(editTextPassword) ||
+                        !checkSyntaxEditText(editTextEmail) ||
+                        !checkSyntaxEditText(editTextName) ||
+                        !checkSyntaxEditText(editTextSurname) ||
+                        !checkSyntaxEditText(editTextAnswer1) ||
+                        !checkSyntaxEditText(editTextAnswer2) ||
+                        !checkSyntaxEditText(editTextAnswer3)
+                ) {
                     errorField = true;
                 }
 
-                if (!checkAuthEditText(editTextPassword)) {
-                    errorField = true;
-                }
-
-                if (!checkAuthEditText(editTextEmail)) {
-                    errorField = true;
-                }
-
-                if (!checkAuthEditText(editTextName)) {
-                    errorField = true;
-                }
-
-                if (!checkAuthEditText(editTextSurname)) {
-                    errorField = true;
-                }
-
-                if (!checkAuthEditText(editTextAnswer1)) {
-                    errorField = true;
-                }
-
-                if (!checkAuthEditText(editTextAnswer2)) {
-                    errorField = true;
-                }
-
-                if (!checkAuthEditText(editTextAnswer3)) {
-                    errorField = true;
-                }
-
+                /*
+                 * If there is not any error, will be created an user object to send to server for the sign up;
+                 *  else, will be shown a Toast message to indicate that there is some error.
+                 */
                 if (!errorField) {
-                    signup = new Signup(
-                            "",
-                            editTextUsername.getText().toString(),
-                            editTextPassword.getText().toString(),
-                            editTextEmail.getText().toString(),
-                            editTextName.getText().toString(),
-                            editTextSurname.getText().toString(),
-                            questionSelected1,
-                            questionSelected2,
-                            questionSelected3,
-                            editTextAnswer1.getText().toString().toLowerCase(),
-                            editTextAnswer2.getText().toString().toLowerCase(),
-                            editTextAnswer3.getText().toString().toLowerCase()
-                    );
+                    user = new User();
+                    user.username = editTextUsername.getText().toString();
+                    user.password = editTextPassword.getText().toString();
+                    user.email = editTextEmail.getText().toString();
+                    user.name = editTextName.getText().toString();
+                    user.surname = editTextSurname.getText().toString();
+                    user.question1 = questionSelected1;
+                    user.question2 = questionSelected2;
+                    user.question3 = questionSelected3;
+                    user.answer1 = editTextAnswer1.getText().toString().toLowerCase();
+                    user.answer2 = editTextAnswer2.getText().toString().toLowerCase();
+                    user.answer3 = editTextAnswer3.getText().toString().toLowerCase();
 
-                    //databaseService.checkUsername(signup.getUsername(), REQUEST_CODE_MASTER + REQUEST_CODE_EXTENSION_CHECK_USERNAME);
-                    //databaseService.checkEmail(signup.getEmail(), REQUEST_CODE_MASTER + REQUEST_CODE_EXTENSION_CHECK_EMAIL);
-
-                    databaseService.signup(signup, BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP);
-
+                    databaseService.signup(user, SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP);
                 } else {
-                    toast.makeToastBlack(R.drawable.ic_baseline_error_24, getString(R.string.toastErrorField));
+                    generalToast.make(R.drawable.ic_error, getString(R.string.toastErrorField));
                 }
             }
         });
@@ -192,8 +194,9 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
     @Override
     protected void onStart() {
         super.onStart();
-        toast = new Toast(SignupActivity.this, getLayoutInflater());
-        setting = new Setting(SignupActivity.this);
+
+        generalToast = new GeneralToast(SignupActivity.this, getLayoutInflater());
+        fileManager = new FileManager(SignupActivity.this);
     }
 
     @Override
@@ -233,87 +236,89 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
     @Override
-    public boolean checkAuthEditText(EditText editText) {
-        TextView errorTextView = null;
-        String errorMessage = "";
+    public boolean checkSyntaxEditText(EditText editText) {
+        TextView textViewMessage = null;
+        String message = "";
 
-        boolean errorSyntax = false;
+        boolean wrongSyntax = false;
 
         switch (editText.getId()) {
             case R.id.editTextUsername:
-                errorTextView = textViewUsername;
-                errorMessage = getString(R.string.errorUsername);
+                databaseService.checkUsername(editText.getText().toString(), SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_CHECK_USERNAME);
 
-                databaseService.checkUsername(editText.getText().toString(), BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_CHECK_USERNAME);
+                textViewMessage = textViewUsernameMessage;
+                message = getString(R.string.emptyFieldUsername);
 
-                if (!checkUsername(editText) && !editText.getText().toString().isEmpty()) {
-                    errorSyntax = true;
-                    errorMessage = getString(R.string.noticeUsername);
+                /* Checking the username syntax and will be reported to the user if is wrong, in the next and final check. */
+                if (!checkUsername(editText)) {
+                    wrongSyntax = true;
+                    message = getString(R.string.wrongSyntaxUsername);
                 }
 
                 break;
             case R.id.editTextPassword:
-                errorTextView = textViewPassword;
-                errorMessage = getString(R.string.errorPassowrd);
+                textViewMessage = textViewPasswordMessage;
+                message = getString(R.string.emptyFieldPassword);
 
-                if (!checkPassword(editText) && !editText.getText().toString().isEmpty()) {
-                    errorSyntax = true;
-                    errorMessage = getString(R.string.noticePassword);
+                /* Checking the password syntax and will be reported to the user if is wrong, in the next and final check. */
+                if (!checkPassword(editText)) {
+                    wrongSyntax = true;
+                    message = getString(R.string.wrongSyntaxPassword);
                 }
 
                 break;
             case R.id.editTextEmail:
-                errorTextView = textViewEmail;
-                errorMessage = getString(R.string.errorEmail);
+                databaseService.checkEmail(editText.getText().toString(), SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_CHECK_EMAIL);
 
-                databaseService.checkEmail(editText.getText().toString(), BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_CHECK_EMAIL);
+                textViewMessage = textViewEmailMessage;
+                message = getString(R.string.errorEmail);
 
-                if (!checkEmail(editText) && !editText.getText().toString().isEmpty()) {
-                    errorSyntax = true;
-                    errorMessage = getString(R.string.noticeEmail);
+                /* Checking the email syntax and will be reported to the user if is wrong, in the next and final check. */
+                if (!checkEmail(editText)) {
+                    wrongSyntax = true;
+                    message = getString(R.string.noticeEmail);
                 }
 
                 break;
             case R.id.editTextName:
-                errorTextView = textViewName;
-                errorMessage = getString(R.string.errorName);
+                textViewMessage = textViewNameMessage;
+                message = getString(R.string.errorName);
                 break;
             case R.id.editTextSurname:
-                errorTextView = textViewSurname;
-                errorMessage = getString(R.string.errorSurname);
+                textViewMessage = textViewSurnameMessage;
+                message = getString(R.string.errorSurname);
                 break;
             case R.id.editTextAnswer1:
-                errorTextView = textViewAnswer1;
-                errorMessage = getString(R.string.errorAnswer);
+                textViewMessage = textViewAnswer1Message;
+                message = getString(R.string.errorAnswer);
                 break;
             case R.id.editTextAnswer2:
-                errorTextView = textViewAnswer2;
-                errorMessage = getString(R.string.errorAnswer);
+                textViewMessage = textViewAnswer2Message;
+                message = getString(R.string.errorAnswer);
                 break;
             case R.id.editTextAnswer3:
-                errorTextView = textViewAnswer3;
-                errorMessage = getString(R.string.errorAnswer);
+                textViewMessage = textViewAnswer3Message;
+                message = getString(R.string.errorAnswer);
                 break;
         }
 
-        if (!editText.getText().toString().isEmpty() && !errorSyntax) {
-            errorTextView.setVisibility(View.GONE);
-
-            return true;
-        } else {
-            errorTextView.setVisibility(View.VISIBLE);
-            errorTextView.setText(errorMessage);
+        /* Checking the actual field and will be reported to the user if is empty or if there is an error of syntax. */
+        if (editText.getText().length() == 0 || wrongSyntax) {
+            textViewMessage.setVisibility(View.VISIBLE);
+            textViewMessage.setText(message);
 
             return false;
+        } else {
+            textViewMessage.setVisibility(View.GONE);
+
+            return true;
         }
     }
 
-    public DatabaseService databaseService;
-    public ServiceConnection serviceConnection = new ServiceConnection() {
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
@@ -325,32 +330,34 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
         }
     };
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context contextFrom, Intent intentFrom) {
         if (intentFrom != null) {
-            if (intentFrom.hasExtra(REQUEST_CODE_SERVICE) && intentFrom.hasExtra(STATUS_CODE_SERVICE)) {
+            if (intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) && intentFrom.hasExtra(SERVICE_STATUS_CODE)) {
                 Intent intentTo = null;
 
-                int statusCode = intentFrom.getIntExtra(STATUS_CODE_SERVICE, 0);
+                int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                 switch (statusCode) {
                     case 201:
                         // CHECK USERNAME BROADCAST
-                        if (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_CHECK_USERNAME) == 0) {
-                            textViewUsername.setVisibility(View.VISIBLE);
-                            textViewUsername.setText(getString(R.string.existsUsername));
+                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_CHECK_USERNAME) == 0) {
+                            textViewUsernameMessage.setVisibility(View.VISIBLE);
+                            textViewUsernameMessage.setText(getString(R.string.existsUsername));
 
                         // CHECK EMAIL BROADCAST
-                        } else if (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_CHECK_EMAIL) == 0) {
-                            textViewEmail.setVisibility(View.VISIBLE);
-                            textViewEmail.setText(getString(R.string.existsEmail));
+                        } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_CHECK_EMAIL) == 0) {
+                            textViewEmailMessage.setVisibility(View.VISIBLE);
+                            textViewEmailMessage.setText(getString(R.string.existsEmail));
 
-                        // SIGN UP
-                        } else if (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP) == 0) {
-                            textViewUsername.setVisibility(View.GONE);
-                            textViewEmail.setVisibility(View.GONE);
+                        // SIGN UP BROADCAST
+                        } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP) == 0) {
+                            textViewUsernameMessage.setVisibility(View.GONE);
+                            textViewEmailMessage.setVisibility(View.GONE);
 
-                            //setting.saveLogin(new Login(signup.getUsername(), signup.getPassword()));
+                            /* Removing the password form the User object and saving it on internal memory of the phone. */
+                            user.password = "";
+                            fileManager.saveObject(user, User.NAMEFILE);
 
                             SignupDialog signupDialog = new SignupDialog();
                             signupDialog.setActivity(SignupActivity.this);
@@ -359,14 +366,16 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
 
                         break;
                     case 403:
-                        toast.makeToastBlack(R.drawable.ic_baseline_error_24, getString(R.string.toastErrorService));
+                        generalToast.make(R.drawable.ic_error, getString(R.string.toastErrorService));
                         break;
                     case 404:
                     case 500:
-                        toast.makeToastBlack(R.drawable.ic_baseline_error_24, getString(R.string.toastServerOffline));
+                        generalToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
                         break;
                     case 422:
-                        toast.makeToastBlack(R.drawable.ic_baseline_error_24, getString(R.string.toastErrorField));
+                        generalToast.make(R.drawable.ic_error, getString(R.string.toastErrorField));
+                        break;
+                    default:
                         break;
                 }
             }

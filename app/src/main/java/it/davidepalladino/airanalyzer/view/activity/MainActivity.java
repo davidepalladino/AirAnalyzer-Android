@@ -1,15 +1,40 @@
+/*
+ * This view class provides to show a screen, where the user can see the several measures for room.
+ *
+ * Copyright (c) 2020 Davide Palladino.
+ * All right reserved.
+ *
+ * @author Davide Palladino
+ * @contact me@davidepalladino.com
+ * @website www.davidepalladino.com
+ * @version 2.0.0
+ * @date 25th December, 2021
+ *
+ * This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 3.0 of the License, or (at your option) any later version
+ *
+ * This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Lesser General Public License for more details.
+ *
+ */
+
 package it.davidepalladino.airanalyzer.view.activity;
 
+import static androidx.work.ExistingPeriodicWorkPolicy.KEEP;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.viewpager.widget.ViewPager;
+import androidx.work.Operation;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
-import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -19,110 +44,148 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.RelativeSizeSpan;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.DatePicker;
 
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
-
+import it.davidepalladino.airanalyzer.AirAnalyzerApplication;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.DatabaseService;
-import it.davidepalladino.airanalyzer.view.widget.Toast;
-import it.davidepalladino.airanalyzer.view.widget.ViewPagerRoom;
-import it.davidepalladino.airanalyzer.controller.Setting;
-import it.davidepalladino.airanalyzer.model.Room;
-import it.davidepalladino.airanalyzer.view.dialog.RemoveRoomDialog;
-import it.davidepalladino.airanalyzer.view.dialog.RenameRoomDialog;
-import it.davidepalladino.airanalyzer.view.fragment.AddFragment;
+import it.davidepalladino.airanalyzer.controller.NotificationErrorWorker;
+import it.davidepalladino.airanalyzer.model.Notification;
+import it.davidepalladino.airanalyzer.model.User;
+import it.davidepalladino.airanalyzer.view.fragment.HomeFragment;
+import it.davidepalladino.airanalyzer.view.fragment.NotificationFragment;
+import it.davidepalladino.airanalyzer.view.fragment.SettingFragment;
 import it.davidepalladino.airanalyzer.view.fragment.RoomFragment;
+import it.davidepalladino.airanalyzer.view.widget.GeneralToast;
+import it.davidepalladino.airanalyzer.controller.FileManager;
 
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.REQUEST_CODE_SERVICE;
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.STATUS_CODE_SERVICE;
-import static it.davidepalladino.airanalyzer.controller.IntentConst.INTENT_BROADCAST;
-import static it.davidepalladino.airanalyzer.controller.IntentConst.INTENT_MESSAGE_TOAST;
-import static it.davidepalladino.airanalyzer.controller.IntentConst.INTENT_ROOM;
-import static it.davidepalladino.airanalyzer.controller.Setting.NAMEPREFERENCE_TOKEN;
+import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
+import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
+import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
+import static it.davidepalladino.airanalyzer.controller.consts.Consts.*;
+import static it.davidepalladino.airanalyzer.model.Notification.*;
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, DatePickerDialog.OnDateSetListener, ViewPager.OnPageChangeListener {
-    public static final String BROADCAST_REQUEST_CODE_MASTER = "MainActivity";
-    public static final String BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOM = "GetActiveRoom";
-    private static final String BROADCAST_REQUEST_CODE_EXTENSION_LOGIN = "Login";
-    private static final String TAB_ADD_ID = "10";
-    private static final String TAB_ADD_NAME = "+";
-    private static final int MAX_ATTEMPTS_LOGIN = 3;
-    private static final int TIMEOUT_TRY_LOGIN = 5000;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private Toolbar toolbarMain;
-    private TabLayout tabLayoutRooms;
-    private ViewPagerRoom viewPagerRooms;
-    private ExtendedFloatingActionButton floatingActionButtonCalendar;
+public class MainActivity extends AppCompatActivity {
+    private AirAnalyzerApplication airAnalyzerApplication;
+    private BottomNavigationView bottomNavigationView;
+    private BadgeDrawable badgeDrawableNotifications;
 
-    private Calendar calendarSelected;
+    private FragmentManager fragmentManager;
+    private HomeFragment fragmentHome;
+    private RoomFragment fragmentRoom;
+    private NotificationFragment fragmentNotification;
+    private SettingFragment fragmentSetting;
+    private Fragment fragmentActive;
 
-    private Toast toast;
-    private Setting setting;
+    private GeneralToast generalToast;
 
-    private AddFragment addFragment;
+    private FileManager fileManager;
+    private User user;
 
-    private int attemptsLogin = 1;
+    private DatabaseService databaseService;
+
+    private byte attemptsLogin = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(this);
+        airAnalyzerApplication = (AirAnalyzerApplication) getApplicationContext();
 
-        toolbarMain = (Toolbar) findViewById(R.id.toolbarMain);
-        setSupportActionBar(toolbarMain);
-
-        viewPagerRooms = (ViewPagerRoom) findViewById(R.id.viewPagerRooms);
-        viewPagerRooms.addOnPageChangeListener(this);
-        viewPagerRooms.setPageMargin(10);
-        //viewPagerRooms.setClipToPadding(false);
-
-        tabLayoutRooms = (TabLayout) findViewById(R.id.tabLayoutRooms);
-        tabLayoutRooms.setupWithViewPager(viewPagerRooms);
-
-        floatingActionButtonCalendar = (ExtendedFloatingActionButton) findViewById(R.id.floatingActionButtonCalendar);
-        floatingActionButtonCalendar.setOnClickListener(new View.OnClickListener() {
+        bottomNavigationView = findViewById(R.id.bottomNavigation);
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                setting.saveRoomPage(viewPagerRooms.getCurrentItem());
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
 
-                new DatePickerDialog(
-                        MainActivity.this,
-                        MainActivity.this,
-                        calendarSelected.get(Calendar.YEAR),
-                        calendarSelected.get(Calendar.MONTH),
-                        calendarSelected.get(Calendar.DAY_OF_MONTH)
-                ).show();
+                // HOME
+                if (id == R.id.menuItemHome) {
+
+                    fragmentManager.beginTransaction().hide((Fragment) fragmentActive).show(fragmentHome).commit();
+                    fragmentActive = fragmentHome;
+                    ((HomeFragment) fragmentActive).updateMeasures();
+
+                // ROOM
+                } else if (id == R.id.menuItemRoom) {
+                    fragmentManager.beginTransaction().hide((Fragment) fragmentActive).show(fragmentRoom).commit();
+                    fragmentActive = fragmentRoom;
+                    ((RoomFragment) fragmentActive).updateMeasures();
+
+                // NOTIFICATIONS
+                } else if (id == R.id.menuItemNotifications) {
+                    fragmentManager.beginTransaction().hide((Fragment) fragmentActive).show(fragmentNotification).commit();
+                    fragmentActive = fragmentNotification;
+
+                    /*
+                     * If the user decided to click the Notification item, will be updated the number considering the latest ID previously
+                     *  saved with the dedicated methods.
+                     */
+                    saveLatestNotificationID(fragmentNotification.arrayListNotificationsLatest);
+                    updateBadge(fragmentNotification.arrayListNotificationsLatest);
+
+                // SETTING
+                } else if (id == R.id.menuItemSetting) {
+                    fragmentManager.beginTransaction().hide((Fragment) fragmentActive).show(fragmentSetting).commit();
+                    fragmentActive = fragmentSetting;
+                }
+
+                return true;
             }
         });
+        badgeDrawableNotifications = bottomNavigationView.getOrCreateBadge(R.id.menuItemNotifications);
+        badgeDrawableNotifications.setHorizontalOffset(10);
+        badgeDrawableNotifications.setVerticalOffset(10);
+        badgeDrawableNotifications.setVisible(false);
+
+        /* Creating the instance for Fragment Manager and every Fragment needed for the application. */
+        fragmentManager = getSupportFragmentManager();
+        fragmentSetting = SettingFragment.newInstance();
+        fragmentNotification = NotificationFragment.newInstance();
+        fragmentRoom = RoomFragment.newInstance();
+        fragmentHome = HomeFragment.newInstance();
+        fragmentActive = fragmentHome;
+
+        /* Adding every Fragment to stack of FragmentManager. */
+        fragmentManager.beginTransaction().add(R.id.frameLayout, fragmentSetting).hide(fragmentSetting).commit();
+        fragmentManager.beginTransaction().add(R.id.frameLayout, fragmentNotification).hide(fragmentNotification).commit();
+        fragmentManager.beginTransaction().add(R.id.frameLayout, fragmentRoom).hide(fragmentRoom).commit();
+        fragmentManager.beginTransaction().add(R.id.frameLayout, fragmentHome).commit();
+
+        /* Forcing the management of menus, calling the home item on Bottom Navigation View. */
+        bottomNavigationView.setSelectedItemId(R.id.menuItemHome);
+        bottomNavigationView.setSelected(true);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        toast = new Toast(MainActivity.this, getLayoutInflater());
-        setting = new Setting(MainActivity.this);
-        calendarSelected = Calendar.getInstance();
+
+        generalToast = new GeneralToast(MainActivity.this, getLayoutInflater());
+
+        fileManager = new FileManager(MainActivity.this);
+        user = (User) fileManager.readObject(User.NAMEFILE);
+
+        WorkManager workManager = WorkManager.getInstance(MainActivity.this);
+        PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest.Builder(NotificationErrorWorker.class, fileManager.readNotificationTime(PREFERENCE_NOTIFICATION_ERROR_TIME), TimeUnit.MINUTES)
+                .build();
+        workManager.enqueueUniquePeriodicWork(NotificationErrorWorker.tag, KEEP, notificationRequest);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        airAnalyzerApplication.setCurrentActivity(this);
 
         registerReceiver(broadcastReceiver, new IntentFilter(INTENT_BROADCAST));
 
@@ -134,207 +197,101 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     protected void onPause() {
         super.onPause();
 
+        if (airAnalyzerApplication.getCurrentActivity() instanceof MainActivity) {
+            airAnalyzerApplication.setCurrentActivity(null);
+        }
+
         unbindService(serviceConnection);
         unregisterReceiver(broadcastReceiver);
     }
 
-    @Override
-    public void onRefresh() {
-        setting.saveRoomPage(viewPagerRooms.getCurrentItem());
-        viewPagerRooms.getAdapter().notifyDataSetChanged();
-
-        databaseService.getActiveRooms(setting.readToken(), BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOM);
-
-        swipeRefreshLayout.setRefreshing(false);
-    }
-
-    @Override
-    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        calendarSelected.set(Calendar.YEAR, year);
-        calendarSelected.set(Calendar.MONTH, month);
-        calendarSelected.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-        viewPagerRooms.getAdapter().notifyDataSetChanged();
-        viewPagerRooms.setCurrentItem(setting.readRoomPage());
-    }
-
-    @Override
-    public boolean onOptionsItemSelected (MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menuItemRenameThisRoom:
-                setting.saveRoomPage(viewPagerRooms.getCurrentItem());
-
-                RenameRoomDialog renameRoomDialog = new RenameRoomDialog();
-                renameRoomDialog.setRoom(pagerAdapterRoom.getRoomAtPosition(setting.readRoomPage()));
-                renameRoomDialog.setToken(setting.readToken());
-                renameRoomDialog.show(getSupportFragmentManager(), "");
-
-                break;
-            case R.id.menuItemRemoveThisRoom:
-                setting.saveRoomPage(viewPagerRooms.getCurrentItem());
-
-                RemoveRoomDialog removeRoomDialog = new RemoveRoomDialog();
-                removeRoomDialog.setRoom(pagerAdapterRoom.getRoomAtPosition(setting.readRoomPage()));
-                removeRoomDialog.setToken(setting.readToken());
-                removeRoomDialog.show(getSupportFragmentManager(), "");
-
-                if (setting.readRoomPage() != 0) {
-                    setting.saveRoomPage(setting.readRoomPage() - 1);
-                } else {
-                    setting.saveRoomPage(0);
-                }
-
-                break;
-            case R.id.menuItemLogout:
-                setting.saveToken("");
-                setting.saveLogin(null);
-
-                Intent intentTo = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intentTo);
-                finish();
-
-                break;
+    /**
+     * @brief This method provides to update the list of notifications if the actual fragment is NotificationFragment.
+     * @param arrayListNotificationsLatest ArrayList of notifications that is necessary for the fragment.
+     */
+    public void updateListNotificationFragment(ArrayList<Notification> arrayListNotificationsLatest) {
+        if (fragmentActive instanceof NotificationFragment) {
+            saveLatestNotificationID(arrayListNotificationsLatest);
         }
 
-        return super.onOptionsItemSelected(item);
+        fragmentNotification.updateList(arrayListNotificationsLatest);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menu.clear();
-        getMenuInflater().inflate(R.menu.menu_toolbar_main, menu);
+    /**
+     * @brief This method provides to update the badge with the number of unread notifications.
+     * @param arrayListNotificationsLatest ArrayList of notifications where will be searched the unseen notification.
+     */
+    public void updateBadge(ArrayList<Notification> arrayListNotificationsLatest) {
+        int totalNotifications = 0;
+        int latestNotificationID = fileManager.readNotificationID(PREFERENCE_NOTIFICATION_LATEST_ID_BADGE);
 
-        return true;
-    }
+        /* Counting the unseen notifications for the badge. */
+        if (arrayListNotificationsLatest != null) {
+            for (Notification notification : arrayListNotificationsLatest) {
+                if (notification.isSeen == 0 && notification.id > latestNotificationID) {
+                    totalNotifications++;
+                }
+            }
+        }
 
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        Menu menuToolbarMain = toolbarMain.getMenu();
-
-        /* Disabling the management of room and the Swipe if the page is 'AddFragment'. */
-        if (pagerAdapterRoom.getRoomAtPosition(position).getId().compareTo(TAB_ADD_ID) != 0) {
-            swipeRefreshLayout.setEnabled(true);
-            floatingActionButtonCalendar.setVisibility(View.VISIBLE);
-
-            onCreateOptionsMenu(menuToolbarMain);
-
-            setting.saveRoomPage(position);
+        /* Setting the badge if the fragment active is not an instance of NotificationFragment. */
+        if (totalNotifications > 0 && !(fragmentActive instanceof NotificationFragment)) {
+            badgeDrawableNotifications.setVisible(true);
+            badgeDrawableNotifications.setNumber(totalNotifications);
         } else {
-            swipeRefreshLayout.setEnabled(false);
-            floatingActionButtonCalendar.setVisibility(View.GONE);
-
-            menuToolbarMain.removeItem(R.id.menuItemRenameThisRoom);
-            menuToolbarMain.removeItem(R.id.menuItemRemoveThisRoom);
+            badgeDrawableNotifications.setVisible(false);
+            badgeDrawableNotifications.clearNumber();
         }
     }
 
-    @Override
-    public void onPageScrollStateChanged(int state) {
-        if (swipeRefreshLayout != null && swipeRefreshLayout.isEnabled()) {
-            swipeRefreshLayout.setEnabled(state == ViewPager.SCROLL_STATE_IDLE);
-        }
-    }
+    /**
+     * @brief This method provides to save the latest ID of unread notification both for badge and Notification.
+     * @param arrayListNotificationsLatest ArrayList of notifications where will be searched the first ID of unseen notification.
+     */
+    public void saveLatestNotificationID(ArrayList<Notification> arrayListNotificationsLatest) {
+        int latestNotificationID = fileManager.readNotificationID(PREFERENCE_NOTIFICATION_LATEST_ID_BADGE);
 
-    public void createViewPagerRoom(ArrayList<Room> listRooms) {
-        pagerAdapterRoom = new PageAdapterRoom(getSupportFragmentManager(), MainActivity.this, listRooms);
-        viewPagerRooms.setAdapter(pagerAdapterRoom);
-    }
-
-    private PageAdapterRoom pagerAdapterRoom;
-    public class PageAdapterRoom extends FragmentStatePagerAdapter {
-        private Activity activity;
-
-        private int nPage;
-        private ArrayList<Room> listTabs;
-
-        public PageAdapterRoom(FragmentManager fragmentManager, Activity activity, ArrayList<Room> listRooms) {
-            super(fragmentManager);
-
-            this.activity = activity;
-
-            if (listRooms != null) {
-                listTabs = listRooms;
-                nPage = listTabs.size() + 1;
-            } else {
-                listTabs = new ArrayList<Room>();
-                nPage = 1;
-            }
-
-            listTabs.add(new Room(TAB_ADD_ID, TAB_ADD_NAME));
-        }
-
-        @Override
-        public int getCount() {
-            return nPage;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            if (position != (nPage - 1)) {
-                return RoomFragment.newInstance(listTabs.get(position), calendarSelected.getTimeInMillis());
-            } else {
-                addFragment = AddFragment.newInstance();
-                return addFragment;
-            }
-        }
-
-        @Override
-        public int getItemPosition(Object object) {
-            if (object instanceof AddFragment) {
-                return POSITION_UNCHANGED;
-            } else {
-                return POSITION_NONE;
-            }
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            if (position != (nPage - 1)) {
-                if (listTabs.get(position).getName() != null) {
-                    return listTabs.get(position).getId() + " | " + listTabs.get(position).getName();
-                } else {
-                    SpannableString spannableString = new SpannableString(listTabs.get(position).getId() + getString(R.string.roomNoName));
-                    spannableString.setSpan(new RelativeSizeSpan(0.6f), 4, 13, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                    return spannableString;
+        /* Searching and save the ID of the first unseen from the list. */
+        if (arrayListNotificationsLatest != null) {
+            for (Notification notification : arrayListNotificationsLatest) {
+                if (notification.isSeen == 0 && notification.id > latestNotificationID) {
+                    fileManager.saveNotitificationID(PREFERENCE_NOTIFICATION_LATEST_ID_BADGE, notification.id);
+                    fileManager.saveNotitificationID(PREFERENCE_NOTIFICATION_LATEST_ID_WORKER, notification.id);
+                    break;
                 }
-            } else {
-                return listTabs.get(position).getName();
             }
-        }
-
-        public Room getRoomAtPosition(int position) {
-            return listTabs.get(position);
-        }
-
-        public int getPositionRoom(Room room) {
-            Iterator<Room> iteratorRoom = listTabs.iterator();
-
-            int position = 0;
-            while (iteratorRoom.hasNext()) {
-                if (iteratorRoom.next().getId().compareTo(room.getId()) == 0) {
-                    return position;
-                }
-
-                position++;
-            }
-
-            return position;
         }
     }
 
-    public DatabaseService databaseService;
-    public ServiceConnection serviceConnection = new ServiceConnection() {
+    /**
+     * @brief This method provides to launch the Login Activity, if the credentials are bad or if
+     *  there is a logout request.
+     * @param toastMessage A message for Toast. The value can be "null", if you wish; in this case
+     *  there will be not any Toast.
+     */
+    private void goToLogin(String toastMessage) {
+        /* Deleting the information for the login. */
+        user.password = "";
+        user.token = "";
+        fileManager.saveObject(user, User.NAMEFILE);
+
+        Intent intentTo = new Intent(MainActivity.this, LoginActivity.class);
+
+        if (toastMessage != null) {
+            intentTo.putExtra(INTENT_TOAST_MESSAGE, getString(R.string.toastUserError));
+        }
+
+        startActivity(intentTo);
+        finish();
+    }
+
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
             databaseService = localBinder.getService();
 
-            databaseService.getActiveRooms(setting.readToken(), BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOM);
+            databaseService.getRooms(user.getAuthorization(), true, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
         }
 
         @Override
@@ -342,78 +299,43 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
     };
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context contextFrom, Intent intentFrom) {
             if (intentFrom != null) {
-                if (intentFrom.hasExtra(REQUEST_CODE_SERVICE) && intentFrom.hasExtra(STATUS_CODE_SERVICE)) {
-                    int statusCode = intentFrom.getIntExtra(STATUS_CODE_SERVICE, 0);
+                if (intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) && intentFrom.hasExtra(SERVICE_STATUS_CODE)) {
+                    int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                     switch (statusCode) {
                         case 200:
-                            // GET ACTIVE ROOMS BROADCAST from this Activity
-                            if (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOM) == 0) {
-                                ArrayList<Room> listRooms = intentFrom.getParcelableArrayListExtra(INTENT_ROOM);
-
-                                createViewPagerRoom(listRooms);
-                                viewPagerRooms.setCurrentItem(setting.readRoomPage());
-
-                            // GET ACTIVE ROOMS BROADCAST from this AddFragment
-                            } else if (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(AddFragment.BROADCAST_REQUEST_CODE_MASTER + AddFragment.BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOM) == 0) {
-                                ArrayList<Room> listRooms = intentFrom.getParcelableArrayListExtra(INTENT_ROOM);
-
-                                Room roomSelected = addFragment.getRoomSelected();
-
-                                createViewPagerRoom(listRooms);
-                                viewPagerRooms.setCurrentItem(pagerAdapterRoom.getPositionRoom(roomSelected));
-
-                                swipeRefreshLayout.setEnabled(true);
-                                floatingActionButtonCalendar.setVisibility(View.VISIBLE);
-
-                                onCreateOptionsMenu(toolbarMain.getMenu());
-
-                            // SET ROOM BROADCAST
-                            // REMOVE ROOM BROADCAST
-                            } else if (
-                                    (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(RenameRoomDialog.BROADCAST_REQUEST_CODE_MASTER + RenameRoomDialog.BROADCAST_REQUEST_CODE_EXTENSION_SET_ROOM) == 0) ||
-                                     (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(RemoveRoomDialog.BROADCAST_REQUEST_CODE_MASTER + RemoveRoomDialog.BROADCAST_REQUEST_CODE_EXTENSION_REMOVE_ROOM) == 0)
-                            ) {
-                                databaseService.getActiveRooms(setting.readToken(), BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOM);
-
                             // LOGIN BROADCAST
-                            } else if (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                setting.saveToken(intentFrom.getStringExtra(NAMEPREFERENCE_TOKEN));
+                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
+                                user = intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                fileManager.saveObject(user, User.NAMEFILE);
+
                                 attemptsLogin = 1;
                             }
 
                             break;
-                        case 204:
-                            // GET ACTIVE ROOMS BROADCAST from this Activity
-                            if (intentFrom.getStringExtra(REQUEST_CODE_SERVICE).compareTo(BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOM) == 0) {
-                                createViewPagerRoom(null);
-                                viewPagerRooms.setCurrentItem(setting.readRoomPage());
-                            }
 
-                            break;
+                        // LOGIN BROADCAST
                         case 401:
+                            /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
-                                        databaseService.login(setting.readLogin(), BROADCAST_REQUEST_CODE_MASTER + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                        databaseService.login(user, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
                                         attemptsLogin++;
                                     }
-                                }, TIMEOUT_TRY_LOGIN);
+                                }, TIME_LOGIN_TIMEOUT);
                             } else {
-                                Intent intentTo = new Intent(MainActivity.this, LoginActivity.class);
-                                intentTo.putExtra(INTENT_MESSAGE_TOAST, getString(R.string.toastUserError));
-                                startActivity(intentTo);
-                                finish();
+                                goToLogin(getString(R.string.toastUserError));
                             }
 
                             break;
                         case 404:
                         case 500:
-                            toast.makeToastBlue(R.drawable.ic_baseline_error_24, getString(R.string.toastServerOffline));
+                            generalToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
                             break;
                         default:
                             break;

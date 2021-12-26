@@ -1,18 +1,47 @@
+/*
+ * This control class provides several constants for the API communication with the Server.
+ *
+ * Copyright (c) 2020 Davide Palladino.
+ * All right reserved.
+ *
+ * @author Davide Palladino
+ * @contact me@davidepalladino.com
+ * @website www.davidepalladino.com
+ * @version 2.0.0
+ * @date 15th December, 2021
+ *
+ * This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 3.0 of the License, or (at your option) any later version
+ *
+ * This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Lesser General Public License for more details.
+ *
+ */
+
 package it.davidepalladino.airanalyzer.controller;
+
+import com.google.gson.JsonArray;
 
 import java.util.ArrayList;
 
-import it.davidepalladino.airanalyzer.model.MeasureAverage;
-import it.davidepalladino.airanalyzer.model.Login;
-import it.davidepalladino.airanalyzer.model.MeasureFull;
-import it.davidepalladino.airanalyzer.model.Room;
-import it.davidepalladino.airanalyzer.model.Signup;
+import it.davidepalladino.airanalyzer.model.MeasuresDateAverage;
+import it.davidepalladino.airanalyzer.model.MeasuresDateLatest;
+import it.davidepalladino.airanalyzer.model.MeasuresTodayLatest;
+import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
+import it.davidepalladino.airanalyzer.model.Room;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 public interface API {
@@ -20,38 +49,42 @@ public interface API {
     String BASE_URL_REMOTE = "http://airanalyzer.servehttp.com:50208/";
 
     @POST("api/login")
-    Call<Login.Response> login(@Body Login login);
+    Call<User> login(@Body User user);
 
     @POST("api/signupAirAnalyzer")
-    Call<Signup.NoResponse> signup(@Body Signup signup);
+    Call<ResponseBody> signup(@Body User user);
 
     @GET("api/checkUsername")
-    Call<Signup.NoResponse> checkUsername(@Query("username") String username);
+    Call<ResponseBody> checkUsername(@Query("username") String username);
 
     @GET("api/checkEmail")
-    Call<Signup.NoResponse> checkEmail(@Query("email") String email);
+    Call<ResponseBody> checkEmail(@Query("email") String email);
 
-    @GET("api/getUser")
-    Call<User> getUser(@Header("Authorization") String token);
-
-    @GET("api/airanalyzer/getActiveRooms")
-    Call<ArrayList<Room>> getActiveRooms(@Header("Authorization") String token);
-
-    @GET("api/airanalyzer/getInactiveRooms")
-    Call<ArrayList<Room>> getInactiveRooms(@Header("Authorization") String token);
+    @GET("api/airanalyzer/getRooms")
+    Call<ArrayList<Room>> getRooms(@Header("Authorization") String token, @Query("IsActive") byte isActive);
 
     @POST("api/airanalyzer/renameRoom")
-    Call<Room.NoResponse> renameRoom(@Header("Authorization") String token, @Body Room room);
+    Call<ResponseBody> renameRoom(@Header("Authorization") String token, @Query("ID") byte roomID, @Query("Name") String roomName);
 
-    @POST("api/airanalyzer/addRoom")
-    Call<Room.NoResponse> addRoom(@Header("Authorization") String token, @Body Room room);
+    @POST("api/airanalyzer/activateRoom")
+    Call<ResponseBody> activateRoom(@Header("Authorization") String token, @Query("ID") byte roomID);
 
-    @POST("api/airanalyzer/removeRoom")
-    Call<Room.NoResponse> removeRoom(@Header("Authorization") String token, @Body Room room);
+    @POST("api/airanalyzer/deactivateRoom")
+    Call<ResponseBody> deactivateRoom(@Header("Authorization") String token, @Query("ID") byte roomID);
 
-    @GET("api/airanalyzer/getMeasureDateLatest")
-    Call<MeasureFull> getMeasureDateLatest(@Header("Authorization") String token, @Query("room") String room, @Query("day") String day, @Query("month") String month, @Query("year") String year, @Query("legal") int legal);
+    @GET("api/airanalyzer/getMeasuresTodayLatest")
+    Call<ArrayList<MeasuresTodayLatest>> getMeasuresTodayLatest(@Header("Authorization") String token, @Query("Date") String date, @Query("UTC") int utc);
+
+    @GET("api/airanalyzer/getMeasuresDateLatest")
+    Call<MeasuresDateLatest> getMeasuresDateLatest(@Header("Authorization") String token, @Query("Room") byte roomID, @Query("Date") String date, @Query("UTC") int utc);
 
     @GET("api/airanalyzer/getMeasuresDateAverage")
-    Call<ArrayList<MeasureAverage>> getMeasuresDateAverage(@Header("Authorization") String token, @Query("room") String room, @Query("day") String day, @Query("month") String month, @Query("year") String year, @Query("legal") int legal);
+    Call<ArrayList<MeasuresDateAverage>> getMeasuresDateAverage(@Header("Authorization") String token, @Query("Room") byte roomID, @Query("Date") String date, @Query("UTC") int utc);
+
+    @GET("api/airanalyzer/getNotificationsLatest")
+    Call<ArrayList<Notification>> getNotificationsLatest(@Header("Authorization") String token, @Query("UTC") int utc);
+
+    @Headers({"Accept: application/json"})
+    @PUT("api/airanalyzer/setStatusNotifications")
+    Call<ResponseBody> setStatusNotifications(@Header("Authorization") String token, @Body JsonArray notifications);
 }

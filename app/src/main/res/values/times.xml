@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The position must be similar to the Spinner about the errors of notifications. -->
+    <integer-array name="timesNotificationErrors">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>480</item>
+    </integer-array>
+</resources>

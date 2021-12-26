@@ -1,9 +1,33 @@
+/*
+ * This view class provides to show a screen, where will be executed the login or the redirection to the
+ *  Login activity.
+ *
+ * Copyright (c) 2020 Davide Palladino.
+ * All right reserved.
+ *
+ * @author Davide Palladino
+ * @contact me@davidepalladino.com
+ * @website www.davidepalladino.com
+ * @version 2.0.0
+ * @date 15th December, 2021
+ *
+ * This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 3.0 of the License, or (at your option) any later version
+ *
+ * This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Lesser General Public License for more details.
+ *
+ */
+
 package it.davidepalladino.airanalyzer.view.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -18,19 +42,21 @@ import android.os.SystemClock;
 
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.DatabaseService;
-import it.davidepalladino.airanalyzer.controller.Setting;
-import it.davidepalladino.airanalyzer.model.Login;
+import it.davidepalladino.airanalyzer.controller.FileManager;
+import it.davidepalladino.airanalyzer.model.User;
 
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.STATUS_CODE_SERVICE;
-import static it.davidepalladino.airanalyzer.controller.Setting.NAMEPREFERENCE_TOKEN;
-import static it.davidepalladino.airanalyzer.controller.IntentConst.*;
+import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
+import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
+import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 
 public class SplashActivity extends AppCompatActivity {
-    private static final String BROADCAST_REQUEST_CODE_MASTER = "SplashActivity";
-    private static final int TIMEOUT_MESSAGE_GO_LOGIN = 5000;
-    private static final int MESSAGE_GO_LOGIN = 1;
+    private static final int TIME_LOGIN_TIMEOUT = 5000;
+    private static final int MESSAGE_LOGIN_TIMEOUT = 1;
 
-    private Setting setting;
+    private FileManager fileManager;
+    private User user;
+
+    private DatabaseService databaseService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +67,9 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        setting = new Setting(SplashActivity.this);
+
+        fileManager = new FileManager(SplashActivity.this);
+        user = (User) fileManager.readObject(User.NAMEFILE);
     }
 
     @Override
@@ -51,7 +79,13 @@ public class SplashActivity extends AppCompatActivity {
         registerReceiver(broadcastReceiver, new IntentFilter(INTENT_BROADCAST));
 
         Intent intentDatabaseService = new Intent(SplashActivity.this, DatabaseService.class);
+        startService(intentDatabaseService);
         bindService(intentDatabaseService, serviceConnection, BIND_AUTO_CREATE);
+
+        /* Checking if there is a previous login and, if not exists, will be launched the Login activity. */
+        if (user == null) {
+            goToLogin();
+        }
     }
 
     @Override
@@ -62,24 +96,19 @@ public class SplashActivity extends AppCompatActivity {
         unregisterReceiver(broadcastReceiver);
     }
 
-    public DatabaseService databaseService;
-    public ServiceConnection serviceConnection = new ServiceConnection() {
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
             databaseService = localBinder.getService();
 
-            Login login = setting.readLogin();
-            if (login != null) {
-                databaseService.login(login, BROADCAST_REQUEST_CODE_MASTER);
+            /* Executing the login and waiting the result within the time defined on TIME_LOGIN_TIMEOUT. */
+            databaseService.login(user, SplashActivity.class.getSimpleName());
 
-                Message messageHandlerGoLogin = new Message();
-                messageHandlerGoLogin.what = MESSAGE_GO_LOGIN;
-
-                handlerTimeout.sendMessageAtTime(messageHandlerGoLogin, SystemClock.uptimeMillis() + TIMEOUT_MESSAGE_GO_LOGIN);
-            } else {
-                goToLogin();
-            }
+            /* Preparing the message for the previously purpose. */
+            Message messageLoginTimeout = new Message();
+            messageLoginTimeout.what = MESSAGE_LOGIN_TIMEOUT;
+            loginTimeout.sendMessageAtTime(messageLoginTimeout, SystemClock.uptimeMillis() + TIME_LOGIN_TIMEOUT);
         }
 
         @Override
@@ -87,48 +116,56 @@ public class SplashActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * @brief This method provides to manage a message like the launch of the Login Activity.
+     */
+    private Handler loginTimeout = new Handler() {
+        /* If has been passed 5 seconds, will be launched the Login activity. */
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            switch (msg.what) {
+                case MESSAGE_LOGIN_TIMEOUT:
+                    goToLogin();
+            }
+        }
+    };
+
+    /**
+     * @brief This method provides to launch the Login Activity, used in several cases.
+     */
     private void goToLogin() {
         Intent intentTo = new Intent(SplashActivity.this, LoginActivity.class);
         startActivity(intentTo);
         finish();
     }
 
-    @SuppressLint("HandlerLeak")
-    private Handler handlerTimeout = new Handler() {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            switch (msg.what) {
-                case MESSAGE_GO_LOGIN:
-                    goToLogin();
-            }
-        }
-    };
-
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context contextFrom, Intent intentFrom) {
             if (intentFrom != null) {
-                if (intentFrom.hasExtra(DatabaseService.REQUEST_CODE_SERVICE) && intentFrom.hasExtra(STATUS_CODE_SERVICE)) {
-                    if (intentFrom.getStringExtra(DatabaseService.REQUEST_CODE_SERVICE).compareTo(BROADCAST_REQUEST_CODE_MASTER) == 0) {
+                if (intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) && intentFrom.hasExtra(SERVICE_STATUS_CODE)) {
+                    if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SplashActivity.class.getSimpleName()) == 0) {
                         Intent intentTo = null;
-                        handlerTimeout.removeMessages(MESSAGE_GO_LOGIN);
+                        loginTimeout.removeMessages(MESSAGE_LOGIN_TIMEOUT);
 
-                        int statusCode = intentFrom.getIntExtra(STATUS_CODE_SERVICE, 0);
+                        /* Checking the result about login by the HTTP status code, provided by the Database Service. */
+                        int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                         switch (statusCode) {
                             case 200:
                                 intentTo = new Intent(SplashActivity.this, MainActivity.class);
-                                setting.saveToken(intentFrom.getStringExtra(NAMEPREFERENCE_TOKEN));
+                                user = (User) intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                fileManager.saveObject(user, User.NAMEFILE);
 
                                 break;
                             case 204:
                                 intentTo = new Intent(SplashActivity.this, LoginActivity.class);
-                                intentTo.putExtra(INTENT_MESSAGE_TOAST, getString(R.string.toastUserNotValidated));
+                                intentTo.putExtra(INTENT_TOAST_MESSAGE, getString(R.string.toastUserNotValidated));
 
                                 break;
                             case 404:
                             case 500:
                                 intentTo = new Intent(SplashActivity.this, LoginActivity.class);
-                                intentTo.putExtra(INTENT_MESSAGE_TOAST, getString(R.string.toastServerOffline));
+                                intentTo.putExtra(INTENT_TOAST_MESSAGE, getString(R.string.toastServerOffline));
 
                                 break;
                             default:
@@ -136,6 +173,7 @@ public class SplashActivity extends AppCompatActivity {
                                 break;
                         }
 
+                        /* Launch the right Activity based the previous checks. */
                         Intent finalIntentTo = intentTo;
                         new Handler().postDelayed(new Runnable() {
                             @Override

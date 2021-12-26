@@ -1,249 +1,398 @@
-<androidx.core.widget.NestedScrollView
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundPrimary" >
+    android:orientation="vertical"
+    android:background="@color/background"
+    tools:context=".view.fragment.RoomFragment" >
 
-    <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="80dp"
-    android:orientation="vertical" >
-
-    <LinearLayout
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/graph_shape"
-            android:orientation="vertical"
-            android:layout_margin="7dp"
-            android:padding="10dp"
-            android:elevation="4dp" >
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primaryColor"
+        app:contentInsetStartWithNavigation="0dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:titleTextColor="@color/primaryTextColor"
+        app:subtitleTextColor="@color/primaryTextColor" >
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-
-                <ImageView
-                    android:id="@+id/imageDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_baseline_today_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/textViewDateSelected"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="@string/textViewDateSelected"
-                    android:textSize="20sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/imageDate"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/textViewDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:textSize="15sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </LinearLayout>
-
+        <!-- ROOM MENU -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/graph_shape"
-            android:orientation="vertical"
-            android:layout_margin="7dp"
-            android:padding="10dp"
-            android:elevation="4dp" >
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="10dp" >
-
-                <ImageView
-                    android:id="@+id/imageGraphTemperature"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_bar_graph"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="@string/temperature"
-                    android:textSize="20sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/imageGraphTemperature"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/graphTemperature"
-                android:layout_width="match_parent"
-                android:layout_height="150dp" />
+            android:layout_gravity="start|center_vertical"
+            android:background="@drawable/snape_toolbar_menu"
+            android:paddingStart="10dp"
+            android:orientation="horizontal" >
 
             <TextView
-                android:id="@+id/textViewNoticeTemperatureGraph"
+                android:id="@+id/textViewRoom"
                 android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:textStyle="italic"
-                android:visibility="gone" />
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                tools:text="5 | Camer…" />
+
+            <ImageView
+                android:id="@+id/imageViewArrowRoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_arrow_drop_down" />
         </LinearLayout>
 
+        <!-- DATE MENU -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/graph_shape"
-            android:orientation="vertical"
-            android:layout_margin="7dp"
-            android:padding="10dp"
-            android:elevation="4dp" >
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="10dp" >
-
-                <ImageView
-                    android:id="@+id/imageGraphHumidity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_bar_graph"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="@string/humidity"
-                    android:textSize="20sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/imageGraphHumidity"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/graphHumidity"
-                android:layout_width="match_parent"
-                android:layout_height="150dp" />
+            android:layout_gravity="center"
+            android:background="@drawable/snape_toolbar_menu"
+            android:paddingStart="10dp"
+            android:orientation="horizontal" >
 
             <TextView
-                android:id="@+id/textViewNoticeHumidityGraph"
+                android:id="@+id/textViewDate"
                 android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:textStyle="italic"
-                android:visibility="gone" />
+                android:layout_height="wrap_content"
+                android:paddingTop="1dp"
+                android:textSize="15sp"
+                tools:text="24/10/2021" />
+
+            <ImageView
+                android:id="@+id/imageViewArrowDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_arrow_drop_down" />
         </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+    <View
+        android:background="#808080"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/graph_shape"
-            android:orientation="vertical"
-            android:layout_margin="7dp"
-            android:padding="10dp"
-            android:elevation="4dp" >
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="10dp" >
-
-                <ImageView
-                    android:id="@+id/LatestMeasurement"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_outline_info_24_card"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="@string/textViewLatestMeasurement"
-                    android:textSize="20sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/LatestMeasurement"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/textViewLatestTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:textSize="15sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
+            <!-- CHIP GROUP FOR ROOM -->
             <LinearLayout
+                android:id="@+id/linearLayoutChipRoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                tools:visibility="visible" >
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupRoom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="true" >
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+
+            <!-- CHIP GROUP FOR DATE -->
+            <LinearLayout
+                android:id="@+id/linearLayoutChipDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                tools:visibility="visible" >
+
+                <com.google.android.material.chip.ChipGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="false" >
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipDateCustom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipBackgroundColor="@color/secondaryColor"
+                        android:textColor="@color/secondaryTextColor"
+                        android:textSize="14sp"
+                        android:text="@string/chipRoomDateCustom" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipDateYesterday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipBackgroundColor="@color/secondaryColor"
+                        android:textColor="@color/secondaryTextColor"
+                        android:textSize="14sp"
+                        android:text="@string/chipRoomDateYesterday" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipDateToday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipBackgroundColor="@color/secondaryColor"
+                        android:textColor="@color/secondaryTextColor"
+                        android:textSize="14sp"
+                        android:text="@string/chipRoomDateToday" />
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+
+            <!-- ROOM NONEXISTENCE -->
+            <LinearLayout
+                android:id="@+id/linearLayoutNoRoom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible" >
+
+                <TextView
+                    android:text="@string/textViewNoRoom"
+                    android:paddingTop="50dp"
+                    android:paddingBottom="25dp"
+                    android:textStyle="italic"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/buttonAdd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/shape_button"
+                    android:text="@string/buttonAdd"
+                    android:textColor="@color/secondaryTextColor" />
+            </LinearLayout>
+
+            <!-- ROOM EXISTENCE -->
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/nestedScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:layout_marginTop="5dp"
-                android:layout_marginHorizontal="25dp">
+                android:background="@color/background"
+                android:visibility="gone"
+                tools:visibility="visible" >
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="center">
+                    android:paddingBottom="80dp"
+                    android:orientation="vertical" >
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_temperature" />
+                    <!-- LATEST MEASUREMENT -->
+                    <LinearLayout
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginVertical="10dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_horizontal" >
 
-                    <TextView
-                        android:id="@+id/textViewLatestTemperature"
-                        android:layout_width="wrap_content"
+                        <!-- HOUR BOX -->
+                        <LinearLayout
+                            android:layout_weight="1"
+                            android:layout_height="75dp"
+                            android:layout_width="0dp"
+                            android:paddingHorizontal="15dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/shape_card_room_latest"
+                            android:gravity="center_vertical"
+                            android:elevation="4dp"
+                            android:orientation="vertical" >
+
+                            <TextView
+                                android:id="@+id/textViewLatestTime"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textColor="@color/secondaryTextColor"
+                                android:textSize="20sp"
+                                tools:text="16:45" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textColor="@color/secondaryTextColor"
+                                android:textSize="11sp"
+                                android:text="@string/latestTime" />
+                        </LinearLayout>
+
+                        <!-- TEMPERATURE BOX -->
+                        <LinearLayout
+                            android:layout_weight="1"
+                            android:layout_height="75dp"
+                            android:layout_width="0dp"
+                            android:paddingHorizontal="15dp"
+                            android:layout_marginHorizontal="10dp"
+                            android:background="@drawable/shape_card_room_latest"
+                            android:gravity="center_vertical"
+                            android:elevation="4dp"
+                            android:orientation="vertical" >
+
+                            <TextView
+                                android:id="@+id/textViewLatestTemperature"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textColor="@color/secondaryTextColor"
+                                android:textSize="20sp"
+                                tools:text="21,7 °C" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textColor="@color/secondaryTextColor"
+                                android:textSize="11sp"
+                                android:text="@string/temperature" />
+                        </LinearLayout>
+
+                        <!-- HUMIDITY BOX -->
+                        <LinearLayout
+                            android:layout_weight="1"
+                            android:layout_height="75dp"
+                            android:layout_width="0dp"
+                            android:paddingHorizontal="15dp"
+                            android:layout_marginStart="10dp"
+                            android:background="@drawable/shape_card_room_latest"
+                            android:gravity="center_vertical"
+                            android:elevation="4dp"
+                            android:orientation="vertical" >
+
+                            <TextView
+                                android:id="@+id/textViewLatestHumidityMeasure"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textColor="@color/secondaryTextColor"
+                                android:textSize="20sp"
+                                tools:text="78.0 %" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textColor="@color/secondaryTextColor"
+                                android:textSize="11sp"
+                                android:text="@string/humidity" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- TEMPERATURE GRAPH -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="@string/textViewNone" />
+                        android:background="@drawable/shape_card_room_graph"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginVertical="10dp"
+                        android:padding="10dp"
+                        android:elevation="4dp"
+                        android:orientation="vertical" >
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="10dp" >
+
+                            <ImageView
+                                android:id="@+id/imageViewTemperature"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_bar_graph"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:text="@string/temperature"
+                                android:textSize="20sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/imageViewTemperature"
+                                app:layout_constraintTop_toTopOf="parent" />
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/barChartTemperature"
+                            android:layout_width="match_parent"
+                            android:layout_height="150dp" />
+
+                        <TextView
+                            android:id="@+id/textViewGraphTemperature"
+                            android:layout_width="wrap_content"
+                            android:layout_height="50dp"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:textStyle="italic"
+                            android:visibility="gone" />
+                    </LinearLayout>
+
+                    <!-- HUMIDITY GRAPH -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/shape_card_room_graph"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginVertical="10dp"
+                        android:padding="10dp"
+                        android:elevation="4dp"
+                        android:orientation="vertical" >
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="10dp" >
+
+                            <ImageView
+                                android:id="@+id/imageViewHumidity"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_bar_graph"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:text="@string/humidity"
+                                android:textSize="20sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/imageViewHumidity"
+                                app:layout_constraintTop_toTopOf="parent" />
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/barChartHumidity"
+                            android:layout_width="match_parent"
+                            android:layout_height="150dp" />
+
+                        <TextView
+                            android:id="@+id/textViewGraphHumidity"
+                            android:layout_width="wrap_content"
+                            android:layout_height="50dp"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:textStyle="italic"
+                            android:visibility="gone" />
+                    </LinearLayout>
                 </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="center" >
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_icona_humidity" />
-
-                    <TextView
-                        android:id="@+id/textViewLatestHumidity"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="@string/textViewNone" />
-                </LinearLayout>
-            </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
         </LinearLayout>
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</LinearLayout>

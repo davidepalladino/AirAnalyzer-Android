@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item android:state_pressed="true" >
+        <shape
+            android:shape="rectangle">
+            <stroke
+                android:width="5dp"
+                android:color="@color/buttonPressed" />
+
+            <solid
+                android:color="@color/buttonPressed" />
+
+            <corners android:radius="5dp" />
+
+            <padding
+                android:left="0dp"
+                android:top="0dp"
+                android:right="0dp"
+                android:bottom="0dp" >
+            </padding>
+        </shape>
+    </item>
+
+    <item android:state_focused="true" >
+        <shape
+            android:shape="rectangle">
+            <stroke
+                android:width="5dp"
+                android:color="@color/buttonFocused" />
+
+            <solid
+                android:color="@color/buttonFocused" />
+
+            <corners android:radius="5dp" />
+
+            <padding
+                android:left="0dp"
+                android:top="0dp"
+                android:right="0dp"
+                android:bottom="0dp" >
+            </padding>
+        </shape>
+    </item>
+
+    <item>
+        <shape
+            android:shape="rectangle">
+            <stroke
+                android:width="5dp"
+                android:color="@color/button" />
+
+            <solid
+                android:color="@color/button" />
+
+            <corners android:radius="5dp" />
+
+            <padding
+                android:left="0dp"
+                android:top="0dp"
+                android:right="0dp"
+                android:bottom="0dp" >
+            </padding>
+        </shape>
+    </item>
+</selector>
