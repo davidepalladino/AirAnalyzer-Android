@@ -50,8 +50,8 @@ public interface API {
     Call<Room.NoResponse> removeRoom(@Header("Authorization") String token, @Body Room room);
 
     @GET("api/airanalyzer/getMeasureDateLatest")
-    Call<MeasureFull> getMeasureDateLatest(@Header("Authorization") String token, @Query("room") String room, @Query("day") String day, @Query("month") String month, @Query("year") String year);
+    Call<MeasureFull> getMeasureDateLatest(@Header("Authorization") String token, @Query("room") String room, @Query("day") String day, @Query("month") String month, @Query("year") String year, @Query("legal") int legal);
 
     @GET("api/airanalyzer/getMeasuresDateAverage")
-    Call<ArrayList<MeasureAverage>> getMeasuresDateAverage(@Header("Authorization") String token, @Query("room") String room, @Query("day") String day, @Query("month") String month, @Query("year") String year);
+    Call<ArrayList<MeasureAverage>> getMeasuresDateAverage(@Header("Authorization") String token, @Query("room") String room, @Query("day") String day, @Query("month") String month, @Query("year") String year, @Query("legal") int legal);
 }

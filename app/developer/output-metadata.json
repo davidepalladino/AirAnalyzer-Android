@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "it.davidepalladino.airanalyzer.developer",
+  "variantName": "developer",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "versionCode": 4,
+      "versionName": "1.1.2-developer",
+      "outputFile": "app-developer.apk"
+    }
+  ]
+}

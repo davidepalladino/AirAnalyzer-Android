@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.viewpager.widget.ViewPager;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
 
 public class ViewPagerRoom extends ViewPager {
     public ViewPagerRoom(@NonNull Context context) {

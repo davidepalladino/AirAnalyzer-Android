@@ -287,7 +287,8 @@ public class DatabaseService extends Service {
                 roomID,
                 String.valueOf(calendarSelected.get(Calendar.DAY_OF_MONTH)),
                 String.valueOf(calendarSelected.get(Calendar.MONTH) + 1),
-                String.valueOf(calendarSelected.get(Calendar.YEAR))
+                String.valueOf(calendarSelected.get(Calendar.YEAR)),
+                calendarSelected.get(Calendar.DST_OFFSET) > 0 ? 1 : 0                    // This indicates that is legal time.
         );
 
         call.enqueue(new Callback<MeasureFull>() {
@@ -315,7 +316,8 @@ public class DatabaseService extends Service {
                 roomID,
                 String.valueOf(calendarSelected.get(Calendar.DAY_OF_MONTH)),
                 String.valueOf(calendarSelected.get(Calendar.MONTH) + 1),
-                String.valueOf(calendarSelected.get(Calendar.YEAR))
+                String.valueOf(calendarSelected.get(Calendar.YEAR)),
+                calendarSelected.get(Calendar.DST_OFFSET) > 0 ? 1 : 0                    // This indicates that is legal time.
         );
 
         call.enqueue(new Callback<ArrayList<MeasureAverage>>() {
