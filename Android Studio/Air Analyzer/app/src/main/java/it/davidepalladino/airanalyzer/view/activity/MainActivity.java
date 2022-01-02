@@ -30,9 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.work.Operation;
 import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.content.BroadcastReceiver;
@@ -66,12 +64,10 @@ import it.davidepalladino.airanalyzer.controller.FileManager;
 import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
-import static it.davidepalladino.airanalyzer.controller.consts.Consts.*;
+import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 import static it.davidepalladino.airanalyzer.model.Notification.*;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {

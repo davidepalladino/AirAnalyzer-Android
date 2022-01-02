@@ -51,9 +51,9 @@ public class User implements Parcelable, Serializable {
     public String token;
 
     /**
-     * @brief ThThis method provides to get the authorization string for several purpose.is constructor provides only to allocate the object.
+     * @brief This constructor provides only to allocate the object.
      */
-    public User () {
+    public User() {
     }
 
     /**

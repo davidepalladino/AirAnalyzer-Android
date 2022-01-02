@@ -68,16 +68,16 @@ public class Notification implements Parcelable {
     };
 
     @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeString(dateAndTime);
         dest.writeString(type);
         dest.writeString(name);
         dest.writeByte(isSeen);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
     }
 }

@@ -90,7 +90,7 @@ import static android.graphics.Typeface.ITALIC;
 import static android.graphics.Typeface.NORMAL;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
-import static it.davidepalladino.airanalyzer.controller.consts.Consts.*;
+import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
 
 public class RoomFragment extends Fragment implements View.OnClickListener {

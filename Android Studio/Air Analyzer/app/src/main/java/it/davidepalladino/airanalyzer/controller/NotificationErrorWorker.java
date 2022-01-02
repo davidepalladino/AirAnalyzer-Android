@@ -28,7 +28,7 @@ package it.davidepalladino.airanalyzer.controller;
 
 import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
-import static it.davidepalladino.airanalyzer.controller.consts.Consts.*;
+import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.INTENT_BROADCAST;
 import static it.davidepalladino.airanalyzer.model.Notification.PREFERENCE_NOTIFICATION_LATEST_ID_WORKER;
 

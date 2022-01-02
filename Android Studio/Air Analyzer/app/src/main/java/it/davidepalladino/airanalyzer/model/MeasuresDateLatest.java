@@ -56,16 +56,15 @@ public class MeasuresDateLatest implements Parcelable {
         }
     };
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(time);
         dest.writeFloat(temperature);
         dest.writeFloat(humidity);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
     }
 }

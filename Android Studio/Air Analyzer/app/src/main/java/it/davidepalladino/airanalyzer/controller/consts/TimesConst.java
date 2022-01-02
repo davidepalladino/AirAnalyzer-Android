@@ -24,10 +24,9 @@
 
 package it.davidepalladino.airanalyzer.controller.consts;
 
-public interface Consts {
+public interface TimesConst {
     static final byte MAX_ATTEMPTS_LOGIN = 3;
     static final int TIME_LOGIN_TIMEOUT = 3000;
     static final int TIME_ADD_DEVICE = 30000;
     static final int TIME_RESET_COLOR_BAR_GRAPH = 2500;
-    static final int TIME_INTERVALS_NOTIFICATION[] = {15, 30, 60};
 }

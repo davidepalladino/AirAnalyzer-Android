@@ -29,7 +29,7 @@ import static it.davidepalladino.airanalyzer.controller.ClientSocket.*;
 import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
-import static it.davidepalladino.airanalyzer.controller.consts.Consts.*;
+import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 

@@ -28,7 +28,7 @@ import static android.content.Context.BIND_AUTO_CREATE;
 import static android.graphics.Typeface.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
-import static it.davidepalladino.airanalyzer.controller.consts.Consts.*;
+import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
 
 import android.content.BroadcastReceiver;
