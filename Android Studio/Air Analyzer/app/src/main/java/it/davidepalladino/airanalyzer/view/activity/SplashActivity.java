@@ -8,8 +8,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 15th December, 2021
+ * @version 2.0.1
+ * @date 3rd January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -28,6 +28,7 @@ package it.davidepalladino.airanalyzer.view.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -48,15 +49,14 @@ import it.davidepalladino.airanalyzer.model.User;
 import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
+import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 
+@SuppressLint("CustomSplashScreen")
 public class SplashActivity extends AppCompatActivity {
-    private static final int TIME_LOGIN_TIMEOUT = 5000;
-    private static final int MESSAGE_LOGIN_TIMEOUT = 1;
+    private final int MESSAGE_LOGIN_TIMEOUT = 1;
 
     private FileManager fileManager;
     private User user;
-
-    private DatabaseService databaseService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +100,7 @@ public class SplashActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
-            databaseService = localBinder.getService();
+            DatabaseService databaseService = localBinder.getService();
 
             /* Executing the login and waiting the result within the time defined on TIME_LOGIN_TIMEOUT. */
             databaseService.login(user, SplashActivity.class.getSimpleName());
@@ -119,7 +119,9 @@ public class SplashActivity extends AppCompatActivity {
     /**
      * @brief This method provides to manage a message like the launch of the Login Activity.
      */
-    private Handler loginTimeout = new Handler() {
+    @SuppressWarnings("deprecation")
+    @SuppressLint("HandlerLeak")
+    private final Handler loginTimeout = new Handler() {
         /* If has been passed 5 seconds, will be launched the Login activity. */
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -145,7 +147,7 @@ public class SplashActivity extends AppCompatActivity {
             if (intentFrom != null) {
                 if (intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) && intentFrom.hasExtra(SERVICE_STATUS_CODE)) {
                     if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SplashActivity.class.getSimpleName()) == 0) {
-                        Intent intentTo = null;
+                        Intent intentTo;
                         loginTimeout.removeMessages(MESSAGE_LOGIN_TIMEOUT);
 
                         /* Checking the result about login by the HTTP status code, provided by the Database Service. */
@@ -175,14 +177,9 @@ public class SplashActivity extends AppCompatActivity {
 
                         /* Launch the right Activity based the previous checks. */
                         Intent finalIntentTo = intentTo;
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (finalIntentTo != null) {
-                                    startActivity(finalIntentTo);
-                                    finish();
-                                }
-                            }
+                        new Handler().postDelayed(() -> {
+                            startActivity(finalIntentTo);
+                            finish();
                         }, 2000);
                     }
                 }
