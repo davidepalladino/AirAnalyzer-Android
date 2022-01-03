@@ -27,6 +27,7 @@ package it.davidepalladino.airanalyzer.view.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -52,6 +53,7 @@ import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 
+@SuppressLint("NonConstantResourceId")
 public class LoginActivity extends AppCompatActivity implements TextWatcherField.AuthTextWatcherCallback, View.OnClickListener {
     private EditText editTextUsername;
     private EditText editTextPassword;
@@ -174,7 +176,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcherField
                 message = getString(R.string.emptyFieldUsername);
 
                 /* Checking the username syntax and will be reported to the user if is wrong, in the next and final check. */
-                if (!checkUsername(editText) && !editText.getText().toString().isEmpty()) {
+                if (!checkUsername(editText.getText().toString()) && !editText.getText().toString().isEmpty()) {
                     wrongSyntax = true;
                     message = getString(R.string.wrongSyntaxUsername);
 
@@ -188,7 +190,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcherField
                 message = getString(R.string.emptyFieldPassword);
 
                 /* Checking the password syntax and will be reported to the user if is wrong, in the next and final check. */
-                if (!checkPassword(editText) && !editText.getText().toString().isEmpty()) {
+                if (!checkPassword(editText.getText().toString()) && !editText.getText().toString().isEmpty()) {
                     wrongSyntax = true;
                     message = getString(R.string.wrongSyntaxPassword);
 
@@ -200,11 +202,13 @@ public class LoginActivity extends AppCompatActivity implements TextWatcherField
 
         /* Checking the actual field and will be reported to the user if is empty or if there is an error of syntax. */
         if (editText.getText().length() == 0 || wrongSyntax) {
+            assert textViewMessage != null;
             textViewMessage.setVisibility(View.VISIBLE);
             textViewMessage.setText(message);
 
             return false;
         } else {
+            assert textViewMessage != null;
             textViewMessage.setVisibility(View.GONE);
 
             return true;
