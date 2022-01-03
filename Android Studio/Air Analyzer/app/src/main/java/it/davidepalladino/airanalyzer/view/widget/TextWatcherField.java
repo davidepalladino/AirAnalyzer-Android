@@ -9,8 +9,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 1.0.0
- * @date 17th November, 2021
+ * @version 1.0.1
+ * @date 3rd January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -35,8 +35,8 @@ public class TextWatcherField implements TextWatcher {
         boolean checkSyntaxEditText(EditText editText);
     }
 
-    private AuthTextWatcherCallback callback;
-    private EditText editText;
+    private final AuthTextWatcherCallback callback;
+    private final EditText editText;
 
     public TextWatcherField(AuthTextWatcherCallback callback, EditText editText) {
         this.callback = callback;

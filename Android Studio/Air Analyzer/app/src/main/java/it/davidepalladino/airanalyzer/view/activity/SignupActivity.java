@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 24th November, 2021
+ * @version 2.0.1
+ * @date 3rd January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -26,6 +26,7 @@ package it.davidepalladino.airanalyzer.view.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -56,6 +57,7 @@ import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 
+@SuppressLint("NonConstantResourceId")
 public class SignupActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, TextWatcherField.AuthTextWatcherCallback {
     private EditText editTextUsername;
     private EditText editTextPassword;
@@ -74,12 +76,6 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
     private TextView textViewAnswer1Message;
     private TextView textViewAnswer2Message;
     private TextView textViewAnswer3Message;
-
-    private Spinner spinnerQuestions1;
-    private Spinner spinnerQuestions2;
-    private Spinner spinnerQuestions3;
-
-    private Button buttonContinue;
 
     private String questionSelected1;
     private String questionSelected2;
@@ -114,11 +110,11 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
         textViewAnswer2Message = findViewById(R.id.textViewAnswer2Message);
         textViewAnswer3Message = findViewById(R.id.textViewAnswer3Message);
 
-        spinnerQuestions1 = findViewById(R.id.spinnerQuestions1);
-        spinnerQuestions2 = findViewById(R.id.spinnerQuestions2);
-        spinnerQuestions3 = findViewById(R.id.spinnerQuestions3);
+        Spinner spinnerQuestions1 = findViewById(R.id.spinnerQuestions1);
+        Spinner spinnerQuestions2 = findViewById(R.id.spinnerQuestions2);
+        Spinner spinnerQuestions3 = findViewById(R.id.spinnerQuestions3);
 
-        buttonContinue = findViewById(R.id.buttonContinue);
+        Button buttonContinue = findViewById(R.id.buttonContinue);
 
         editTextUsername.addTextChangedListener(new TextWatcherField(this, editTextUsername));
         editTextPassword.addTextChangedListener(new TextWatcherField(this, editTextPassword));
@@ -129,15 +125,15 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
         editTextAnswer2.addTextChangedListener(new TextWatcherField(this, editTextAnswer2));
         editTextAnswer3.addTextChangedListener(new TextWatcherField(this, editTextAnswer3));
 
-        ArrayAdapter<String> adapterQuestions1 = new ArrayAdapter<String>(this, R.layout.item_spinner, getResources().getStringArray(R.array.spinnerSignupQuestions1));
+        ArrayAdapter<String> adapterQuestions1 = new ArrayAdapter<>(this, R.layout.item_spinner, getResources().getStringArray(R.array.spinnerSignupQuestions1));
         adapterQuestions1.setDropDownViewResource(R.layout.item_spinner_dropdown);
         spinnerQuestions1.setAdapter(adapterQuestions1);
 
-        ArrayAdapter<String> adapterQuestions2 = new ArrayAdapter<String>(this, R.layout.item_spinner, getResources().getStringArray(R.array.spinnerSignupQuestions2));
+        ArrayAdapter<String> adapterQuestions2 = new ArrayAdapter<>(this, R.layout.item_spinner, getResources().getStringArray(R.array.spinnerSignupQuestions2));
         adapterQuestions2.setDropDownViewResource(R.layout.item_spinner_dropdown);
         spinnerQuestions2.setAdapter(adapterQuestions2);
 
-        ArrayAdapter<String> adapterQuestions3 = new ArrayAdapter<String>(this, R.layout.item_spinner, getResources().getStringArray(R.array.spinnerSignupQuestions3));
+        ArrayAdapter<String> adapterQuestions3 = new ArrayAdapter<>(this, R.layout.item_spinner, getResources().getStringArray(R.array.spinnerSignupQuestions3));
         adapterQuestions3.setDropDownViewResource(R.layout.item_spinner_dropdown);
         spinnerQuestions3.setAdapter(adapterQuestions3);
 
@@ -145,48 +141,45 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
         spinnerQuestions2.setOnItemSelectedListener(this);
         spinnerQuestions3.setOnItemSelectedListener(this);
 
-        buttonContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean errorField = false;
+        buttonContinue.setOnClickListener(v -> {
+            boolean errorField = false;
 
-                /* Checking the text for every fields. */
-                if (
-                        !checkSyntaxEditText(editTextUsername) ||
-                        !checkSyntaxEditText(editTextPassword) ||
-                        !checkSyntaxEditText(editTextPassword) ||
-                        !checkSyntaxEditText(editTextEmail) ||
-                        !checkSyntaxEditText(editTextName) ||
-                        !checkSyntaxEditText(editTextSurname) ||
-                        !checkSyntaxEditText(editTextAnswer1) ||
-                        !checkSyntaxEditText(editTextAnswer2) ||
-                        !checkSyntaxEditText(editTextAnswer3)
-                ) {
-                    errorField = true;
-                }
+            /* Checking the text for every fields. */
+            if (
+                    !checkSyntaxEditText(editTextUsername) ||
+                    !checkSyntaxEditText(editTextPassword) ||
+                    !checkSyntaxEditText(editTextPassword) ||
+                    !checkSyntaxEditText(editTextEmail) ||
+                    !checkSyntaxEditText(editTextName) ||
+                    !checkSyntaxEditText(editTextSurname) ||
+                    !checkSyntaxEditText(editTextAnswer1) ||
+                    !checkSyntaxEditText(editTextAnswer2) ||
+                    !checkSyntaxEditText(editTextAnswer3)
+            ) {
+                errorField = true;
+            }
 
-                /*
-                 * If there is not any error, will be created an user object to send to server for the sign up;
-                 *  else, will be shown a Toast message to indicate that there is some error.
-                 */
-                if (!errorField) {
-                    user = new User();
-                    user.username = editTextUsername.getText().toString();
-                    user.password = editTextPassword.getText().toString();
-                    user.email = editTextEmail.getText().toString();
-                    user.name = editTextName.getText().toString();
-                    user.surname = editTextSurname.getText().toString();
-                    user.question1 = questionSelected1;
-                    user.question2 = questionSelected2;
-                    user.question3 = questionSelected3;
-                    user.answer1 = editTextAnswer1.getText().toString().toLowerCase();
-                    user.answer2 = editTextAnswer2.getText().toString().toLowerCase();
-                    user.answer3 = editTextAnswer3.getText().toString().toLowerCase();
+            /*
+             * If there is not any error, will be created an user object to send to server for the sign up;
+             *  else, will be shown a Toast message to indicate that there is some error.
+             */
+            if (!errorField) {
+                user = new User();
+                user.username = editTextUsername.getText().toString();
+                user.password = editTextPassword.getText().toString();
+                user.email = editTextEmail.getText().toString();
+                user.name = editTextName.getText().toString();
+                user.surname = editTextSurname.getText().toString();
+                user.question1 = questionSelected1;
+                user.question2 = questionSelected2;
+                user.question3 = questionSelected3;
+                user.answer1 = editTextAnswer1.getText().toString().toLowerCase();
+                user.answer2 = editTextAnswer2.getText().toString().toLowerCase();
+                user.answer3 = editTextAnswer3.getText().toString().toLowerCase();
 
-                    databaseService.signup(user, SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP);
-                } else {
-                    generalToast.make(R.drawable.ic_error, getString(R.string.toastErrorField));
-                }
+                databaseService.signup(user, SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP);
+            } else {
+                generalToast.make(R.drawable.ic_error, getString(R.string.toastErrorField));
             }
         });
     }
@@ -253,7 +246,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
                 message = getString(R.string.emptyFieldUsername);
 
                 /* Checking the username syntax and will be reported to the user if is wrong, in the next and final check. */
-                if (!checkUsername(editText)) {
+                if (!checkUsername(editText.getText().toString())) {
                     wrongSyntax = true;
                     message = getString(R.string.wrongSyntaxUsername);
                 }
@@ -264,7 +257,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
                 message = getString(R.string.emptyFieldPassword);
 
                 /* Checking the password syntax and will be reported to the user if is wrong, in the next and final check. */
-                if (!checkPassword(editText)) {
+                if (!checkPassword(editText.getText().toString())) {
                     wrongSyntax = true;
                     message = getString(R.string.wrongSyntaxPassword);
                 }
@@ -277,7 +270,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
                 message = getString(R.string.errorEmail);
 
                 /* Checking the email syntax and will be reported to the user if is wrong, in the next and final check. */
-                if (!checkEmail(editText)) {
+                if (!checkEmail(editText.getText().toString())) {
                     wrongSyntax = true;
                     message = getString(R.string.noticeEmail);
                 }
@@ -307,11 +300,13 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
 
         /* Checking the actual field and will be reported to the user if is empty or if there is an error of syntax. */
         if (editText.getText().length() == 0 || wrongSyntax) {
+            assert textViewMessage != null;
             textViewMessage.setVisibility(View.VISIBLE);
             textViewMessage.setText(message);
 
             return false;
         } else {
+            assert textViewMessage != null;
             textViewMessage.setVisibility(View.GONE);
 
             return true;
@@ -335,8 +330,6 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
         public void onReceive(Context contextFrom, Intent intentFrom) {
         if (intentFrom != null) {
             if (intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) && intentFrom.hasExtra(SERVICE_STATUS_CODE)) {
-                Intent intentTo = null;
-
                 int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                 switch (statusCode) {
                     case 201:
