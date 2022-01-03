@@ -8,8 +8,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 1.0.0
- * @date 26th December, 2021
+ * @version 2.0.1
+ * @date 3rd January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -25,12 +25,11 @@
 
 package it.davidepalladino.airanalyzer.controller;
 
-
 import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
-import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.INTENT_BROADCAST;
-import static it.davidepalladino.airanalyzer.model.Notification.PREFERENCE_NOTIFICATION_LATEST_ID_WORKER;
+import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
+import static it.davidepalladino.airanalyzer.model.Notification.*;
 
 import android.app.Activity;
 import android.app.NotificationChannel;
@@ -63,15 +62,14 @@ import it.davidepalladino.airanalyzer.view.activity.MainActivity;
 public class NotificationErrorWorker extends Worker {
     public static final String tag = "NotificationErrorWorker";
 
-    private Context context;
+    private final Context context;
 
     private NotificationChannel notificationChannel;
-    private String channelId;
+    private final String channelID;
 
-    private Calendar date;
-    private int utc;
+    private final int utc;
 
-    private FileManager fileManager;
+    private final FileManager fileManager;
     private User user;
 
     private DatabaseService databaseService;
@@ -84,11 +82,11 @@ public class NotificationErrorWorker extends Worker {
 
         this.context = context;
 
-        channelId = NotificationErrorWorker.class.getSimpleName();
+        channelID = NotificationErrorWorker.class.getSimpleName();
 
         if (Build.VERSION.SDK_INT > 25) {
             notificationChannel = new NotificationChannel(
-                    channelId,
+                    channelID,
                     context.getString(R.string.notificationErrorChannelName),
                     NotificationManager.IMPORTANCE_HIGH);
             notificationChannel.setDescription(context.getString(R.string.notificationErrorChannelDescription));
@@ -97,7 +95,7 @@ public class NotificationErrorWorker extends Worker {
         fileManager = new FileManager(context);
         user = (User) fileManager.readObject(User.NAMEFILE);
 
-        date = Calendar.getInstance();
+        Calendar date = Calendar.getInstance();
         utc = ManageDatetime.getUTC(date);
     }
 
@@ -164,12 +162,12 @@ public class NotificationErrorWorker extends Worker {
                                 }
 
                                 /* Searching the latest notification not seen. */
-                                int latestID = fileManager.readNotificationID(PREFERENCE_NOTIFICATION_LATEST_ID_WORKER);
+                                int latestID = fileManager.readPreferenceNotificationID(NAMEFILE, PREFERENCE_NOTIFICATION_LATEST_ID_WORKER);
                                 for (Notification notification: arrayListNotificationsLatest) {
                                     if (latestID < notification.id && notification.isSeen == 0) {
                                         byte notificationManagerID = 0;
 
-                                        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(contextFrom, channelId);
+                                        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(contextFrom, channelID);
 
                                         /* Preparing the right notification based of the type of error. */
                                         if (notification.type.equals("ERROR_NOT_UPDATED")) {
@@ -195,7 +193,7 @@ public class NotificationErrorWorker extends Worker {
                                         notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH)
                                                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                                                 .setAutoCancel(true)
-                                                .setChannelId(channelId);
+                                                .setChannelId(channelID);
 
                                         NotificationManager notificationManager = (NotificationManager) contextFrom.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -205,7 +203,7 @@ public class NotificationErrorWorker extends Worker {
 
                                         notificationManager.notify(notificationManagerID, notificationBuilder.build());
 
-                                        fileManager.saveNotitificationID(PREFERENCE_NOTIFICATION_LATEST_ID_WORKER, notification.id);
+                                        fileManager.savePreferenceNotificationID(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_LATEST_ID_WORKER, notification.id);
 
                                         contextFrom.unbindService(serviceConnection);
                                         contextFrom.unregisterReceiver(broadcastReceiver);
@@ -234,12 +232,9 @@ public class NotificationErrorWorker extends Worker {
 
                             /* Checking the attempts for executing another login, or for unbinding the DatabaseService and the BroadcastReceiver. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        databaseService.login(user, NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
-                                        attemptsLogin++;
-                                    }
+                                new Handler().postDelayed(() -> {
+                                    databaseService.login(user, NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
                                 contextFrom.unbindService(serviceConnection);

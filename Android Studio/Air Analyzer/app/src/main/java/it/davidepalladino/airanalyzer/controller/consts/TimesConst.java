@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 29th November, 2021
+ * @version 2.0.1
+ * @date 1st January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -25,8 +25,8 @@
 package it.davidepalladino.airanalyzer.controller.consts;
 
 public interface TimesConst {
-    static final byte MAX_ATTEMPTS_LOGIN = 3;
-    static final int TIME_LOGIN_TIMEOUT = 3000;
-    static final int TIME_ADD_DEVICE = 30000;
-    static final int TIME_RESET_COLOR_BAR_GRAPH = 2500;
+    byte MAX_ATTEMPTS_LOGIN = 3;
+    int TIME_LOGIN_TIMEOUT = 3000;
+    int TIME_ADD_DEVICE = 30000;
+    int TIME_RESET_COLOR_BAR_GRAPH = 2500;
 }

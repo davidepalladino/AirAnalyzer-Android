@@ -8,8 +8,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 24th October, 2021
+ * @version 2.0.1
+ * @date 3rd January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -30,7 +30,6 @@ import android.content.Intent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetAddress;
@@ -43,14 +42,14 @@ public class ClientSocket {
     public static final String ERROR_SOCKET = "ERROR_SOCKET";
     public static final String MESSAGE_SOCKET = "MESSAGE_SOCKET";
 
-    private Context context;
+    private final Context context;
 
-    private String serverIP;
-    private int serverPort;
+    private final String serverIP;
+    private final int serverPort;
 
     private boolean isConnected;
     private boolean isErrorWrite;
-    private boolean isEerrorRead;
+    private boolean isErrorRead;
 
     public String messageRead;
 
@@ -70,7 +69,7 @@ public class ClientSocket {
 
         this.isConnected = false;
         this.isErrorWrite = false;
-        this.isEerrorRead = false;
+        this.isErrorRead = false;
 
         this.messageRead = null;
 
@@ -87,9 +86,7 @@ public class ClientSocket {
         /* Checking if there is an previously connection. */
         if (!isConnected) {
             socket = new Socket(InetAddress.getByName(serverIP), serverPort);
-            if (socket != null) {
-                isConnected = true;
-            }
+            isConnected = true;
         }
 
         return socket;
@@ -101,38 +98,34 @@ public class ClientSocket {
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
     public void write(String messageSocket, String applicantActivity) {
-        workingThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Socket socket = connect();
-                    if (socket != null) {
-                        isErrorWrite = false;
+        workingThread = new Thread(() -> {
+            try {
+                Socket socket = connect();
+                if (socket != null) {
+                    isErrorWrite = false;
 
-                        InputStream in = socket.getInputStream();
-                        OutputStream out = socket.getOutputStream();
+                    OutputStream out = socket.getOutputStream();
 
-                        /* Sending the message. */
-                        out.write(messageSocket.getBytes());
+                    /* Sending the message. */
+                    out.write(messageSocket.getBytes());
 
-                        /* Closing the socket and deleting the reference of object 'workingThread'. */
-                        socket.close();
-                        workingThread = null;
-                        isConnected = false;
-                    } else {
-                        isErrorWrite = true;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    /* Closing the socket and deleting the reference of object 'workingThread'. */
+                    socket.close();
+                    workingThread = null;
+                    isConnected = false;
+                } else {
                     isErrorWrite = true;
                 }
-
-                /* Sending the result with the broadcast. */
-                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
-                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
-                intentBroadcast.putExtra(ERROR_SOCKET, isErrorWrite);
-                context.sendBroadcast(intentBroadcast);
+            } catch (IOException e) {
+                e.printStackTrace();
+                isErrorWrite = true;
             }
+
+            /* Sending the result with the broadcast. */
+            Intent intentBroadcast = new Intent(INTENT_BROADCAST);
+            intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
+            intentBroadcast.putExtra(ERROR_SOCKET, isErrorWrite);
+            context.sendBroadcast(intentBroadcast);
         });
         workingThread.start();
     }
@@ -143,43 +136,39 @@ public class ClientSocket {
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
     public void read(String applicantActivity) {
-        workingThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Socket socket = connect();
-                    if (socket != null) {
-                        isEerrorRead = false;
+        workingThread = new Thread(() -> {
+            try {
+                Socket socket = connect();
+                if (socket != null) {
+                    isErrorRead = false;
 
-                        OutputStream out = socket.getOutputStream();
-                        InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
-                        inputStreamReader.getEncoding();
-                        BufferedReader in = new BufferedReader(inputStreamReader);
+                    InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
+                    inputStreamReader.getEncoding();
+                    BufferedReader in = new BufferedReader(inputStreamReader);
 
-                        /* Reading the message. */
-                        messageRead = in.readLine();
+                    /* Reading the message. */
+                    messageRead = in.readLine();
 
-                        /* Closing the socket and deleting the reference of object 'workingThread'. */
-                        socket.close();
-                        workingThread = null;
-                        isConnected = false;
-                    } else {
-                        isEerrorRead = true;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    isEerrorRead = true;
+                    /* Closing the socket and deleting the reference of object 'workingThread'. */
+                    socket.close();
+                    workingThread = null;
+                    isConnected = false;
+                } else {
+                    isErrorRead = true;
                 }
-
-                /* Sending the result with the broadcast. */
-                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
-                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
-                intentBroadcast.putExtra(ERROR_SOCKET, isEerrorRead);
-                intentBroadcast.putExtra(MESSAGE_SOCKET, messageRead);
-                context.sendBroadcast(intentBroadcast);
-
-                messageRead = null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                isErrorRead = true;
             }
+
+            /* Sending the result with the broadcast. */
+            Intent intentBroadcast = new Intent(INTENT_BROADCAST);
+            intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
+            intentBroadcast.putExtra(ERROR_SOCKET, isErrorRead);
+            intentBroadcast.putExtra(MESSAGE_SOCKET, messageRead);
+            context.sendBroadcast(intentBroadcast);
+
+            messageRead = null;
         });
         workingThread.start();
     }

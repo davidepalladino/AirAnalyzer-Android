@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 1.0.0
- * @date 15th December, 2021
+ * @version 2.0.1
+ * @date 3rd January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -24,6 +24,8 @@
 
 package it.davidepalladino.airanalyzer.controller;
 
+import android.annotation.SuppressLint;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -36,10 +38,9 @@ public class ManageDatetime {
      * @return String wth the date in specific format.
      */
     public static String createDateFormat(Calendar dateSelected, String format) {
-        SimpleDateFormat formatter = new SimpleDateFormat(format);
-        String date = formatter.format(dateSelected.getTime());
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat(format);
 
-        return date;
+        return formatter.format(dateSelected.getTime());
     }
 
     /**

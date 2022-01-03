@@ -8,8 +8,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 15th December, 2021
+ * @version 2.0.1
+ * @date 3rd January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -85,7 +85,7 @@ public class DatabaseService extends Service {
         isRunning = true;
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        String localIP = Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
+        @SuppressWarnings("deprecation") String localIP = Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
 
         /* Checking if the the build config is for developer or not, to get the right IP address of the server. */
         String baseURL;
@@ -147,6 +147,7 @@ public class DatabaseService extends Service {
 
                 if (response.code() == 200) {
                     /* Getting the new User object and adding only the password stored into the old User object. */
+                    assert response.body() != null;
                     response.body().password = user.password;
                     intentBroadcast.putExtra(SERVICE_RESPONSE, (Parcelable) response.body());
                 }
@@ -195,7 +196,7 @@ public class DatabaseService extends Service {
      */
     public void checkUsername(String username, String applicantActivity) {
         if (!username.isEmpty()) {
-            Call<ResponseBody> call = api.checkUsername(username.toString());
+            Call<ResponseBody> call = api.checkUsername(username);
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -221,7 +222,7 @@ public class DatabaseService extends Service {
      */
     public void checkEmail(String email, String applicantActivity) {
         if (!email.isEmpty()) {
-            Call<ResponseBody> call = api.checkEmail(email.toString());
+            Call<ResponseBody> call = api.checkEmail(email);
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
