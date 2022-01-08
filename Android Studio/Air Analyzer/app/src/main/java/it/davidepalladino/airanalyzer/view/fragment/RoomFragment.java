@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 26th December, 2021
+ * @version 2.0.1
+ * @date 8th January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -24,6 +24,7 @@
 
 package it.davidepalladino.airanalyzer.view.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -49,7 +50,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -93,27 +93,27 @@ import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
 
+@SuppressWarnings("deprecation")
+@SuppressLint("DefaultLocale")
 public class RoomFragment extends Fragment implements View.OnClickListener {
     private Toolbar toolbar;
     private LinearLayout linearLayoutChipRoom;
     private LinearLayout linearLayoutChipDate;
-    private SwipeRefreshLayout swipeRefreshLayout;
     private LinearLayout linearLayoutNoRoom;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private NestedScrollView nestedScrollView;
     private ChipGroup chipGroupRoom;
-    private ArrayList<Chip> chipRoom = new ArrayList<>();
+    private final ArrayList<Chip> chipRoom = new ArrayList<>();
     private ImageView imageViewArrowDate;
     private ImageView imageViewArrowRoom;
     private TextView textViewRoomSelected;
     private TextView textViewDateSelected;
     private TextView textViewRoomLatestTime;
     private TextView textViewRoomLatestTemperature;
-    private TextView textViewRoomLatestHumidityMeasure;
+    private TextView textViewRoomLatestHumidity;
     private TextView textViewNoticeTemperatureGraph;
     private TextView textViewNoticeHumidityGraph;
-
     private DatePickerDialog datePickerDialog;
-
     private BarChart barChartTemperature;
     private BarChart barChartHumidity;
 
@@ -126,7 +126,6 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
     private User user;
     private Room roomSelected;
     private ArrayList<Room> arrayListRoom;
-    private ArrayList<MeasuresDateAverage> arrayListMeasuresDateAverage;
 
     private DatabaseService databaseService;
 
@@ -189,12 +188,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
         linearLayoutNoRoom = layoutFragment.findViewById(R.id.linearLayoutNoRoom);
 
         swipeRefreshLayout = layoutFragment.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                databaseService.getRooms(user.getAuthorization(), true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
-            }
-        });
+        swipeRefreshLayout.setOnRefreshListener(() -> databaseService.getRooms(user.getAuthorization(), true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS));
 
         nestedScrollView = layoutFragment.findViewById(R.id.nestedScrollView);
 
@@ -219,7 +213,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
         textViewDateSelected.setOnClickListener(this);
         textViewRoomLatestTime = layoutFragment.findViewById(R.id.textViewLatestTime);
         textViewRoomLatestTemperature = layoutFragment.findViewById(R.id.textViewLatestTemperature);
-        textViewRoomLatestHumidityMeasure = layoutFragment.findViewById(R.id.textViewLatestHumidityMeasure);
+        textViewRoomLatestHumidity = layoutFragment.findViewById(R.id.textViewLatestHumidityMeasure);
         textViewNoticeTemperatureGraph = layoutFragment.findViewById(R.id.textViewGraphTemperature);
         textViewNoticeHumidityGraph = layoutFragment.findViewById(R.id.textViewGraphHumidity);
 
@@ -232,18 +226,15 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
         barChartTemperature.setNoDataText("");
         barChartHumidity.setNoDataText("");
 
-        DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                date.set(Calendar.YEAR, year);
-                date.set(Calendar.MONTH, month);
-                date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                utc = ManageDatetime.getUTC(date);
+        DatePickerDialog.OnDateSetListener onDateSetListener = (view, year, month, dayOfMonth) -> {
+            date.set(Calendar.YEAR, year);
+            date.set(Calendar.MONTH, month);
+            date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            utc = ManageDatetime.getUTC(date);
 
-                textViewDateSelected.setText(ManageDatetime.createDateFormat(date, getString(R.string.localFormatDate)));
+            textViewDateSelected.setText(ManageDatetime.createDateFormat(date, getString(R.string.localFormatDate)));
 
-                updateMeasures();
-            }
+            updateMeasures();
         };
 
         if (Build.VERSION.SDK_INT > 23) {
@@ -441,7 +432,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
      * @param listMeasures List of measures required for creating the graph.
      */
     private void generateBarGraphTemperature(ArrayList<MeasuresDateAverage> listMeasures) {
-        List<BarEntry> measuresTemperatureBarEntry = new ArrayList<BarEntry>();
+        List<BarEntry> measuresTemperatureBarEntry = new ArrayList<>();
         for (MeasuresDateAverage measuresDateLatestRoom : listMeasures) {
             measuresTemperatureBarEntry.add(new BarEntry(measuresDateLatestRoom.hour, measuresDateLatestRoom.temperature));
         }
@@ -471,7 +462,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
      * @param listMeasures List of measures required for creating the graph.
      */
     private void generateBarGraphHumidity(ArrayList<MeasuresDateAverage> listMeasures) {
-        List<BarEntry> measuresHumidityBarEntry = new ArrayList<BarEntry>();
+        List<BarEntry> measuresHumidityBarEntry = new ArrayList<>();
         for (MeasuresDateAverage measure : listMeasures) {
             measuresHumidityBarEntry.add(new BarEntry(measure.hour, measure.humidity));
         }
@@ -534,12 +525,9 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
      * @param barChart BarGraph where reset the color.
      */
     private void resetColorBarGraph(BarChart barChart) {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                barChart.highlightValue(null);
-                //barDataSet.setHighLightColor(getResources().getColor(R.color.secondaryColor));
-            }
+        new Handler().postDelayed(() -> {
+            barChart.highlightValue(null);
+            //barDataSet.setHighLightColor(getResources().getColor(R.color.secondaryColor));
         }, TIME_RESET_COLOR_BAR_GRAPH);
     }
 
@@ -638,15 +626,15 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
 
                                 textViewRoomLatestTime.setTypeface(null, NORMAL);
                                 textViewRoomLatestTemperature.setTypeface(null, NORMAL);
-                                textViewRoomLatestHumidityMeasure.setTypeface(null, NORMAL);
+                                textViewRoomLatestHumidity.setTypeface(null, NORMAL);
 
                                 textViewRoomLatestTime.setText(measuresDateLatest.time);
                                 textViewRoomLatestTemperature.setText(String.format("%s °C", decimalFormat.format(measuresDateLatest.temperature)));
-                                textViewRoomLatestHumidityMeasure.setText(String.format("%s %%", decimalFormat.format(measuresDateLatest.humidity)));
+                                textViewRoomLatestHumidity.setText(String.format("%s %%", decimalFormat.format(measuresDateLatest.humidity)));
 
                             // MEASURES DATE AVERAGE BROADCAST
                             } else if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.id) == 0) {
-                                arrayListMeasuresDateAverage = intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE);
+                                ArrayList<MeasuresDateAverage> arrayListMeasuresDateAverage = intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE);
 
                                 barChartTemperature.setVisibility(View.VISIBLE);
                                 barChartHumidity.setVisibility(View.VISIBLE);
@@ -671,11 +659,11 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
                             if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_LATEST + roomSelected.id) == 0) {
                                 textViewRoomLatestTime.setTypeface(null, ITALIC);
                                 textViewRoomLatestTemperature.setTypeface(null, ITALIC);
-                                textViewRoomLatestHumidityMeasure.setTypeface(null, ITALIC);
+                                textViewRoomLatestHumidity.setTypeface(null, ITALIC);
 
                                 textViewRoomLatestTime.setText(getString(R.string.textViewNone));
                                 textViewRoomLatestTemperature.setText(getString(R.string.textViewNone));
-                                textViewRoomLatestHumidityMeasure.setText(getString(R.string.textViewNone));
+                                textViewRoomLatestHumidity.setText(getString(R.string.textViewNone));
 
                             // MEASURES DATE AVERAGE BROADCAST
                             } else if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.id) == 0) {
@@ -694,12 +682,9 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
                         case 401:
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        databaseService.login(user, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
-                                        attemptsLogin++;
-                                    }
+                                new Handler().postDelayed(() -> {
+                                    databaseService.login(user, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
                                 goToLogin(getString(R.string.toastUserError));
