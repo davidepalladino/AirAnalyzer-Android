@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 15th December, 2021
+ * @version 2.0.1
+ * @date 8th January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -22,14 +22,13 @@
  *
  */
 
-package it.davidepalladino.airanalyzer;
+package it.davidepalladino.airanalyzer.controller;
 
 import android.app.Activity;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.work.Configuration;
-import androidx.work.WorkManagerInitializer;
 
 public class AirAnalyzerApplication extends Application implements Configuration.Provider {
     private Activity currentActivity;
@@ -59,7 +58,7 @@ public class AirAnalyzerApplication extends Application implements Configuration
     /**
      * @brief This method provides to store the current activity, for several purpose of the application like the Notification Workers.
      * @param currentActivity The current Activity to store.
-     * @wrong To avoid runtime error, is advisable to set null at the pause or end of Activity.
+     * @warning To avoid runtime error, is advisable to set null at the pause state or at the end of Activity.
      */
     public void setCurrentActivity(Activity currentActivity) {
         this.currentActivity = currentActivity;

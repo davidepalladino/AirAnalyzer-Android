@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 26th December, 2021
+ * @version 1.0.1
+ * @date 8th January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -25,7 +25,6 @@
 package it.davidepalladino.airanalyzer.view.fragment;
 
 import static androidx.work.ExistingPeriodicWorkPolicy.REPLACE;
-import static it.davidepalladino.airanalyzer.model.Notification.PREFERENCE_NOTIFICATION_ERROR_TIME;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -46,28 +45,22 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import it.davidepalladino.airanalyzer.BuildConfig;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.FileManager;
 import it.davidepalladino.airanalyzer.controller.NotificationErrorWorker;
+import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.activity.LoginActivity;
 
 public class SettingFragment extends Fragment {
-    private Toolbar toolbar;
-
-    private Spinner spinnerNotificationErrors;
-    private TextView textViewVersionName;
-    private TextView textViewDeveloperName;
-
     private FileManager fileManager;
     private User user;
 
-    int[] timesNotificationErrors;
-    int latestPositionSpinnerNotificationErrors;
+    private int[] timesNotificationErrors;
+    private int latestPositionSpinnerNotificationErrors;
 
     public static SettingFragment newInstance() {
         return new SettingFragment();
@@ -88,18 +81,18 @@ public class SettingFragment extends Fragment {
 
         View layoutFragment = inflater.inflate(R.layout.fragment_setting, container, false);
 
-        toolbar = layoutFragment.findViewById(R.id.toolbar);
+        Toolbar toolbar = layoutFragment.findViewById(R.id.toolbar);
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         toolbar.inflateMenu(R.menu.menu_setting);
 
-        spinnerNotificationErrors = layoutFragment.findViewById(R.id.spinnerNotificationErrors);
+        Spinner spinnerNotificationErrors = layoutFragment.findViewById(R.id.spinnerNotificationErrors);
 
-        ArrayAdapter<String> adapterNotificationErrors = new ArrayAdapter<String>(getContext(), R.layout.item_spinner, getResources().getStringArray(R.array.spinnerNotificationErrors));
+        ArrayAdapter<String> adapterNotificationErrors = new ArrayAdapter<>(getContext(), R.layout.item_spinner, getResources().getStringArray(R.array.spinnerNotificationErrors));
         adapterNotificationErrors.setDropDownViewResource(R.layout.item_spinner_dropdown);
         spinnerNotificationErrors.setAdapter(adapterNotificationErrors);
 
         /* Searching the position of latest time minutes set, to select the right element into spinner. */
-        int savedTimeNotificationErrors = fileManager.readNotificationTime(PREFERENCE_NOTIFICATION_ERROR_TIME);
+        long savedTimeNotificationErrors = fileManager.readPreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_ERROR_TIME);
         for (int p = 0; p < timesNotificationErrors.length; p++) {
             if (timesNotificationErrors[p] == savedTimeNotificationErrors) {
                 latestPositionSpinnerNotificationErrors = p;
@@ -114,7 +107,7 @@ public class SettingFragment extends Fragment {
                 /* The changing will be apply only if there is a difference between the latest and new position. */
                 if (position != latestPositionSpinnerNotificationErrors) {
                     latestPositionSpinnerNotificationErrors = position;
-                    fileManager.saveNotitificationTime(PREFERENCE_NOTIFICATION_ERROR_TIME, timesNotificationErrors[position]);
+                    fileManager.savePreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_ERROR_TIME, timesNotificationErrors[position]);
 
                     WorkManager workManager = WorkManager.getInstance(requireActivity());
                     PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest.Builder(NotificationErrorWorker.class, timesNotificationErrors[position], TimeUnit.MINUTES)
@@ -128,17 +121,14 @@ public class SettingFragment extends Fragment {
             }
         });
 
-        textViewVersionName = layoutFragment.findViewById(R.id.textViewVersionName);
+        TextView textViewVersionName = layoutFragment.findViewById(R.id.textViewVersionName);
         textViewVersionName.setText(BuildConfig.VERSION_NAME);
 
-        textViewDeveloperName = layoutFragment.findViewById(R.id.textViewDeveloperName);
-        textViewDeveloperName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intentEmail = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"));
-                intentEmail.putExtra(Intent.EXTRA_EMAIL, new String[] { "me@davidepalladino.com" });
-                startActivity(intentEmail);
-            }
+        TextView textViewDeveloperName = layoutFragment.findViewById(R.id.textViewDeveloperName);
+        textViewDeveloperName.setOnClickListener(v -> {
+            Intent intentEmail = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"));
+            intentEmail.putExtra(Intent.EXTRA_EMAIL, new String[] { "me@davidepalladino.com" });
+            startActivity(intentEmail);
         });
 
         return layoutFragment;

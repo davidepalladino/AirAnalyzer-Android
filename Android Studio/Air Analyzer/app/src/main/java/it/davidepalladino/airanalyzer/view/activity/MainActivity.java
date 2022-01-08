@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 25th December, 2021
+ * @version 2.0.1
+ * @date 8th January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -26,7 +26,6 @@ package it.davidepalladino.airanalyzer.view.activity;
 
 import static androidx.work.ExistingPeriodicWorkPolicy.KEEP;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -42,13 +41,11 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.view.MenuItem;
 
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 
-import it.davidepalladino.airanalyzer.AirAnalyzerApplication;
+import it.davidepalladino.airanalyzer.controller.AirAnalyzerApplication;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.DatabaseService;
 import it.davidepalladino.airanalyzer.controller.NotificationErrorWorker;
@@ -65,14 +62,12 @@ import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
-import static it.davidepalladino.airanalyzer.model.Notification.*;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
     private AirAnalyzerApplication airAnalyzerApplication;
-    private BottomNavigationView bottomNavigationView;
     private BadgeDrawable badgeDrawableNotifications;
 
     private FragmentManager fragmentManager;
@@ -98,45 +93,42 @@ public class MainActivity extends AppCompatActivity {
 
         airAnalyzerApplication = (AirAnalyzerApplication) getApplicationContext();
 
-        bottomNavigationView = findViewById(R.id.bottomNavigation);
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
 
-                // HOME
-                if (id == R.id.menuItemHome) {
+            // HOME
+            if (id == R.id.menuItemHome) {
 
-                    fragmentManager.beginTransaction().hide((Fragment) fragmentActive).show(fragmentHome).commit();
-                    fragmentActive = fragmentHome;
-                    ((HomeFragment) fragmentActive).updateMeasures();
+                fragmentManager.beginTransaction().hide(fragmentActive).show(fragmentHome).commit();
+                fragmentActive = fragmentHome;
+                ((HomeFragment) fragmentActive).updateMeasures();
 
-                // ROOM
-                } else if (id == R.id.menuItemRoom) {
-                    fragmentManager.beginTransaction().hide((Fragment) fragmentActive).show(fragmentRoom).commit();
-                    fragmentActive = fragmentRoom;
-                    ((RoomFragment) fragmentActive).updateMeasures();
+            // ROOM
+            } else if (id == R.id.menuItemRoom) {
+                fragmentManager.beginTransaction().hide(fragmentActive).show(fragmentRoom).commit();
+                fragmentActive = fragmentRoom;
+                ((RoomFragment) fragmentActive).updateMeasures();
 
-                // NOTIFICATIONS
-                } else if (id == R.id.menuItemNotifications) {
-                    fragmentManager.beginTransaction().hide((Fragment) fragmentActive).show(fragmentNotification).commit();
-                    fragmentActive = fragmentNotification;
+            // NOTIFICATIONS
+            } else if (id == R.id.menuItemNotifications) {
+                fragmentManager.beginTransaction().hide(fragmentActive).show(fragmentNotification).commit();
+                fragmentActive = fragmentNotification;
 
-                    /*
-                     * If the user decided to click the Notification item, will be updated the number considering the latest ID previously
-                     *  saved with the dedicated methods.
-                     */
-                    saveLatestNotificationID(fragmentNotification.arrayListNotificationsLatest);
-                    updateBadge(fragmentNotification.arrayListNotificationsLatest);
+                /*
+                 * If the user decided to click the Notification item, will be updated the number considering the latest ID previously
+                 *  saved with the dedicated methods.
+                 */
+                saveLatestNotificationID(fragmentNotification.arrayListNotificationsLatest);
+                updateBadge(fragmentNotification.arrayListNotificationsLatest);
 
-                // SETTING
-                } else if (id == R.id.menuItemSetting) {
-                    fragmentManager.beginTransaction().hide((Fragment) fragmentActive).show(fragmentSetting).commit();
-                    fragmentActive = fragmentSetting;
-                }
-
-                return true;
+            // SETTING
+            } else if (id == R.id.menuItemSetting) {
+                fragmentManager.beginTransaction().hide(fragmentActive).show(fragmentSetting).commit();
+                fragmentActive = fragmentSetting;
             }
+
+            return true;
         });
         badgeDrawableNotifications = bottomNavigationView.getOrCreateBadge(R.id.menuItemNotifications);
         badgeDrawableNotifications.setHorizontalOffset(10);
@@ -172,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         user = (User) fileManager.readObject(User.NAMEFILE);
 
         WorkManager workManager = WorkManager.getInstance(MainActivity.this);
-        PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest.Builder(NotificationErrorWorker.class, fileManager.readNotificationTime(PREFERENCE_NOTIFICATION_ERROR_TIME), TimeUnit.MINUTES)
+        PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest.Builder(NotificationErrorWorker.class, fileManager.readPreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_ERROR_TIME), TimeUnit.MINUTES)
                 .build();
         workManager.enqueueUniquePeriodicWork(NotificationErrorWorker.tag, KEEP, notificationRequest);
     }
@@ -219,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void updateBadge(ArrayList<Notification> arrayListNotificationsLatest) {
         int totalNotifications = 0;
-        int latestNotificationID = fileManager.readNotificationID(PREFERENCE_NOTIFICATION_LATEST_ID_BADGE);
+        int latestNotificationID = fileManager.readPreferenceNotificationID(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_LATEST_ID_BADGE);
 
         /* Counting the unseen notifications for the badge. */
         if (arrayListNotificationsLatest != null) {
@@ -245,14 +237,14 @@ public class MainActivity extends AppCompatActivity {
      * @param arrayListNotificationsLatest ArrayList of notifications where will be searched the first ID of unseen notification.
      */
     public void saveLatestNotificationID(ArrayList<Notification> arrayListNotificationsLatest) {
-        int latestNotificationID = fileManager.readNotificationID(PREFERENCE_NOTIFICATION_LATEST_ID_BADGE);
+        int latestNotificationID = fileManager.readPreferenceNotificationID(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_LATEST_ID_BADGE);
 
         /* Searching and save the ID of the first unseen from the list. */
         if (arrayListNotificationsLatest != null) {
             for (Notification notification : arrayListNotificationsLatest) {
                 if (notification.isSeen == 0 && notification.id > latestNotificationID) {
-                    fileManager.saveNotitificationID(PREFERENCE_NOTIFICATION_LATEST_ID_BADGE, notification.id);
-                    fileManager.saveNotitificationID(PREFERENCE_NOTIFICATION_LATEST_ID_WORKER, notification.id);
+                    fileManager.savePreferenceNotificationID(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_LATEST_ID_BADGE, notification.id);
+                    fileManager.savePreferenceNotificationID(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_LATEST_ID_WORKER, notification.id);
                     break;
                 }
             }
@@ -317,12 +309,9 @@ public class MainActivity extends AppCompatActivity {
                         case 401:
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        databaseService.login(user, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
-                                        attemptsLogin++;
-                                    }
+                                new Handler().postDelayed(() -> {
+                                    databaseService.login(user, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
                                 goToLogin(getString(R.string.toastUserError));

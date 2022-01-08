@@ -8,8 +8,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.1
- * @date 3rd January, 2022
+ * @version 1.0.1
+ * @date 8th January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -53,7 +53,6 @@ import androidx.work.WorkerParameters;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import it.davidepalladino.airanalyzer.AirAnalyzerApplication;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
