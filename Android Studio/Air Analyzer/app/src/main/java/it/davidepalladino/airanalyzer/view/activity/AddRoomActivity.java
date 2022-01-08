@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 1.0.0
- * @date 24th November, 2021
+ * @version 1.0.1
+ * @date 8th January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -33,6 +33,7 @@ import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -68,12 +69,12 @@ import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.widget.GeneralToast;
 
+@SuppressWarnings("deprecation")
+@SuppressLint("NonConstantResourceId")
 public class AddRoomActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener {
     private LinearLayout linearLayoutAddRoom;
     private Spinner spinnerRooms;
     private EditText editTextLocalIP;
-    private Button buttonAddRoom;
-    private Button buttonAddDevice;
     private AlertDialog dialogAddDevice;
 
     private GeneralToast generalToast;
@@ -83,7 +84,6 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
     private Room roomSelected;
 
     private DatabaseService databaseService;
-    private ClientSocket clientSocket;
 
     private byte attemptsLogin = 1;
 
@@ -99,10 +99,10 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
 
         editTextLocalIP = findViewById(R.id.editTextLocalIP);
 
-        buttonAddRoom = findViewById(R.id.buttonAddRoom);
+        Button buttonAddRoom = findViewById(R.id.buttonAddRoom);
         buttonAddRoom.setOnClickListener(this);
 
-        buttonAddDevice = findViewById(R.id.buttonAddDevice);
+        Button buttonAddDevice = findViewById(R.id.buttonAddDevice);
         buttonAddDevice.setOnClickListener(this);
     }
 
@@ -155,8 +155,8 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                  * Checking the field and the its syntax. If is correct, will be execute the communication with the device;
                  *  else, will be execute a toast message to notify the error.
                  */
-                if (editTextLocalIP.getText().toString().length() != 0 && checkIPv4(editTextLocalIP)) {
-                    WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+                if (editTextLocalIP.getText().toString().length() != 0 && checkIPv4(editTextLocalIP.getText().toString())) {
+                    WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
 
                     InetAddress mobileIP = null;
                     InetAddress deviceIP = null;
@@ -169,6 +169,8 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                     }
 
                     /* Checking if the device and the mobile are in the same local network. */
+                    assert mobileIP != null;
+                    assert deviceIP != null;
                     if (mobileIP.getAddress()[0] == deviceIP.getAddress()[0] && mobileIP.getAddress()[1] == deviceIP.getAddress()[1]  && mobileIP.getAddress()[2] == deviceIP.getAddress()[2]) {
                         /* Creating the JSON message and its serialization. */
                         JSONObject requestJSON = new JSONObject();
@@ -189,7 +191,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                                 .show();
 
                         /* Starting the socket connection and writing the JSON message. */
-                        clientSocket = new ClientSocket(AddRoomActivity.this, editTextLocalIP.getText().toString(), 60000);
+                        ClientSocket clientSocket = new ClientSocket(AddRoomActivity.this, editTextLocalIP.getText().toString(), 60000);
                         clientSocket.write(serializedJSON, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_SOCKET_WRITE_CREDENTIALS);
                     } else {
                         generalToast.make(R.drawable.ic_error, getString(R.string.toastErrorLocalNetwork));
@@ -236,7 +238,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                                 if (!arrayListRooms.isEmpty()) {
                                     linearLayoutAddRoom.setVisibility(View.VISIBLE);
 
-                                    ArrayAdapter<Room> arrayAdapterRoom = new ArrayAdapter<Room>(AddRoomActivity.this, R.layout.item_spinner, arrayListRooms);
+                                    ArrayAdapter<Room> arrayAdapterRoom = new ArrayAdapter<>(AddRoomActivity.this, R.layout.item_spinner, arrayListRooms);
                                     arrayAdapterRoom.setDropDownViewResource(R.layout.item_spinner_dropdown);
 
                                     spinnerRooms.setAdapter(arrayAdapterRoom);
@@ -251,7 +253,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
 
                             // LOGIN BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = (User) intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                user = intentFrom.getParcelableExtra(SERVICE_RESPONSE);
                                 fileManager.saveObject(user, User.NAMEFILE);
 
                                 attemptsLogin = 1;
@@ -263,12 +265,9 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                         case 401:
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        databaseService.login((User) fileManager.readObject(User.NAMEFILE), AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
-                                        attemptsLogin++;
-                                    }
+                                new Handler().postDelayed(() -> {
+                                    databaseService.login((User) fileManager.readObject(User.NAMEFILE), AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
                                 finish();
@@ -291,12 +290,9 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                          *  else, there will be a Toast message to notify the user about the error.
                          */
                         if (!intentFrom.getBooleanExtra(ERROR_SOCKET, true)) {
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    generalToast.make(R.drawable.ic_check_circle, getString(R.string.toastDeviceAdded));
-                                    dialogAddDevice.dismiss();
-                                }
+                            new Handler().postDelayed(() -> {
+                                generalToast.make(R.drawable.ic_check_circle, getString(R.string.toastDeviceAdded));
+                                dialogAddDevice.dismiss();
                             }, TIME_ADD_DEVICE);
                         } else {
                             generalToast.make(R.drawable.ic_error, getString(R.string.toastErrorConnectionDevice));
