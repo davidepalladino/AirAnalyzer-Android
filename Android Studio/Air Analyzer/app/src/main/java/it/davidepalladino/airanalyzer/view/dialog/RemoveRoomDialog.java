@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 4th November, 2021
+ * @version 2.0.1
+ * @date 24th November, 2021
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -26,7 +26,6 @@ package it.davidepalladino.airanalyzer.view.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,13 +33,16 @@ import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
 
+import java.util.Objects;
+
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.view.activity.ManageRoomActivity;
 
 public class RemoveRoomDialog extends DialogFragment {
+    @SuppressWarnings("unused")
     public interface RemoveRoomDialogCallback {
-        public void onPushOkButtonRemoveRoomDialog(Room room);
+        void onPushOkButtonRemoveRoomDialog(Room room);
     }
 
     private ManageRoomActivity context;
@@ -61,20 +63,13 @@ public class RemoveRoomDialog extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogeTheme);
         builder.setView(layout)
-                .setPositiveButton(R.string.buttonOk, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        if (context != null) {
-                            context.onPushOkButtonRemoveRoomDialog(room);
-                        }
+                .setPositiveButton(R.string.buttonOk, (dialog, id) -> {
+                    if (context != null) {
+                        context.onPushOkButtonRemoveRoomDialog(room);
                     }
                 })
 
-                .setNegativeButton(R.string.buttonCancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        RemoveRoomDialog.this.getDialog().cancel();
-                    }
-                });
+                .setNegativeButton(R.string.buttonCancel, (dialog, id) -> Objects.requireNonNull(RemoveRoomDialog.this.getDialog()).cancel());
 
         return builder.create();
     }

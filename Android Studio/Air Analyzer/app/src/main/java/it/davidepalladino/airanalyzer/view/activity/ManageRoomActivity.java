@@ -63,7 +63,6 @@ import it.davidepalladino.airanalyzer.view.widget.ManageRoomsAdapterView;
 public class ManageRoomActivity extends AppCompatActivity implements ManageRoomsAdapterView.ManageRoomsAdapterViewCallback, RemoveRoomDialog.RemoveRoomDialogCallback {
     private TextView textViewNoRoom;
     private ListView listViewRoom;
-    private ManageRoomsAdapterView adapterViewManageRooms;
 
     private GeneralToast generalToast;
 
@@ -186,7 +185,7 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
                                     listViewRoom.setVisibility(View.VISIBLE);
 
                                     arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE);
-                                    adapterViewManageRooms = new ManageRoomsAdapterView(ManageRoomActivity.this, arrayListRoom);
+                                    ManageRoomsAdapterView adapterViewManageRooms = new ManageRoomsAdapterView(ManageRoomActivity.this, arrayListRoom);
                                     listViewRoom.setAdapter(adapterViewManageRooms);
                                 } else {
                                     textViewNoRoom.setVisibility(View.VISIBLE);
@@ -217,12 +216,9 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
                         case 401:
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        databaseService.login((User) fileManager.readObject(User.NAMEFILE), MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
-                                        attemptsLogin++;
-                                    }
+                                new Handler().postDelayed(() -> {
+                                    databaseService.login((User) fileManager.readObject(User.NAMEFILE), MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
                                 finish();

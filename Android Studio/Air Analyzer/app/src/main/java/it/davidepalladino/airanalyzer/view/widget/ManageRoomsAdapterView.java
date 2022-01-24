@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 14th November, 2021
+ * @version 2.0.1
+ * @date 23th January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -24,6 +24,7 @@
 
 package it.davidepalladino.airanalyzer.view.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,47 +44,50 @@ import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.view.activity.ManageRoomActivity;
 
 public class ManageRoomsAdapterView extends ArrayAdapter<Room> {
+    @SuppressWarnings("unused")
     public interface ManageRoomsAdapterViewCallback {
-        public void onPushAcceptButtonManageRoomsAdapterView(Room room);
-        public void onPushDeleteButtonManageRoomsAdapterView(Room room);
+        void onPushAcceptButtonManageRoomsAdapterView(Room room);
+        void onPushDeleteButtonManageRoomsAdapterView(Room room);
     }
 
-    private ManageRoomActivity context;
-    private int resource;
+    private final ManageRoomActivity context;
+    private final int resource;
 
     public ManageRoomsAdapterView(@NonNull Context context, @NonNull List<Room> objects) {
         super(context, R.layout.manage_rooms_adapter_view, objects);
 
         if (context instanceof ManageRoomActivity) {
             this.context = (ManageRoomActivity) context;
+        } else {
+            this.context = null;
         }
         this.resource = R.layout.manage_rooms_adapter_view;
     }
 
+    @SuppressLint("ViewHolder")
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(resource, null);
+        if (context != null) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(resource, null);
 
-        Room room = getItem(position);
+            Room room = getItem(position);
 
-        TextView textViewID = convertView.findViewById(R.id.textViewID_ManageRoom);
-        textViewID.setText(String.valueOf(room.id));
+            TextView textViewID = convertView.findViewById(R.id.textViewID_ManageRoom);
+            textViewID.setText(String.valueOf(room.id));
 
-        TextView textViewRoom = convertView.findViewById(R.id.textViewRoom_ManageRoom);
-        textViewRoom.setText(room.name);
+            TextView textViewRoom = convertView.findViewById(R.id.textViewRoom_ManageRoom);
+            textViewRoom.setText(room.name);
 
-        EditText editTextRoom = convertView.findViewById(R.id.editTextRoom);
+            EditText editTextRoom = convertView.findViewById(R.id.editTextRoom);
 
-        ImageButton imageViewEdit = convertView.findViewById(R.id.imageViewEdit);
-        ImageButton imageViewRemove = convertView.findViewById(R.id.imageViewRemove);
-        ImageButton imageViewAccept = convertView.findViewById(R.id.imageViewAccept);
-        ImageButton imageViewDiscard = convertView.findViewById(R.id.imageViewDiscard);
+            ImageButton imageViewEdit = convertView.findViewById(R.id.imageViewEdit);
+            ImageButton imageViewRemove = convertView.findViewById(R.id.imageViewRemove);
+            ImageButton imageViewAccept = convertView.findViewById(R.id.imageViewAccept);
+            ImageButton imageViewDiscard = convertView.findViewById(R.id.imageViewDiscard);
 
-        // EDIT BUTTON
-        imageViewEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            // EDIT BUTTON
+            imageViewEdit.setOnClickListener(v -> {
                 textViewRoom.setVisibility(View.GONE);
 
                 editTextRoom.setText(room.name);
@@ -94,21 +98,13 @@ public class ManageRoomsAdapterView extends ArrayAdapter<Room> {
 
                 imageViewAccept.setVisibility(View.VISIBLE);
                 imageViewDiscard.setVisibility(View.VISIBLE);
-            }
-        });
+            });
 
-        // REMOVE BUTTON
-        imageViewRemove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                context.onPushDeleteButtonManageRoomsAdapterView(room);
-            }
-        });
+            // REMOVE BUTTON
+            imageViewRemove.setOnClickListener(v -> context.onPushDeleteButtonManageRoomsAdapterView(room));
 
-        // ACCEPT BUTTON
-        imageViewAccept.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            // ACCEPT BUTTON
+            imageViewAccept.setOnClickListener(v -> {
                 room.name = String.valueOf(editTextRoom.getText());
                 context.onPushAcceptButtonManageRoomsAdapterView(room);
 
@@ -122,13 +118,10 @@ public class ManageRoomsAdapterView extends ArrayAdapter<Room> {
 
                 imageViewAccept.setVisibility(View.GONE);
                 imageViewDiscard.setVisibility(View.GONE);
-            }
-        });
+            });
 
-        // DISCARD BUTTON
-        imageViewDiscard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            // DISCARD BUTTON
+            imageViewDiscard.setOnClickListener(v -> {
                 textViewRoom.setText(room.name);
                 textViewRoom.setVisibility(View.VISIBLE);
 
@@ -139,8 +132,8 @@ public class ManageRoomsAdapterView extends ArrayAdapter<Room> {
 
                 imageViewAccept.setVisibility(View.GONE);
                 imageViewDiscard.setVisibility(View.GONE);
-            }
-        });
+            });
+        }
 
         return convertView;
     }
