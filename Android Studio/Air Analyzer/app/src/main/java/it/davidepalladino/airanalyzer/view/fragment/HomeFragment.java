@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 1.0.0
- * @date 26th December, 2021
+ * @version 1.0.1
+ * @date 25th January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -36,10 +36,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.icu.util.Calendar;
+import java.util.Calendar;
 import android.os.Bundle;
 
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -120,15 +119,8 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View layoutFragment = inflater.inflate(R.layout.fragment_home, container, false);
 
-        Toolbar toolbar = layoutFragment.findViewById(R.id.toolbar);
-
         swipeRefreshLayout = layoutFragment.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                databaseService.getMeasuresTodayLatest(user.getAuthorization(), HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST);
-            }
-        });
+        swipeRefreshLayout.setOnRefreshListener(() -> databaseService.getMeasuresTodayLatest(user.getAuthorization(), HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST));
 
         TextView textViewHomeWelcome = layoutFragment.findViewById(R.id.textViewWelcome);
         textViewNoMeasures = layoutFragment.findViewById(R.id.textViewNoMeasures);
@@ -223,7 +215,7 @@ public class HomeFragment extends Fragment {
 
                             // LOGIN BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = (User) intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                user = intentFrom.getParcelableExtra(SERVICE_RESPONSE);
                                 fileManager.saveObject(user, User.NAMEFILE);
 
                                 attemptsLogin = 1;
@@ -246,12 +238,9 @@ public class HomeFragment extends Fragment {
                         case 401:
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        databaseService.login(user, HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
-                                        attemptsLogin++;
-                                    }
+                                new Handler().postDelayed(() -> {
+                                    databaseService.login(user, HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
                                 goToLogin(getString(R.string.toastUserError));

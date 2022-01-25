@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 4th November, 2021
+ * @version 2.0.1
+ * @date 25th January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -24,6 +24,7 @@
 
 package it.davidepalladino.airanalyzer.view.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,8 +43,8 @@ import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.model.MeasuresTodayLatest;
 
 public class MeasuresTodayAdapterView extends ArrayAdapter<MeasuresTodayLatest> {
-    private Context context;
-    private int resource;
+    private final Context context;
+    private final int resource;
 
     public MeasuresTodayAdapterView(@NonNull Context context, @NonNull List<MeasuresTodayLatest> objects) {
         super(context, R.layout.measures_today_adapter_view, objects);
@@ -52,6 +53,7 @@ public class MeasuresTodayAdapterView extends ArrayAdapter<MeasuresTodayLatest> 
         this.resource = R.layout.measures_today_adapter_view;
     }
 
+    @SuppressLint("ViewHolder")
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -73,8 +75,8 @@ public class MeasuresTodayAdapterView extends ArrayAdapter<MeasuresTodayLatest> 
         textViewID.setText(String.valueOf(measuresTodayLatest.id));
         textViewName.setText(measuresTodayLatest.name);
         textViewTime.setText(measuresTodayLatest.time);
-        textViewTemperature.setText(String.format("%s °C", String.valueOf(decimalFormat.format(measuresTodayLatest.temperature))));
-        textViewHumidity.setText(String.format("%s %%", String.valueOf(decimalFormat.format(measuresTodayLatest.humidity))));
+        textViewTemperature.setText(String.format("%s °C", decimalFormat.format(measuresTodayLatest.temperature)));
+        textViewHumidity.setText(String.format("%s %%", decimalFormat.format(measuresTodayLatest.humidity)));
 
         return convertView;
     }
