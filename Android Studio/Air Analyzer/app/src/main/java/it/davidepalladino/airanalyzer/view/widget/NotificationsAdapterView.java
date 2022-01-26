@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 15th November, 2021
+ * @version 2.0.1
+ * @date 26th January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -27,6 +27,7 @@ package it.davidepalladino.airanalyzer.view.widget;
 import static android.graphics.Typeface.BOLD;
 import static android.graphics.Typeface.NORMAL;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,9 +49,10 @@ import java.util.List;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.model.Notification;
 
+@SuppressLint({"ViewHolder", "SimpleDateFormat", "DefaultLocale"})
 public class NotificationsAdapterView extends ArrayAdapter<Notification> {
-    private Context context;
-    private int resource;
+    private final Context context;
+    private final int resource;
     public Notification notification;
 
     public NotificationsAdapterView(@NonNull Context context, @NonNull List<Notification> objects) {
@@ -73,11 +76,11 @@ public class NotificationsAdapterView extends ArrayAdapter<Notification> {
 
         /* Setting the right icon and message based of the type of notification. */
         if (notification.type.compareTo("ERROR_NOT_UPDATED") == 0) {
-            imageViewTypeNotification.setImageDrawable(context.getDrawable(R.drawable.ic_link_off));
+            imageViewTypeNotification.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_link_off));
             textViewType.setText(context.getString(R.string.notificationErrorTypeNotUpdated));
             textViewMessage.setText(String.format("%s %s %s", context.getString(R.string.textViewNotificationDevice), notification.name,  context.getString(R.string.notificationErrorMessageNotUpdated)));
         } else if (notification.type.compareTo("ERROR_MEASURE") == 0) {
-            imageViewTypeNotification.setImageDrawable(context.getDrawable(R.drawable.ic_question_mark));
+            imageViewTypeNotification.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_question_mark));
             textViewType.setText(context.getString(R.string.notificationErrorTypeMeasure));
             textViewMessage.setText(String.format("%s %s %s", context.getString(R.string.textViewNotificationDevice), notification.name,  context.getString(R.string.notificationErrorMessageMeasure)));
         }
@@ -92,9 +95,10 @@ public class NotificationsAdapterView extends ArrayAdapter<Notification> {
         }
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = null;
+        Date date;
         try {
             date = simpleDateFormat.parse(notification.dateAndTime);
+            assert date != null;
             textViewDateAndTime.setText(createSimpleDate(date.getTime(), Calendar.getInstance().getTimeInMillis()));
 
         } catch (ParseException e) {

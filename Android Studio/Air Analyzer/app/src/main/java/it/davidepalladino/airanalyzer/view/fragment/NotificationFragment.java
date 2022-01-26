@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact me@davidepalladino.com
  * @website www.davidepalladino.com
- * @version 1.0.0
- * @date 26th December, 2021
+ * @version 1.0.1
+ * @date 26th January, 2022
  *
  * This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -50,7 +50,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -73,8 +72,6 @@ import it.davidepalladino.airanalyzer.view.widget.GeneralToast;
 import it.davidepalladino.airanalyzer.view.widget.NotificationsAdapterView;
 
 public class NotificationFragment extends Fragment {
-    private Toolbar toolbar;
-
     private SwipeRefreshLayout swipeRefreshLayout;
     private TextView textViewNoNotification;
     private ListView listViewNotificationsLatest;
@@ -86,7 +83,6 @@ public class NotificationFragment extends Fragment {
     private User user;
     public ArrayList<Notification> arrayListNotificationsLatest;
 
-    private Calendar date;
     private int utc;
 
     private DatabaseService databaseService;
@@ -111,7 +107,7 @@ public class NotificationFragment extends Fragment {
         fileManager = new FileManager(getContext());
         user = (User) fileManager.readObject(User.NAMEFILE);
 
-        date = Calendar.getInstance();
+        Calendar date = Calendar.getInstance();
         utc = ManageDatetime.getUTC(date);
     }
 
@@ -137,44 +133,36 @@ public class NotificationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View layoutFragment = inflater.inflate(R.layout.fragment_notification, container, false);
 
-        toolbar = layoutFragment.findViewById(R.id.toolbar);
+        Toolbar toolbar = layoutFragment.findViewById(R.id.toolbar);
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         toolbar.inflateMenu(R.menu.menu_notification);
 
         swipeRefreshLayout = layoutFragment.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                databaseService.getNotificationsLatest(user.getAuthorization(), utc, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST);
-            }
-        });
+        swipeRefreshLayout.setOnRefreshListener(() -> databaseService.getNotificationsLatest(user.getAuthorization(), utc, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST));
 
         textViewNoNotification = layoutFragment.findViewById(R.id.textViewNoNotification);
         listViewNotificationsLatest = layoutFragment.findViewById(R.id.listViewNotifications);
-        listViewNotificationsLatest.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Notification notificationSelected = arrayListNotificationsLatest.get(position);
+        listViewNotificationsLatest.setOnItemClickListener((parent, view, position, id) -> {
+            Notification notificationSelected = arrayListNotificationsLatest.get(position);
 
-                /* Checking if the item selected is unseen. */
-                if (notificationSelected.isSeen == 0) {
-                    notificationSelected.isSeen = 1;
+            /* Checking if the item selected is unseen. */
+            if (notificationSelected.isSeen == 0) {
+                notificationSelected.isSeen = 1;
 
-                    /* Creating the JSON Array to send with the API request. */
-                    JsonArray jsonArrayNotifications = new JsonArray();
-                    try {
-                        jsonArrayNotifications.add(generateJsonObjectNotification(notificationSelected));
-                    } catch (JsonIOException e) {
-                        e.printStackTrace();
-                    }
-                    databaseService.setStatusNotifications(user.getAuthorization(), jsonArrayNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSIONS_SET_STATUS_NOTIFICATIONS);
-
-                    /* Updating the texts style of TextView and store the status for next update of database. */
-                    TextView textViewType = view.findViewById(R.id.textViewType);
-                    TextView textViewMessage = view.findViewById(R.id.textViewMessage);
-                    textViewType.setTypeface(null, NORMAL);
-                    textViewMessage.setTypeface(null, NORMAL);
+                /* Creating the JSON Array to send with the API request. */
+                JsonArray jsonArrayNotifications = new JsonArray();
+                try {
+                    jsonArrayNotifications.add(generateJsonObjectNotification(notificationSelected));
+                } catch (JsonIOException e) {
+                    e.printStackTrace();
                 }
+                databaseService.setStatusNotifications(user.getAuthorization(), jsonArrayNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSIONS_SET_STATUS_NOTIFICATIONS);
+
+                /* Updating the texts style of TextView and store the status for next update of database. */
+                TextView textViewType = view.findViewById(R.id.textViewType);
+                TextView textViewMessage = view.findViewById(R.id.textViewMessage);
+                textViewType.setTypeface(null, NORMAL);
+                textViewMessage.setTypeface(null, NORMAL);
             }
         });
 
@@ -219,8 +207,11 @@ public class NotificationFragment extends Fragment {
         return jsonObjectNotification;
     }
 
-//TODO
-    public void updateList(ArrayList<Notification> arrayListNotificationsLatest) {
+    /**
+     * @brief This method provides to update the ListView.
+     * @param arrayListNotificationsLatest List of elements to use for the ListView.
+     */
+    public void updateListView(ArrayList<Notification> arrayListNotificationsLatest) {
         this.arrayListNotificationsLatest = arrayListNotificationsLatest;
 
         /* Setting the right visibility for the TextView and the ListView. */
@@ -284,7 +275,7 @@ public class NotificationFragment extends Fragment {
                                 swipeRefreshLayout.setRefreshing(false);
 
                                 /* Getting the measures and updating the ListView. */
-                                updateList(intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE));
+                                updateListView(intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE));
 
                                 if (getContext() instanceof MainActivity) {
                                     ((MainActivity) getContext()).updateBadge(arrayListNotificationsLatest);
@@ -296,7 +287,7 @@ public class NotificationFragment extends Fragment {
 
                             // LOGIN BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = (User) intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                user = intentFrom.getParcelableExtra(SERVICE_RESPONSE);
                                 fileManager.saveObject(user, User.NAMEFILE);
 
                                 attemptsLogin = 1;
@@ -319,12 +310,9 @@ public class NotificationFragment extends Fragment {
                         case 401:
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        databaseService.login(user, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
-                                        attemptsLogin++;
-                                    }
+                                new Handler().postDelayed(() -> {
+                                    databaseService.login(user, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
                                 goToLogin(getString(R.string.toastUserError));

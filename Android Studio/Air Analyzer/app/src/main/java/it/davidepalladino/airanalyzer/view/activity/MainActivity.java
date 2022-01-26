@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
             saveLatestNotificationID(arrayListNotificationsLatest);
         }
 
-        fragmentNotification.updateList(arrayListNotificationsLatest);
+        fragmentNotification.updateListView(arrayListNotificationsLatest);
     }
 
     /**
