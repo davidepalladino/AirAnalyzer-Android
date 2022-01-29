@@ -1,9 +1,9 @@
-# AirAnalyzer-Android
+# AirAnalyzer-AndroidApp
 ## Description
 This project concerns an Android application where the user can:
- - view the actual measures for all room;
+ - view the actual measures for all rooms;
  - view the measures for single room, in specific day too;
- - add new device or roo;
+ - add new device or room;
  - manage the room, like renaming or removing it;
  - receive notification about the errors of devices.
 
