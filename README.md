@@ -12,13 +12,13 @@ This project concerns an Android application where the user can:
 ![Home](https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Home.png)
 
 ### Rooms
-![Rooms] (https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Rooms.png)
+![Rooms](https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Rooms.png)
 
 ### Manage rooms
-![ManageRooms] (https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Manage-Rooms.png)
+![ManageRooms](https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Manage-Rooms.png)
 
 ### Notifications
-![Notifications] (https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Notifications.png)
+![Notifications](https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Notifications.png)
 
 ### Settings
-![Settings] (https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Settings.png)
+![Settings](https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Settings.png)
