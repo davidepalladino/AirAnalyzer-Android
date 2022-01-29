@@ -9,7 +9,7 @@ This project concerns an Android application where the user can:
 
 ## Screenshots
 ### Home
-![Home](https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Home.png|width=100)
+![Home][[https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Home.png|width=100]]
 
 ### Rooms
 ![Rooms](https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Rooms.png)
