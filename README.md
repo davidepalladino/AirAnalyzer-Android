@@ -12,13 +12,13 @@ This project concerns an Android application where the user can:
 <img src="https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Home.png" alt="Home image" width="400px" height="auto">
 
 ### Rooms
-<img src="https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Rooms.png" alt="All rooms image" width="400px" height="auto">
+<img src="https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Rooms.png" alt="Rooms image" width="400px" height="auto">
 
 ### Manage rooms
-![ManageRooms](https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Manage-Rooms.png)
+<img src="https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Manage-Rooms.png" alt="Manage rooms image" width="400px" height="auto">
 
 ### Notifications
-![Notifications](https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Notifications.png)
+<img src="https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Notifications.png" alt="Notifications image" width="400px" height="auto">
 
 ### Settings
-![Settings](https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Settings.png)
+<img src="https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Settings.png" alt="Settings image" width="400px" height="auto">
