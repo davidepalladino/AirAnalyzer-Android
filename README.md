@@ -10,6 +10,7 @@ This project concerns an Android application where the user can:
 ## Screenshots
 ### Home
 <img src="https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Home.png" alt="Home image" width="250px" height="auto">
+<img src="https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Rooms.png" alt="All rooms image" width="250px" height="auto">
 
 ### Rooms
 ![Rooms](https://www.davidepalladino.com/wp-content/uploads/2022/01/Air-Analyzer-Android-App-v3.0.0-Rooms.png)
