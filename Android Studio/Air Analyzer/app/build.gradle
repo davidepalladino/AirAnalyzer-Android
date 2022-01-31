@@ -1,5 +1,14 @@
 plugins {
     id 'com.android.application'
+    id "org.sonarqube" version "3.3"
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "AirAnalyzer-AndroidApp"
+        property "sonar.organization", "davidepalladino-airanalyzer"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
