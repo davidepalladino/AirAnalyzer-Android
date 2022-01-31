@@ -1,32 +1,23 @@
 plugins {
     id 'com.android.application'
-    id "org.sonarqube" version "3.3"
 }
 
-sonarqube {
-    properties {
-        property "sonar.projectKey", "AirAnalyzer-AndroidApp"
-        property "sonar.organization", "davidepalladino-airanalyzer"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
-//def keystorePropertiesFile = rootProject.file("keystore.properties")
-//def keystoreProperties = new Properties()
-//keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     compileSdkVersion 31
     buildToolsVersion "30.0.2"
 
-//    signingConfigs {
-//        airanalyzer {
-//            keyAlias keystoreProperties['keyAlias']
-//            keyPassword keystoreProperties['keyPassword']
-//            storeFile file(keystoreProperties['storeFile'])
-//            storePassword keystoreProperties['storePassword']
-//        }
-//    }
+    signingConfigs {
+        airanalyzer {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
 
     defaultConfig {
         applicationId "it.davidepalladino.airanalyzer"
@@ -37,7 +28,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "boolean", "DEVELOPER_APP", "false"
-//        signingConfig signingConfigs.airanalyzer
+        signingConfig signingConfigs.airanalyzer
     }
 
     buildTypes {
@@ -46,13 +37,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "DEVELOPER_APP", "true"
-//            signingConfig signingConfigs.airanalyzer
+            signingConfig signingConfigs.airanalyzer
         }
 
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-//            signingConfig signingConfigs.airanalyzer
+            signingConfig signingConfigs.airanalyzer
         }
 
         developer {
@@ -62,11 +53,7 @@ android {
             applicationIdSuffix ".developer"
             versionNameSuffix "-developer"
             buildConfigField "boolean", "DEVELOPER_APP", "true"
-//            signingConfig signingConfigs.airanalyzer
-        }
-
-        dexOptions {
-            javaMaxHeapSize "4g"
+            signingConfig signingConfigs.airanalyzer
         }
     }
 
