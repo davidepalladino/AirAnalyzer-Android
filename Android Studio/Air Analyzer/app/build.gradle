@@ -37,7 +37,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "boolean", "DEVELOPER_APP", "false"
-        signingConfig signingConfigs.airanalyzer
+//        signingConfig signingConfigs.airanalyzer
     }
 
     buildTypes {
@@ -46,13 +46,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "DEVELOPER_APP", "true"
-            signingConfig signingConfigs.airanalyzer
+//            signingConfig signingConfigs.airanalyzer
         }
 
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.airanalyzer
+//            signingConfig signingConfigs.airanalyzer
         }
 
         developer {
@@ -62,7 +62,7 @@ android {
             applicationIdSuffix ".developer"
             versionNameSuffix "-developer"
             buildConfigField "boolean", "DEVELOPER_APP", "true"
-            signingConfig signingConfigs.airanalyzer
+//            signingConfig signingConfigs.airanalyzer
         }
     }
 
