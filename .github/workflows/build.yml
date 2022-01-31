@@ -33,4 +33,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./Android\ Studio/Air\ Analyzer/gradlew build sonarqube --info --settings-file=Air\ Analyzer/
+        run: ./Android\ Studio/Air\ Analyzer/gradlew build sonarqube --info --settings-file=/Android\ Studio/Air\ Analyzer/
