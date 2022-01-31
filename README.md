@@ -1,6 +1,6 @@
 # AirAnalyzer-AndroidApp
 ## Description
-This repository concerns an Android application for the Air Analyzer project, where the user can:
+This repositories concerns an Android application for the Air Analyzer project, where the user can:
  - view the actual measures for all rooms;
  - view the measures for single room, in specific day too;
  - add new device or room;
