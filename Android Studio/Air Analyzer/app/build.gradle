@@ -64,6 +64,10 @@ android {
             buildConfigField "boolean", "DEVELOPER_APP", "true"
 //            signingConfig signingConfigs.airanalyzer
         }
+
+        dexOptions {
+            javaMaxHeapSize "4g"
+        }
     }
 
     compileOptions {
