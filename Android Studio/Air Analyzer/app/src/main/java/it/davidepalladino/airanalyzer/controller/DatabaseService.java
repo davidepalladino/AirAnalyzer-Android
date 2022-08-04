@@ -34,10 +34,11 @@ import android.os.Parcelable;
 import android.text.format.Formatter;
 import android.util.Log;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import it.davidepalladino.airanalyzer.BuildConfig;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.model.MeasuresDateAverage;
 import it.davidepalladino.airanalyzer.model.MeasuresDateLatest;
@@ -57,6 +58,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 import com.google.gson.JsonArray;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class DatabaseService extends Service {
     public static final String SERVICE_STATUS_CODE = "STATUS_CODE_SERVICE";
@@ -84,28 +89,12 @@ public class DatabaseService extends Service {
 
         isRunning = true;
 
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        @SuppressWarnings("deprecation") String localIP = Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
-
-        /* Checking if the the build config is for developer or not, to get the right IP address of the server. */
-        String baseURL;
-        if (BuildConfig.DEVELOPER_APP && (localIP.substring(0, 3).compareTo("192") == 0 || localIP.substring(0, 2).compareTo("10") == 0)) {
-            baseURL = API.BASE_URL_LOCAL;
-        } else {
-            baseURL = API.BASE_URL_REMOTE;
-        }
-
-        /* Creating the logging interceptor for debugging. */
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(interceptor)
-                .build();
+        String baseURL = API.BASE_URL;
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
+                .client(UnsafeOkHttpClient.getUnsafeOkHttpClient())
                 .build();
 
         api = retrofit.create(API.class);

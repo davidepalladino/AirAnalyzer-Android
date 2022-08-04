@@ -2,22 +2,8 @@ plugins {
     id 'com.android.application'
 }
 
-def keystorePropertiesFile = rootProject.file("keystore.properties")
-def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-
 android {
     compileSdkVersion 31
-    buildToolsVersion "30.0.2"
-
-    signingConfigs {
-        airanalyzer {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-        }
-    }
 
     defaultConfig {
         applicationId "it.davidepalladino.airanalyzer"
@@ -28,7 +14,6 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "boolean", "DEVELOPER_APP", "false"
-        signingConfig signingConfigs.airanalyzer
     }
 
     buildTypes {
@@ -36,14 +21,13 @@ android {
             debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "boolean", "DEVELOPER_APP", "true"
-            signingConfig signingConfigs.airanalyzer
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
         }
 
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.airanalyzer
         }
 
         developer {
@@ -52,8 +36,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             applicationIdSuffix ".developer"
             versionNameSuffix "-developer"
-            buildConfigField "boolean", "DEVELOPER_APP", "true"
-            signingConfig signingConfigs.airanalyzer
         }
     }
 
