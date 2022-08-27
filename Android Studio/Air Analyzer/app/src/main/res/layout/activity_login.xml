@@ -102,7 +102,7 @@
                     android:text="@string/textViewNew" />
 
                 <TextView
-                    android:id="@+id/textViewSignUp"
+                    android:id="@+id/buttonSignUp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

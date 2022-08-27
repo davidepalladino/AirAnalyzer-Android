@@ -34,7 +34,7 @@
         </provider>
 
         <service
-            android:name=".controller.DatabaseService"
+            android:name=".controller.APIService"
             android:enabled="true"
             android:exported="false" />
 
@@ -45,7 +45,6 @@
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

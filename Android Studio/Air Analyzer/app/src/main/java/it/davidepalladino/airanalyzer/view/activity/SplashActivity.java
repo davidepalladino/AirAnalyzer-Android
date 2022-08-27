@@ -2,24 +2,14 @@
  * This view class provides to show a screen, where will be executed the login or the redirection to the
  *  Login activity.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
- * @contact me@davidepalladino.com
- * @website www.davidepalladino.com
- * @version 2.0.1
- * @date 3rd January, 2022
- *
- * This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public
- *  License as published by the Free Software Foundation; either
- *  version 3.0 of the License, or (at your option) any later version
- *
- * This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU Lesser General Public License for more details.
+ * @contact davidepalladino@hotmail.com
+ * @website https://davidepalladino.github.io/
+ * @version 3.0.0
+ * @date 27th August, 2022
  *
  */
 
@@ -42,11 +32,11 @@ import android.os.Message;
 import android.os.SystemClock;
 
 import it.davidepalladino.airanalyzer.R;
-import it.davidepalladino.airanalyzer.controller.DatabaseService;
+import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.FileManager;
 import it.davidepalladino.airanalyzer.model.User;
 
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
+import static it.davidepalladino.airanalyzer.controller.APIService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
@@ -55,21 +45,10 @@ import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 public class SplashActivity extends AppCompatActivity {
     private final int MESSAGE_LOGIN_TIMEOUT = 1;
 
-    private FileManager fileManager;
-    private User user;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        fileManager = new FileManager(SplashActivity.this);
-        user = (User) fileManager.readObject(User.NAMEFILE);
     }
 
     @Override
@@ -78,12 +57,19 @@ public class SplashActivity extends AppCompatActivity {
 
         registerReceiver(broadcastReceiver, new IntentFilter(INTENT_BROADCAST));
 
-        Intent intentDatabaseService = new Intent(SplashActivity.this, DatabaseService.class);
+        Intent intentDatabaseService = new Intent(SplashActivity.this, APIService.class);
         startService(intentDatabaseService);
         bindService(intentDatabaseService, serviceConnection, BIND_AUTO_CREATE);
 
-        /* Checking if there is a previous login and, if not exists, will be launched the Login activity. */
-        if (user == null) {
+        /*
+         * Checking if exists a previous login and, if doesn't exist, will be launched the Login activity.
+         * This condition is valid when the application is launched for the first time, or if the data has been wiped.
+         */
+        FileManager fileManager = new FileManager(SplashActivity.this);
+        User user = (User) fileManager.readObject(User.NAMEFILE);
+        if (user != null) {
+            User.setInstance((User) fileManager.readObject(User.NAMEFILE));
+        } else {
             goToLogin();
         }
     }
@@ -99,11 +85,11 @@ public class SplashActivity extends AppCompatActivity {
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
-            DatabaseService databaseService = localBinder.getService();
+            APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
+            APIService apiService = localBinder.getService();
 
             /* Executing the login and waiting the result within the time defined on TIME_LOGIN_TIMEOUT. */
-            databaseService.login(user, SplashActivity.class.getSimpleName());
+            apiService.login(SplashActivity.class.getSimpleName());
 
             /* Preparing the message for the previously purpose. */
             Message messageLoginTimeout = new Message();
@@ -112,8 +98,7 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
+        public void onServiceDisconnected(ComponentName name) {}
     };
 
     /**
@@ -144,45 +129,42 @@ public class SplashActivity extends AppCompatActivity {
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context contextFrom, Intent intentFrom) {
-            if (intentFrom != null) {
-                if (intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) && intentFrom.hasExtra(SERVICE_STATUS_CODE)) {
-                    if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SplashActivity.class.getSimpleName()) == 0) {
-                        Intent intentTo;
-                        loginTimeout.removeMessages(MESSAGE_LOGIN_TIMEOUT);
+            if (
+                intentFrom != null &&
+                intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) &&
+                intentFrom.hasExtra(SERVICE_STATUS_CODE) &&
+                intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SplashActivity.class.getSimpleName()) == 0)
+            {
+                Intent intentTo;
+                loginTimeout.removeMessages(MESSAGE_LOGIN_TIMEOUT);
 
-                        /* Checking the result about login by the HTTP status code, provided by the Database Service. */
-                        int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
-                        switch (statusCode) {
-                            case 200:
-                                intentTo = new Intent(SplashActivity.this, MainActivity.class);
-                                user = (User) intentFrom.getParcelableExtra(SERVICE_RESPONSE);
-                                fileManager.saveObject(user, User.NAMEFILE);
+                /* Checking the result about login by the HTTP status code, provided by the Database Service. */
+                int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
+                switch (statusCode) {
+                    case 200:
+                        intentTo = new Intent(SplashActivity.this, MainActivity.class);
+                        break;
+                    case 401:
+                        intentTo = new Intent(SplashActivity.this, LoginActivity.class);
+                        intentTo.putExtra(INTENT_TOAST_MESSAGE, getString(R.string.toastIncorrectUsernamePassword));
 
-                                break;
-                            case 204:
-                                intentTo = new Intent(SplashActivity.this, LoginActivity.class);
-                                intentTo.putExtra(INTENT_TOAST_MESSAGE, getString(R.string.toastUserNotValidated));
+                        break;
+                    case 500:
+                        intentTo = new Intent(SplashActivity.this, LoginActivity.class);
+                        intentTo.putExtra(INTENT_TOAST_MESSAGE, getString(R.string.toastServerOffline));
 
-                                break;
-                            case 404:
-                            case 500:
-                                intentTo = new Intent(SplashActivity.this, LoginActivity.class);
-                                intentTo.putExtra(INTENT_TOAST_MESSAGE, getString(R.string.toastServerOffline));
-
-                                break;
-                            default:
-                                intentTo = new Intent(SplashActivity.this, LoginActivity.class);
-                                break;
-                        }
-
-                        /* Launch the right Activity based the previous checks. */
-                        Intent finalIntentTo = intentTo;
-                        new Handler().postDelayed(() -> {
-                            startActivity(finalIntentTo);
-                            finish();
-                        }, 2000);
-                    }
+                        break;
+                    default:
+                        intentTo = new Intent(SplashActivity.this, LoginActivity.class);
+                        break;
                 }
+
+                /* Launch the right Activity based the previous checks. */
+                Intent finalIntentTo = intentTo;
+                new Handler().postDelayed(() -> {
+                    startActivity(finalIntentTo);
+                    finish();
+                }, 2000);
             }
         }
     };

@@ -28,6 +28,7 @@ import com.google.gson.JsonArray;
 
 import java.util.ArrayList;
 
+import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.MeasuresDateAverage;
 import it.davidepalladino.airanalyzer.model.MeasuresDateLatest;
 import it.davidepalladino.airanalyzer.model.MeasuresTodayLatest;
@@ -44,19 +45,38 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
-public interface API {
-    String BASE_URL = "https://airanalyzer.servehttp.com:444/";
+public interface APIRoute {
+    String BASE_URL = "http://192.168.0.4:10000/";
 
-    @POST("api/login")
-    Call<User> login(@Body User user);
+    @Headers({"Content-Type: application/json"})
+    @POST("user/login")
+    Call<Authorization> login(@Body User user);
 
-    @POST("api/signupAirAnalyzer")
+    @POST("user/getMe")
+    Call<User> getMe(@Header("Authorization") String token);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // FIXME
+
+    @GET("user/signup")
     Call<ResponseBody> signup(@Body User user);
 
-    @GET("api/checkUsername")
+    @GET("user/checkUsername")
     Call<ResponseBody> checkUsername(@Query("username") String username);
 
-    @GET("api/checkEmail")
+    @GET("user/checkEmail")
     Call<ResponseBody> checkEmail(@Query("email") String email);
 
     @GET("api/airanalyzer/getRooms")

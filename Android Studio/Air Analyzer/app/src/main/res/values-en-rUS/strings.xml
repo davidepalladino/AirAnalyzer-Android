@@ -91,7 +91,7 @@
     <string name="existsEmail">This email already exists. Try another!</string>
 
     <string name="wrongSyntaxUsername">Username should be 5–20 characters long and can contain \"-\" and \"_\" like special characters.</string>
-    <string name="wrongSyntaxPassword">Password should be 16–24 characters long and must contain one upper case letter, one numeric character and one special character (@$!%*?&amp;.#).</string>
+    <string name="wrongSyntaxPassword">Password should be 8–24 characters long and must contain one upper case letter, one numeric character and one special character (@$!%*?&amp;.#).</string>
     <string name="noticeEmail">Enter the correct email</string>
     <string name="noticeGraphTryAgain">Please try again at the\u0020</string>
     <string name="noticeGraphNoMeasure">No measures in this date</string>
@@ -100,6 +100,7 @@
     <string name="toastServerOffline">Server offline, try again later</string>
     <string name="toastUserNotValidated">This userOLD is not validated</string>
     <string name="toastUserError">There is some error with authentication</string>
+    <string name="toastUserUnauthorized">This user is not This user is not validated</string>
     <string name="toastIncorrectUsernamePassword">Incorrect username or password</string>
     <string name="toastErrorService">This service is disabled</string>
     <string name="toastErrorConnectionDevice">Error connection to device</string>
