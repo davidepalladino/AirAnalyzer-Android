@@ -33,7 +33,7 @@ import android.widget.Toast;
 
 import it.davidepalladino.airanalyzer.R;
 
-public class GeneralToast {
+public class GenericToast {
     private final Activity activity;
     private final LayoutInflater layoutInflater;
 
@@ -42,7 +42,7 @@ public class GeneralToast {
      * @param activity Applicant Activity.
      * @param layoutInflater Applicant Layout Inflater
      */
-    public GeneralToast(Activity activity, LayoutInflater layoutInflater) {
+    public GenericToast(Activity activity, LayoutInflater layoutInflater) {
         this.activity = activity;
         this.layoutInflater = layoutInflater;
     }

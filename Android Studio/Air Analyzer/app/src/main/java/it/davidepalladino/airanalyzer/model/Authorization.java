@@ -30,6 +30,10 @@ public class Authorization {
         return instance;
     }
 
+    public static synchronized void setInstance(Authorization instanceFrom) {
+        instance = instanceFrom;
+    }
+
     /**
      * @brief This method prepares the authentication token.
      * @return String concatenation between "token" and "tokenType".

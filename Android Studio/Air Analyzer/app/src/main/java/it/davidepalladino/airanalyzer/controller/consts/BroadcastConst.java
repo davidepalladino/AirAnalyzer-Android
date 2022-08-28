@@ -1,24 +1,14 @@
 /*
  * This control class provides several constants for the broadcast requests.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
- * @contact me@davidepalladino.com
- * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 4th December, 2021
- *
- * This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public
- *  License as published by the Free Software Foundation; either
- *  version 3.0 of the License, or (at your option) any later version
- *
- * This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU Lesser General Public License for more details.
+ * @contact davidepalladino@hotmail.com
+ * @website https://davidepalladino.github.io/
+ * @version 3.0.0
+ * @date 28th August, 2022
  *
  */
 
@@ -27,6 +17,11 @@ package it.davidepalladino.airanalyzer.controller.consts;
 public interface BroadcastConst {
     String BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY = "ApplicantActivity";
     String BROADCAST_REQUEST_CODE_EXTENSION_LOGIN = "Login";
+    String BROADCAST_REQUEST_CODE_EXTENSION_GET_ME = "GetMe";
+
+
+
+
     String BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP = "Signup";
     String BROADCAST_REQUEST_CODE_EXTENSION_CHECK_USERNAME = "CheckUsername";
     String BROADCAST_REQUEST_CODE_EXTENSION_CHECK_EMAIL = "CheckEmail";

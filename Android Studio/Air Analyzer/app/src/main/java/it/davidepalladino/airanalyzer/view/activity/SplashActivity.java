@@ -9,7 +9,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 27th August, 2022
+ * @date 28th August, 2022
  *
  */
 
@@ -45,6 +45,10 @@ import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 public class SplashActivity extends AppCompatActivity {
     private final int MESSAGE_LOGIN_TIMEOUT = 1;
 
+    private User user;
+
+    private APIService apiService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,10 +70,11 @@ public class SplashActivity extends AppCompatActivity {
          * This condition is valid when the application is launched for the first time, or if the data has been wiped.
          */
         FileManager fileManager = new FileManager(SplashActivity.this);
-        User user = (User) fileManager.readObject(User.NAMEFILE);
+        user = (User) fileManager.readObject(User.NAMEFILE);
         if (user != null) {
             User.setInstance((User) fileManager.readObject(User.NAMEFILE));
         } else {
+            user = User.getInstance();
             goToLogin();
         }
     }
@@ -86,10 +91,10 @@ public class SplashActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
-            APIService apiService = localBinder.getService();
+            apiService = localBinder.getService();
 
             /* Executing the login and waiting the result within the time defined on TIME_LOGIN_TIMEOUT. */
-            apiService.login(SplashActivity.class.getSimpleName());
+            apiService.login(user, SplashActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
 
             /* Preparing the message for the previously purpose. */
             Message messageLoginTimeout = new Message();
@@ -132,17 +137,26 @@ public class SplashActivity extends AppCompatActivity {
             if (
                 intentFrom != null &&
                 intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) &&
-                intentFrom.hasExtra(SERVICE_STATUS_CODE) &&
-                intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SplashActivity.class.getSimpleName()) == 0)
-            {
-                Intent intentTo;
+                intentFrom.hasExtra(SERVICE_STATUS_CODE)
+            ) {
+                Intent intentTo = null;
                 loginTimeout.removeMessages(MESSAGE_LOGIN_TIMEOUT);
 
                 /* Checking the result about login by the HTTP status code, provided by the Database Service. */
                 int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                 switch (statusCode) {
                     case 200:
-                        intentTo = new Intent(SplashActivity.this, MainActivity.class);
+                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SplashActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
+                            apiService.getMe(SplashActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME);
+                        } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SplashActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME) == 0) {
+                            String passwordStored = User.getInstance().password;
+                            User.setInstance(intentFrom.getParcelableExtra(SERVICE_BODY));
+                            User.getInstance().password = passwordStored;
+
+                            intentTo = new Intent(SplashActivity.this, MainActivity.class);
+                        } else {
+                            intentTo = new Intent(SplashActivity.this, LoginActivity.class);
+                        }
                         break;
                     case 401:
                         intentTo = new Intent(SplashActivity.this, LoginActivity.class);
@@ -160,11 +174,13 @@ public class SplashActivity extends AppCompatActivity {
                 }
 
                 /* Launch the right Activity based the previous checks. */
-                Intent finalIntentTo = intentTo;
-                new Handler().postDelayed(() -> {
-                    startActivity(finalIntentTo);
-                    finish();
-                }, 2000);
+                if (intentTo != null) {
+                    Intent finalIntentTo = intentTo;
+                    new Handler().postDelayed(() -> {
+                        startActivity(finalIntentTo);
+                        finish();
+                    }, 2000);
+                }
             }
         }
     };

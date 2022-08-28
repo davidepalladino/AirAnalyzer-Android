@@ -9,7 +9,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 27th August, 2022
+ * @date 28th August, 2022
  *
  */
 
@@ -35,7 +35,7 @@ import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.FileManager;
 import it.davidepalladino.airanalyzer.model.User;
-import it.davidepalladino.airanalyzer.view.widget.GeneralToast;
+import it.davidepalladino.airanalyzer.view.widget.GenericToast;
 
 import static it.davidepalladino.airanalyzer.controller.APIService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
@@ -55,7 +55,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextView textViewUsernameMessage;
     private TextView textViewPasswordMessage;
 
-    private GeneralToast generalToast;
+    private GenericToast genericToast;
     private User user;
 
     private APIService apiService;
@@ -82,25 +82,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onStart() {
         super.onStart();
 
-        generalToast = new GeneralToast(LoginActivity.this, getLayoutInflater());
+        genericToast = new GenericToast(LoginActivity.this, getLayoutInflater());
 
-        /*
-         * Checking if there is a User stored into the internal memory of the phone. In this case,
-         *  where will be set the EditText with the username; else, will be created a new Ususerer object.
-         */
-        FileManager fileManager = new FileManager(LoginActivity.this);
-        user = (User) fileManager.readObject(User.NAMEFILE);
-        if (user != null) {
-            User.setInstance(user);
-            editTextUsername.setText(user.username);
-        } else {
-            user = User.getInstance();
-        }
+        user = User.getInstance();
+        editTextUsername.setText(user.username);
 
         /* Getting the Intent object and check if there is some Toast message, to show if exists. */
         Intent intentFrom = getIntent();
         if (intentFrom != null && intentFrom.hasExtra(INTENT_TOAST_MESSAGE)) {
-            generalToast.make(R.drawable.ic_error, intentFrom.getStringExtra(INTENT_TOAST_MESSAGE));
+            genericToast.make(R.drawable.ic_error, intentFrom.getStringExtra(INTENT_TOAST_MESSAGE));
         }
     }
 
@@ -129,10 +119,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 user.username = editTextUsername.getText().toString();
                 user.password = editTextPassword.getText().toString();
 
+                /* Saving the information for next time that the application is launched. */
                 FileManager fileManager = new FileManager(LoginActivity.this);
                 fileManager.saveObject(User.getInstance(), User.NAMEFILE);
 
-                apiService.login(LoginActivity.class.getSimpleName());
+                apiService.login(user, LoginActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
 
                 break;
             case R.id.buttonSignUp:
@@ -160,19 +151,26 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             if (
                 intentFrom != null &&
                 intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) &&
-                intentFrom.hasExtra(SERVICE_STATUS_CODE) &&
-                intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(LoginActivity.class.getSimpleName()) == 0
+                intentFrom.hasExtra(SERVICE_STATUS_CODE)
             ) {
                 int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                 switch (statusCode) {
                     case 200:
-                        Intent intentTo = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intentTo);
-                        finish();
+                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(LoginActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
+                            apiService.getMe(LoginActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME);
+                        } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(LoginActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME) == 0) {
+                            String passwordStored = User.getInstance().password;
+                            User.setInstance(intentFrom.getParcelableExtra(SERVICE_BODY));
+                            User.getInstance().password = passwordStored;
 
+
+                            Intent intentTo = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intentTo);
+                            finish();
+                        }
                         break;
                     case 401:
-                        generalToast.make(R.drawable.ic_error,getString(R.string.toastIncorrectUsernamePassword));
+                        genericToast.make(R.drawable.ic_error,getString(R.string.toastIncorrectUsernamePassword));
 
                         textViewUsernameMessage.setVisibility(View.GONE);
                         textViewUsernameMessage.setText("");
@@ -182,7 +180,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                         break;
                     case 409:
-                        String response = intentFrom.getStringExtra(SERVICE_RESPONSE);
+                        String response = intentFrom.getStringExtra(SERVICE_BODY);
 
                         try {
                             JSONObject jsonObject = new JSONObject(response);
@@ -199,7 +197,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                         break;
                     case 500:
-                        generalToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
+                        genericToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
                         break;
                     default:
                         break;

@@ -2,15 +2,14 @@
  * This control class provides to connect to the database between API request.
  * Specifically, is possible to get and set information about the room, and to get information about the measures read from the sensors.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
- * @contact me@davidepalladino.com
- * @website www.davidepalladino.com
- * @version 2.0.1
- * @date 3rd January, 2022
- *
+ * @contact davidepalladino@hotmail.com
+ * @website https://davidepalladino.github.io/
+ * @version 3.0.0
+ * @date 28th August, 2022
  *
  */
 
@@ -20,6 +19,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.Parcelable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,8 +48,8 @@ import androidx.annotation.NonNull;
 import com.google.gson.JsonArray;
 
 public class APIService extends Service {
-    public static final String SERVICE_STATUS_CODE = "STATUS_CODE_SERVICE";
-    public static final String SERVICE_RESPONSE = "SERVICE_RESPONSE";
+    public static final String SERVICE_STATUS_CODE = "SERVICE_STATUS_CODE";
+    public static final String SERVICE_BODY = "SERVICE_BODY";
 
     public static boolean isRunning = false;
 
@@ -97,9 +97,7 @@ public class APIService extends Service {
      * @brief This method provides to execute the login, saving the token and his type on Authorization object.
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
-    public void login(@NonNull String applicantActivity) {
-        User user = User.getInstance();
-
+    public void login(@NonNull User user, @NonNull String applicantActivity) {
         Call<Authorization> call = api.login(user);
         call.enqueue(new Callback<Authorization>() {
             @Override
@@ -107,14 +105,10 @@ public class APIService extends Service {
                 Intent intentBroadcast = new Intent(INTENT_BROADCAST);
 
                 if ((response.code() == 200) && (response.body() != null)) {
-                    Authorization authorization = Authorization.getInstance();
-                    authorization.token = response.body().token;
-                    authorization.tokenType = response.body().tokenType;
-
-                    APIService.this.getMe(null);
+                    Authorization.setInstance(response.body());
                 } else if ((response.code() == 409) && (response.errorBody() != null)) {
                     try {
-                        intentBroadcast.putExtra(SERVICE_RESPONSE, response.errorBody().string());
+                        intentBroadcast.putExtra(SERVICE_BODY, response.errorBody().string());
                     } catch (IOException ignored) { }
                 }
 
@@ -124,32 +118,30 @@ public class APIService extends Service {
             }
 
             @Override
-            public void onFailure(Call<Authorization> call, Throwable t) {}
+            public void onFailure(Call<Authorization> call, Throwable t) { }
         });
     }
 
     /**
      * @brief This method provides to get information about the user authenticate.
      * @param applicantActivity Name of the applicant activity for the broadcast message.
-     *   Can be set null, and in this case will be not launched any broadcast message.
      */
-    public void getMe(String applicantActivity) {
+    public void getMe(@NonNull String applicantActivity) {
         String authorizationToken = Authorization.getInstance().getAuthorization();
 
         Call<User> call = api.getMe(authorizationToken);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                if (applicantActivity != null) {
-                    Intent intentBroadcast = new Intent(INTENT_BROADCAST);
-                    intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
-                    intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                    sendBroadcast(intentBroadcast);
-                }
+                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
+                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
+                intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
+                intentBroadcast.putExtra(SERVICE_BODY, (Parcelable) response.body());
+                sendBroadcast(intentBroadcast);
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {}
+            public void onFailure(Call<User> call, Throwable t) { }
         });
     }
 
@@ -165,13 +157,8 @@ public class APIService extends Service {
 
     // FIXME
 
-
     /**
-     * @brief This method provides to execute the sign up. Will be launched a message Broadcast, Specifically:
-     *  - 201 status code to indicate that the user has been registered to Air Analyzer;
-     *  - 403 status code to indicate that the service doesn't exist or is not active;
-     *  - 500 status code to indicate that the service has not been registered for some reason, like the user is already registered.
-     * @param user User object that contains the information of the new user.
+     * @brief This method provides to execute the sign up.
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
     public void signup(User user, String applicantActivity) {
@@ -190,6 +177,7 @@ public class APIService extends Service {
             }
         });
     }
+
 
     /**
      * @brief This method provides to check if the username is already exists on the database. Will be launched a message Broadcast, specifically:
@@ -261,7 +249,7 @@ public class APIService extends Service {
                 Intent intentBroadcast = new Intent(INTENT_BROADCAST);
                 intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
                 intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                intentBroadcast.putParcelableArrayListExtra(SERVICE_RESPONSE, listRooms);
+                intentBroadcast.putParcelableArrayListExtra(SERVICE_BODY, listRooms);
                 sendBroadcast(intentBroadcast);
             }
 
@@ -371,7 +359,7 @@ public class APIService extends Service {
                 Intent intentBroadcast = new Intent(INTENT_BROADCAST);
                 intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
                 intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                intentBroadcast.putParcelableArrayListExtra(SERVICE_RESPONSE, listMeasures);
+                intentBroadcast.putParcelableArrayListExtra(SERVICE_BODY, listMeasures);
                 sendBroadcast(intentBroadcast);
             }
 
@@ -403,7 +391,7 @@ public class APIService extends Service {
                 Intent intentBroadcast = new Intent(INTENT_BROADCAST);
                 intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
                 intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                intentBroadcast.putExtra(SERVICE_RESPONSE, measuresDateLatest);
+                intentBroadcast.putExtra(SERVICE_BODY, measuresDateLatest);
                 sendBroadcast(intentBroadcast);
             }
 
@@ -436,7 +424,7 @@ public class APIService extends Service {
                 Intent intentBroadcast = new Intent(INTENT_BROADCAST);
                 intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
                 intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                intentBroadcast.putParcelableArrayListExtra(SERVICE_RESPONSE, listMeasures);
+                intentBroadcast.putParcelableArrayListExtra(SERVICE_BODY, listMeasures);
                 sendBroadcast(intentBroadcast);
             }
 
@@ -466,7 +454,7 @@ public class APIService extends Service {
                 Intent intentBroadcast = new Intent(INTENT_BROADCAST);
                 intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
                 intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                intentBroadcast.putParcelableArrayListExtra(SERVICE_RESPONSE, listNotifications);
+                intentBroadcast.putParcelableArrayListExtra(SERVICE_BODY, listNotifications);
                 sendBroadcast(intentBroadcast);
             }
 
