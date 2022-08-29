@@ -55,22 +55,6 @@
     <string name="buttonCancel">Cancel</string>
     <string name="buttonAdd">Add</string>
 
-    <string name="spinnerSignupQuestion1">Your parent\'s first pet?</string>
-    <string name="spinnerSignupQuestion2">In which city did your grandparents meet?</string>
-    <string name="spinnerSignupQuestion3">Your grandfather/grandmother\'s first job?</string>
-    <string name="spinnerSignupQuestion4">What was the first trip of a relative of yours?</string>
-    <string name="spinnerSignupQuestion5">What is the name of your father\'s first close friend?</string>
-    <string name="spinnerSignupQuestion6">What is the first teacher who gave you top marks?</string>
-    <string name="spinnerSignupQuestion7">What is your uncle\'s free time?</string>
-    <string name="spinnerSignupQuestion8">In which city was your grandparents\' first home located?</string>
-    <string name="spinnerSignupQuestion9">Who is the first graduate in the family?</string>
-    <string name="spinnerSignupQuestion10">Which country did you want to move a relative to?</string>
-    <string name="spinnerSignupQuestion11">What was the most interesting holiday for an acquaintance of yours?</string>
-    <string name="spinnerSignupQuestion12">In which year did a relative of yours have a driver\'s license?</string>
-    <string name="spinnerSignupQuestion13">What is the name of your mother\'s first best friend?</string>
-    <string name="spinnerSignupQuestion14">On what occasion did your parent receive the first traffic ticket?</string>
-    <string name="spinnerSignupQuestion15">What is the first car of a relative of yours?</string>
-
     <string name="spinnerNotificationErrorsTime1">15 minuti</string>
     <string name="spinnerNotificationErrorsTime2">30 minuti</string>
     <string name="spinnerNotificationErrorsTime3">1 ora</string>
@@ -133,28 +117,8 @@
     <string name="notificationErrorMessageNotUpdated">is not revealing any measure. Please, check the device.</string>
     <string name="notificationErrorMessageMeasure">has revealed a strange measure.</string>
 
-    <array name="spinnerSignupQuestions1">
-        <item>@string/spinnerSignupQuestion1</item>
-        <item>@string/spinnerSignupQuestion2</item>
-        <item>@string/spinnerSignupQuestion3</item>
-        <item>@string/spinnerSignupQuestion4</item>
-        <item>@string/spinnerSignupQuestion5</item>
-    </array>
-
-    <array name="spinnerSignupQuestions2">
-        <item>@string/spinnerSignupQuestion6</item>
-        <item>@string/spinnerSignupQuestion7</item>
-        <item>@string/spinnerSignupQuestion8</item>
-        <item>@string/spinnerSignupQuestion9</item>
-        <item>@string/spinnerSignupQuestion10</item>
-    </array>
-
-    <array name="spinnerSignupQuestions3">
-        <item>@string/spinnerSignupQuestion11</item>
-        <item>@string/spinnerSignupQuestion12</item>
-        <item>@string/spinnerSignupQuestion13</item>
-        <item>@string/spinnerSignupQuestion14</item>
-        <item>@string/spinnerSignupQuestion15</item>
+    <array name="spinnerTimezone">
+        <item></item>
     </array>
 
     <array name="spinnerNotificationErrors">
@@ -164,7 +128,6 @@
         <item>@string/spinnerNotificationErrorsTime4</item>
         <item>@string/spinnerNotificationErrorsTime5</item>
     </array>
-
 
     <string name="localFormatDate">dd/MM/yyyy</string>
     <string name="timestamp">yyyy-MM-dd</string>

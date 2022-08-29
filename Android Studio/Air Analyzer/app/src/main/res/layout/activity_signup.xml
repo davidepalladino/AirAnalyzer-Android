@@ -197,122 +197,13 @@
             android:layout_marginTop="1dp"
             android:layout_marginBottom="5dp" />
 
-        <!-- Question 1 -->
+        <!-- Timezone -->
         <Spinner
-            android:id="@+id/spinnerQuestions1"
+            android:id="@+id/spinnerTimezone"
             android:layout_width="330dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="50dp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:theme="@style/TextInputEditText.Outlined"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:boxBackgroundColor="@color/background"
-            app:hintTextColor="@color/secondaryColor"
-            app:boxStrokeColor="@color/secondaryColor" >
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextAnswer1"
-                android:layout_width="330dp"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:hint="@string/editTextAnswer"
-                android:textSize="15sp"
-                android:paddingStart="0dp"
-                android:paddingEnd="0dp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/textViewAnswer1Message"
-            android:layout_width="324dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_gravity="center"
-            android:textColor="@color/error"
-            android:textStyle="bold"
-            android:layout_marginTop="1dp"
-            android:layout_marginBottom="5dp" />
-
-        <!-- Question 2 -->
-        <Spinner
-            android:id="@+id/spinnerQuestions2"
-            android:layout_width="330dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="15dp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:theme="@style/TextInputEditText.Outlined"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:boxBackgroundColor="@color/background"
-            app:hintTextColor="@color/secondaryColor"
-            app:boxStrokeColor="@color/secondaryColor" >
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextAnswer2"
-                android:layout_width="330dp"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:hint="@string/editTextAnswer"
-                android:textSize="15sp"
-                android:paddingStart="0dp"
-                android:paddingEnd="0dp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/textViewAnswer2Message"
-            android:layout_width="324dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_gravity="center"
-            android:textColor="@color/error"
-            android:textStyle="bold"
-            android:layout_marginTop="1dp"
-            android:layout_marginBottom="5dp" />
-
-        <!-- Question 3 -->
-        <Spinner
-            android:id="@+id/spinnerQuestions3"
-            android:layout_width="330dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="15dp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:theme="@style/TextInputEditText.Outlined"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:boxBackgroundColor="@color/background"
-            app:hintTextColor="@color/secondaryColor"
-            app:boxStrokeColor="@color/secondaryColor" >
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextAnswer3"
-                android:layout_width="330dp"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:hint="@string/editTextAnswer"
-                android:textSize="15sp"
-                android:paddingStart="0dp"
-                android:paddingEnd="0dp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/textViewAnswer3Message"
-            android:layout_width="324dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_gravity="center"
-            android:textColor="@color/error"
-            android:textStyle="bold"
-            android:layout_marginTop="1dp"
-            android:layout_marginBottom="5dp" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonContinue"
