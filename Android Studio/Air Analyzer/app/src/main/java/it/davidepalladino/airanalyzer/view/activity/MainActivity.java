@@ -47,18 +47,19 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import it.davidepalladino.airanalyzer.controller.AirAnalyzerApplication;
 import it.davidepalladino.airanalyzer.R;
-import it.davidepalladino.airanalyzer.controller.DatabaseService;
+import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.NotificationErrorWorker;
+import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.fragment.HomeFragment;
 import it.davidepalladino.airanalyzer.view.fragment.NotificationFragment;
 import it.davidepalladino.airanalyzer.view.fragment.SettingFragment;
 import it.davidepalladino.airanalyzer.view.fragment.RoomFragment;
-import it.davidepalladino.airanalyzer.view.widget.GeneralToast;
+import it.davidepalladino.airanalyzer.view.widget.GenericToast;
 import it.davidepalladino.airanalyzer.controller.FileManager;
 
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
+import static it.davidepalladino.airanalyzer.controller.APIService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
@@ -77,12 +78,12 @@ public class MainActivity extends AppCompatActivity {
     private SettingFragment fragmentSetting;
     private Fragment fragmentActive;
 
-    private GeneralToast generalToast;
+    private GenericToast generalToast;
 
     private FileManager fileManager;
     private User user;
 
-    private DatabaseService databaseService;
+    private APIService databaseService;
 
     private byte attemptsLogin = 1;
 
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        generalToast = new GeneralToast(MainActivity.this, getLayoutInflater());
+        generalToast = new GenericToast(MainActivity.this, getLayoutInflater());
 
         fileManager = new FileManager(MainActivity.this);
         user = (User) fileManager.readObject(User.NAMEFILE);
@@ -177,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
         registerReceiver(broadcastReceiver, new IntentFilter(INTENT_BROADCAST));
 
-        Intent intentDatabaseService = new Intent(MainActivity.this, DatabaseService.class);
+        Intent intentDatabaseService = new Intent(MainActivity.this, APIService.class);
         bindService(intentDatabaseService, serviceConnection, BIND_AUTO_CREATE);
     }
 
@@ -260,7 +261,6 @@ public class MainActivity extends AppCompatActivity {
     private void goToLogin(String toastMessage) {
         /* Deleting the information for the login. */
         user.password = "";
-        user.token = "";
         fileManager.saveObject(user, User.NAMEFILE);
 
         Intent intentTo = new Intent(MainActivity.this, LoginActivity.class);
@@ -276,10 +276,10 @@ public class MainActivity extends AppCompatActivity {
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
+            APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             databaseService = localBinder.getService();
 
-            databaseService.getRooms(user.getAuthorization(), true, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
+            databaseService.getRooms(Authorization.getInstance().getAuthorization(), true, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
         }
 
         @Override
@@ -297,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
                         case 200:
                             // LOGIN BROADCAST
                             if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                user = intentFrom.getParcelableExtra(SERVICE_BODY);
                                 fileManager.saveObject(user, User.NAMEFILE);
 
                                 attemptsLogin = 1;

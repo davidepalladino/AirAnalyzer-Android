@@ -28,7 +28,7 @@ import static android.content.Context.BIND_AUTO_CREATE;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
+import static it.davidepalladino.airanalyzer.controller.APIService.*;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -53,13 +53,14 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import it.davidepalladino.airanalyzer.R;
-import it.davidepalladino.airanalyzer.controller.DatabaseService;
+import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.FileManager;
+import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.MeasuresTodayLatest;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.activity.LoginActivity;
 import it.davidepalladino.airanalyzer.view.widget.MeasuresTodayAdapterView;
-import it.davidepalladino.airanalyzer.view.widget.GeneralToast;
+import it.davidepalladino.airanalyzer.view.widget.GenericToast;
 
 public class HomeFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -67,12 +68,12 @@ public class HomeFragment extends Fragment {
     private TextView textViewHomeNameSurname;
     private ListView listViewHomeMeasuresToday;
 
-    private GeneralToast generalToast;
+    private GenericToast generalToast;
 
     private FileManager fileManager;
     private User user;
 
-    private DatabaseService databaseService;
+    private APIService databaseService;
 
     private byte attemptsLogin = 1;
 
@@ -89,11 +90,12 @@ public class HomeFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        generalToast = new GeneralToast(getActivity(), getLayoutInflater());
+        generalToast = new GenericToast(getActivity(), getLayoutInflater());
 
         fileManager = new FileManager(getContext());
 
         user = (User) fileManager.readObject(User.NAMEFILE);
+        user = User.getInstance();
         textViewHomeNameSurname.setText(String.format("%s %s", user.name, user.surname));
     }
 
@@ -103,7 +105,7 @@ public class HomeFragment extends Fragment {
 
         requireActivity().registerReceiver(broadcastReceiver, new IntentFilter(INTENT_BROADCAST));
 
-        Intent intentDatabaseService = new Intent(getActivity(), DatabaseService.class);
+        Intent intentDatabaseService = new Intent(getActivity(), APIService.class);
         requireActivity().bindService(intentDatabaseService, serviceConnection, BIND_AUTO_CREATE);
     }
 
@@ -120,7 +122,7 @@ public class HomeFragment extends Fragment {
         View layoutFragment = inflater.inflate(R.layout.fragment_home, container, false);
 
         swipeRefreshLayout = layoutFragment.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(() -> databaseService.getMeasuresTodayLatest(user.getAuthorization(), HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST));
+        swipeRefreshLayout.setOnRefreshListener(() -> databaseService.getMeasuresTodayLatest(Authorization.getInstance().getAuthorization(), HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST));
 
         TextView textViewHomeWelcome = layoutFragment.findViewById(R.id.textViewWelcome);
         textViewNoMeasures = layoutFragment.findViewById(R.id.textViewNoMeasures);
@@ -149,7 +151,7 @@ public class HomeFragment extends Fragment {
          *  on the premature call of this method by the MainActivity.
          */
         if (databaseService != null) {
-            databaseService.getMeasuresTodayLatest(user.getAuthorization(), HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST);
+            databaseService.getMeasuresTodayLatest(Authorization.getInstance().getAuthorization(), HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST);
         }
     }
 
@@ -162,7 +164,6 @@ public class HomeFragment extends Fragment {
     private void goToLogin(String toastMessage) {
         /* Deleting the information for the login. */
         user.password = "";
-        user.token = "";
         fileManager.saveObject(user, User.NAMEFILE);
 
         Intent intentTo = new Intent(getActivity(), LoginActivity.class);
@@ -181,10 +182,10 @@ public class HomeFragment extends Fragment {
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
+            APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             databaseService = localBinder.getService();
 
-            databaseService.getMeasuresTodayLatest(user.getAuthorization(), HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST);
+            databaseService.getMeasuresTodayLatest(Authorization.getInstance().getAuthorization(), HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST);
         }
 
         @Override
@@ -209,13 +210,13 @@ public class HomeFragment extends Fragment {
                                 listViewHomeMeasuresToday.setVisibility(View.VISIBLE);
 
                                 /* Getting the measures and setting the ListView. */
-                                ArrayList<MeasuresTodayLatest> measuresTodayLatest = intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE);
+                                ArrayList<MeasuresTodayLatest> measuresTodayLatest = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
                                 MeasuresTodayAdapterView adapterViewMeasureToday = new MeasuresTodayAdapterView(requireActivity().getApplicationContext(), measuresTodayLatest);
                                 listViewHomeMeasuresToday.setAdapter(adapterViewMeasureToday);
 
                             // LOGIN BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                user = intentFrom.getParcelableExtra(SERVICE_BODY);
                                 fileManager.saveObject(user, User.NAMEFILE);
 
                                 attemptsLogin = 1;

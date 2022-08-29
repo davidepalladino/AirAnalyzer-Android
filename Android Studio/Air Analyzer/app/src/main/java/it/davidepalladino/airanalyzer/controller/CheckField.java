@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public class CheckField {
     private static final String REGEX_USERNAME = "^[a-z0-9_-]{5,20}$";
-    private static final String REGEX_PASSWORD = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.#])[A-Za-z\\d@$!%*?&.#]{16,24}$";
+    private static final String REGEX_PASSWORD = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.#])[A-Za-z\\d@$!%*?&.#]{8,24}$";
     private static final String REGEX_EMAIL = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
     private static final String REGEX_IPV4 =
             "^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\." +

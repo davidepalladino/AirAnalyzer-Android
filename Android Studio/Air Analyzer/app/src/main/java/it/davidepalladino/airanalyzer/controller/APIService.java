@@ -123,6 +123,35 @@ public class APIService extends Service {
     }
 
     /**
+     * @brief This method provides to execute the sign up.
+     * @param applicantActivity Name of the applicant activity for the broadcast message.
+     */
+    public void signup(User user, String applicantActivity) {
+        Call<User> call = api.signup(user);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
+
+                if ((response.code() == 200) && (response.body() != null)) {
+                    intentBroadcast.putExtra(SERVICE_BODY, (Parcelable) response.body());
+                } else if ((response.code() == 409) && (response.errorBody() != null)) {
+                    try {
+                        intentBroadcast.putExtra(SERVICE_BODY, response.errorBody().string());
+                    } catch (IOException ignored) { }
+                }
+
+                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
+                intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
+                sendBroadcast(intentBroadcast);
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) { }
+        });
+    }
+
+    /**
      * @brief This method provides to get information about the user authenticate.
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
@@ -153,31 +182,7 @@ public class APIService extends Service {
 
 
 
-
-
     // FIXME
-
-    /**
-     * @brief This method provides to execute the sign up.
-     * @param applicantActivity Name of the applicant activity for the broadcast message.
-     */
-    public void signup(User user, String applicantActivity) {
-        Call<ResponseBody> call = api.signup(user);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
-                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
-                intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                sendBroadcast(intentBroadcast);
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-            }
-        });
-    }
-
 
     /**
      * @brief This method provides to check if the username is already exists on the database. Will be launched a message Broadcast, specifically:

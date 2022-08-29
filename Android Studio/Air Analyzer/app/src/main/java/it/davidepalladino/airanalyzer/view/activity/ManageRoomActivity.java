@@ -28,7 +28,7 @@ package it.davidepalladino.airanalyzer.view.activity;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
+import static it.davidepalladino.airanalyzer.controller.APIService.*;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,24 +52,25 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import it.davidepalladino.airanalyzer.R;
-import it.davidepalladino.airanalyzer.controller.DatabaseService;
+import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.FileManager;
+import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.dialog.RemoveRoomDialog;
-import it.davidepalladino.airanalyzer.view.widget.GeneralToast;
+import it.davidepalladino.airanalyzer.view.widget.GenericToast;
 import it.davidepalladino.airanalyzer.view.widget.ManageRoomsAdapterView;
 
 public class ManageRoomActivity extends AppCompatActivity implements ManageRoomsAdapterView.ManageRoomsAdapterViewCallback, RemoveRoomDialog.RemoveRoomDialogCallback {
     private TextView textViewNoRoom;
     private ListView listViewRoom;
 
-    private GeneralToast generalToast;
+    private GenericToast generalToast;
 
     private FileManager fileManager;
     private User user;
 
-    private DatabaseService databaseService;
+    private APIService databaseService;
 
     private byte attemptsLogin = 1;
 
@@ -89,7 +90,7 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
     protected void onStart() {
         super.onStart();
 
-        generalToast = new GeneralToast(ManageRoomActivity.this, getLayoutInflater());
+        generalToast = new GenericToast(ManageRoomActivity.this, getLayoutInflater());
 
         fileManager = new FileManager(ManageRoomActivity.this);
         user = (User) fileManager.readObject(User.NAMEFILE);
@@ -109,7 +110,7 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
 
         registerReceiver(broadcastReceiver, new IntentFilter(INTENT_BROADCAST));
 
-        Intent intentDatabaseService = new Intent(ManageRoomActivity.this, DatabaseService.class);
+        Intent intentDatabaseService = new Intent(ManageRoomActivity.this, APIService.class);
         bindService(intentDatabaseService, serviceConnection, BIND_AUTO_CREATE);
     }
 
@@ -138,7 +139,7 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
 
     @Override
     public void onPushAcceptButtonManageRoomsAdapterView(Room room) {
-        databaseService.renameRoom(user.getAuthorization(), room.id, room.name, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_RENAME_ROOM);
+        databaseService.renameRoom(Authorization.getInstance().getAuthorization(), room.id, room.name, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_RENAME_ROOM);
     }
 
     @Override
@@ -150,16 +151,16 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
 
     @Override
     public void onPushOkButtonRemoveRoomDialog(Room room) {
-        databaseService.deactivateRoom(user.getAuthorization(), room.id, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_REMOVE_ROOM);
+        databaseService.deactivateRoom(Authorization.getInstance().getAuthorization(), room.id, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_REMOVE_ROOM);
     }
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
+            APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             databaseService = localBinder.getService();
 
-            databaseService.getRooms(user.getAuthorization(), true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
+            databaseService.getRooms(Authorization.getInstance().getAuthorization(), true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
         }
 
         @Override
@@ -177,14 +178,14 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
                         case 200:
                             // ACTIVE ROOMS BROADCAST
                             if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS) == 0) {
-                                ArrayList<Room> arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE);
+                                ArrayList<Room> arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
 
                                 /*  Checking the list of rooms to update or not the ListView dedicated. */
                                 if (!arrayListRoom.isEmpty()) {
                                     textViewNoRoom.setVisibility(View.GONE);
                                     listViewRoom.setVisibility(View.VISIBLE);
 
-                                    arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE);
+                                    arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
                                     ManageRoomsAdapterView adapterViewManageRooms = new ManageRoomsAdapterView(ManageRoomActivity.this, arrayListRoom);
                                     listViewRoom.setAdapter(adapterViewManageRooms);
                                 } else {
@@ -194,17 +195,17 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
 
                             // RENAME ROOM BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_RENAME_ROOM) == 0) {
-                                databaseService.getRooms(user.getAuthorization(), true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
+                                databaseService.getRooms(Authorization.getInstance().getAuthorization(), true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
                                 generalToast.make(R.drawable.ic_check_circle, getString(R.string.toastRoomRenamed));
 
                             // REMOVE ROOM BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_REMOVE_ROOM) == 0) {
-                                databaseService.getRooms(user.getAuthorization(), true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
+                                databaseService.getRooms(Authorization.getInstance().getAuthorization(), true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
                                 generalToast.make(R.drawable.ic_check_circle, getString(R.string.toastRoomRemoved));
 
                             // LOGIN BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = (User) intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                user = (User) intentFrom.getParcelableExtra(SERVICE_BODY);
                                 fileManager.saveObject(user, User.NAMEFILE);
 
                                 attemptsLogin = 1;
@@ -217,7 +218,7 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(() -> {
-                                    databaseService.login((User) fileManager.readObject(User.NAMEFILE), MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    databaseService.login(user, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
                                     attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {

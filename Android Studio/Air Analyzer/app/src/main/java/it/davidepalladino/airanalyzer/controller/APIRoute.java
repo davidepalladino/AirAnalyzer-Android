@@ -41,12 +41,16 @@ import retrofit2.http.Query;
 public interface APIRoute {
     String BASE_URL = "http://192.168.0.4:10000/";
 
-    @Headers({"Content-Type: application/json"})
     @POST("user/login")
+    @Headers({"Content-Type: application/json"})
     Call<Authorization> login(@Body User user);
 
     @GET("user/getMe")
     Call<User> getMe(@Header("Authorization") String token);
+
+    @POST("user/register")
+    @Headers({"Content-Type: application/json"})
+    Call<User> signup(@Body User user);
 
 
 
@@ -62,9 +66,6 @@ public interface APIRoute {
 
 
     // FIXME
-
-    @GET("user/signup")
-    Call<ResponseBody> signup(@Body User user);
 
     @GET("user/checkUsername")
     Call<ResponseBody> checkUsername(@Query("username") String username);

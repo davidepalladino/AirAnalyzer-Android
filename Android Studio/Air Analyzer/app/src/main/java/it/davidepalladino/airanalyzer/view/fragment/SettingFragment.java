@@ -51,6 +51,7 @@ import it.davidepalladino.airanalyzer.BuildConfig;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.FileManager;
 import it.davidepalladino.airanalyzer.controller.NotificationErrorWorker;
+import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.activity.LoginActivity;
@@ -153,7 +154,6 @@ public class SettingFragment extends Fragment {
     private void goToLogin() {
         /* Deleting the information for the login. */
         user.password = "";
-        user.token = "";
         fileManager.saveObject(user, User.NAMEFILE);
 
         Intent intentTo = new Intent(getActivity(), LoginActivity.class);

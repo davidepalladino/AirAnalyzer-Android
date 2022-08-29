@@ -73,9 +73,10 @@ import java.util.Calendar;
 import java.util.List;
 
 import it.davidepalladino.airanalyzer.R;
-import it.davidepalladino.airanalyzer.controller.DatabaseService;
+import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.ManageDatetime;
 import it.davidepalladino.airanalyzer.controller.FileManager;
+import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.MeasuresDateAverage;
 import it.davidepalladino.airanalyzer.model.MeasuresDateLatest;
 import it.davidepalladino.airanalyzer.model.Room;
@@ -83,7 +84,7 @@ import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.activity.AddRoomActivity;
 import it.davidepalladino.airanalyzer.view.activity.LoginActivity;
 import it.davidepalladino.airanalyzer.view.activity.ManageRoomActivity;
-import it.davidepalladino.airanalyzer.view.widget.GeneralToast;
+import it.davidepalladino.airanalyzer.view.widget.GenericToast;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 import static android.graphics.Typeface.ITALIC;
@@ -91,7 +92,7 @@ import static android.graphics.Typeface.NORMAL;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
+import static it.davidepalladino.airanalyzer.controller.APIService.*;
 
 @SuppressWarnings("deprecation")
 @SuppressLint("DefaultLocale")
@@ -117,7 +118,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
     private BarChart barChartTemperature;
     private BarChart barChartHumidity;
 
-    private GeneralToast generalToast;
+    private GenericToast generalToast;
 
     private Calendar date;
     private int utc;
@@ -127,7 +128,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
     private Room roomSelected;
     private ArrayList<Room> arrayListRoom;
 
-    private DatabaseService databaseService;
+    private APIService databaseService;
 
     private DecimalFormat decimalFormat;
     private final MutableBoolean isOpenedMenuDate = new MutableBoolean(false);
@@ -143,7 +144,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
     public void onStart() {
         super.onStart();
 
-        generalToast = new GeneralToast(getActivity(), getLayoutInflater());
+        generalToast = new GenericToast(getActivity(), getLayoutInflater());
 
         fileManager = new FileManager(getContext());
         user = (User) fileManager.readObject(User.NAMEFILE);
@@ -163,7 +164,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
 
         requireActivity().registerReceiver(broadcastReceiver, new IntentFilter(INTENT_BROADCAST));
 
-        Intent intentDatabaseService = new Intent(getActivity(), DatabaseService.class);
+        Intent intentDatabaseService = new Intent(getActivity(), APIService.class);
         requireActivity().bindService(intentDatabaseService, serviceConnection, BIND_AUTO_CREATE);
     }
 
@@ -188,7 +189,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
         linearLayoutNoRoom = layoutFragment.findViewById(R.id.linearLayoutNoRoom);
 
         swipeRefreshLayout = layoutFragment.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(() -> databaseService.getRooms(user.getAuthorization(), true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS));
+        swipeRefreshLayout.setOnRefreshListener(() -> databaseService.getRooms(Authorization.getInstance().getAuthorization(), true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS));
 
         nestedScrollView = layoutFragment.findViewById(R.id.nestedScrollView);
 
@@ -360,8 +361,8 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
 
         String timestamp = ManageDatetime.createDateFormat(date, getString(R.string.timestamp));
 
-        databaseService.getMeasuresDateLatest(user.getAuthorization(), roomSelected.id, timestamp, utc, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_LATEST + roomSelected.id);
-        databaseService.getMeasuresDateAverage(user.getAuthorization(), roomSelected.id, timestamp, utc, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.id);
+        databaseService.getMeasuresDateLatest(Authorization.getInstance().getAuthorization(), roomSelected.id, timestamp, utc, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_LATEST + roomSelected.id);
+        databaseService.getMeasuresDateAverage(Authorization.getInstance().getAuthorization(), roomSelected.id, timestamp, utc, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.id);
     }
 
     /**
@@ -411,7 +412,6 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
     private void goToLogin(String toastMessage) {
         /* Deleting the information for the login. */
         user.password = "";
-        user.token = "";
         fileManager.saveObject(user, User.NAMEFILE);
 
         Intent intentTo = new Intent(getActivity(), LoginActivity.class);
@@ -534,10 +534,10 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
+            APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             databaseService = localBinder.getService();
 
-            databaseService.getRooms(user.getAuthorization(), true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
+            databaseService.getRooms(Authorization.getInstance().getAuthorization(), true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
         }
 
         @Override
@@ -557,7 +557,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
                             if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS) == 0) {
                                 swipeRefreshLayout.setRefreshing(false);
 
-                                arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE);
+                                arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
 
                                 /* Checking if there is at least one room, to create the Chips object. */
                                 if (arrayListRoom.isEmpty()) {
@@ -622,7 +622,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
 
                             // MEASURES DATE LATEST BROADCAST
                             else if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_LATEST + roomSelected.id) == 0) {
-                                MeasuresDateLatest measuresDateLatest = intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                MeasuresDateLatest measuresDateLatest = intentFrom.getParcelableExtra(SERVICE_BODY);
 
                                 textViewRoomLatestTime.setTypeface(null, NORMAL);
                                 textViewRoomLatestTemperature.setTypeface(null, NORMAL);
@@ -634,7 +634,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
 
                             // MEASURES DATE AVERAGE BROADCAST
                             } else if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.id) == 0) {
-                                ArrayList<MeasuresDateAverage> arrayListMeasuresDateAverage = intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE);
+                                ArrayList<MeasuresDateAverage> arrayListMeasuresDateAverage = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
 
                                 barChartTemperature.setVisibility(View.VISIBLE);
                                 barChartHumidity.setVisibility(View.VISIBLE);
@@ -647,7 +647,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
 
                             // LOGIN BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                user = intentFrom.getParcelableExtra(SERVICE_BODY);
                                 fileManager.saveObject(user, User.NAMEFILE);
 
                                 attemptsLogin = 1;

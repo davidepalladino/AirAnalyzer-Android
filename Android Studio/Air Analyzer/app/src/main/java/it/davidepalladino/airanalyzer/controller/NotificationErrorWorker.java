@@ -25,7 +25,7 @@
 
 package it.davidepalladino.airanalyzer.controller;
 
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
+import static it.davidepalladino.airanalyzer.controller.APIService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import it.davidepalladino.airanalyzer.R;
+import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.activity.MainActivity;
@@ -71,7 +72,7 @@ public class NotificationErrorWorker extends Worker {
     private final FileManager fileManager;
     private User user;
 
-    private DatabaseService databaseService;
+    private APIService databaseService;
 
     private byte attemptsLogin = 1;
 
@@ -110,8 +111,8 @@ public class NotificationErrorWorker extends Worker {
          *  will be started in foreground if the API level is greater than 25, to avoid
          *  the background limitation of Android.
          */
-        Intent intentDatabaseService = new Intent(context, DatabaseService.class);
-        if (!DatabaseService.isRunning) {
+        Intent intentDatabaseService = new Intent(context, APIService.class);
+        if (!APIService.isRunning) {
             if (Build.VERSION.SDK_INT > 25) {
                 Log.d(NotificationErrorWorker.class.getSimpleName(), "Started service in foreground.");
                 context.startForegroundService(intentDatabaseService);
@@ -128,10 +129,10 @@ public class NotificationErrorWorker extends Worker {
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
+            APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             databaseService = localBinder.getService();
 
-            databaseService.getNotificationsLatest(user.getAuthorization(), utc, NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST);
+            databaseService.getNotificationsLatest(Authorization.getInstance().getAuthorization(), utc, NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST);
         }
 
         @Override
@@ -151,7 +152,7 @@ public class NotificationErrorWorker extends Worker {
                             if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST) == 0) {
                                 Log.d(NotificationErrorWorker.class.getSimpleName(), "Get latest notification.");
 
-                                ArrayList<Notification> arrayListNotificationsLatest = intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE);
+                                ArrayList<Notification> arrayListNotificationsLatest = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
 
                                 /* Updating the badge and the NotificationFragment if the current Activity is the MainActivity. */
                                 Activity currentActivity = ((AirAnalyzerApplication) contextFrom).getCurrentActivity();
@@ -215,10 +216,10 @@ public class NotificationErrorWorker extends Worker {
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
                                 Log.d(NotificationErrorWorker.class.getSimpleName(), "Executed login.");
 
-                                user = intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                user = intentFrom.getParcelableExtra(SERVICE_BODY);
                                 fileManager.saveObject(user, User.NAMEFILE);
 
-                                databaseService.getNotificationsLatest(user.getAuthorization(), utc, NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST);
+                                databaseService.getNotificationsLatest(Authorization.getInstance().getAuthorization(), utc, NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST);
 
                                 attemptsLogin = 1;
                             }

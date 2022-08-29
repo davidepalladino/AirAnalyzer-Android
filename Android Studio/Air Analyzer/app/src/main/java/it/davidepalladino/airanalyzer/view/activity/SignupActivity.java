@@ -55,6 +55,12 @@ import static it.davidepalladino.airanalyzer.controller.APIService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
 @SuppressLint("NonConstantResourceId")
 public class SignupActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private EditText editTextUsername;
@@ -158,58 +164,93 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
+        public void onServiceDisconnected(ComponentName name) { }
     };
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context contextFrom, Intent intentFrom) {
-        if (intentFrom != null) {
-            if (intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) && intentFrom.hasExtra(SERVICE_STATUS_CODE)) {
+            if (
+                intentFrom != null &&
+                intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) &&
+                intentFrom.hasExtra(SERVICE_STATUS_CODE)
+            ) {
                 int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                 switch (statusCode) {
-                    case 201:
-                        // CHECK USERNAME BROADCAST
-                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_CHECK_USERNAME) == 0) {
-                            textViewUsernameMessage.setVisibility(View.VISIBLE);
-                            textViewUsernameMessage.setText(getString(R.string.existsUsername));
-
-                        // CHECK EMAIL BROADCAST
-                        } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_CHECK_EMAIL) == 0) {
-                            textViewEmailMessage.setVisibility(View.VISIBLE);
-                            textViewEmailMessage.setText(getString(R.string.existsEmail));
-
-                        // SIGN UP BROADCAST
-                        } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP) == 0) {
-                            textViewUsernameMessage.setVisibility(View.GONE);
-                            textViewEmailMessage.setVisibility(View.GONE);
-
-                            /* Removing the password form the User object and saving it on internal memory of the phone. */
-                            user.password = "";
-//                            fileManager.saveObject(user, User.NAMEFILE);
-
-                            SignupDialog signupDialog = new SignupDialog();
-                            signupDialog.setActivity(SignupActivity.this);
-                            signupDialog.show(getSupportFragmentManager(), "");
+                    case 200:
+                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
+                            Intent intentTo = new Intent(SignupActivity.this, MainActivity.class);
+                            startActivity(intentTo);
+                            finish();
                         }
 
                         break;
-                    case 403:
-                        genericToast.make(R.drawable.ic_error, getString(R.string.toastErrorService));
+                    case 201:
+                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP) == 0) {
+                            FileManager fileManager = new FileManager(SignupActivity.this);
+                            fileManager.saveObject(user, User.NAMEFILE);
+
+                            apiService.login(user, SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                        }
+
+                        break;
+                    case 409:
+                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP) == 0) {
+                            String response = intentFrom.getStringExtra(SERVICE_BODY);
+
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                jsonObject = (JSONObject) jsonObject.getJSONObject("reason");
+
+                                JSONArray jsonArrayUsername = jsonObject.has("username") ? jsonObject.getJSONArray("username") : null;
+                                updateTextViewMessage(jsonArrayUsername, textViewUsernameMessage);
+
+                                JSONArray jsonArrayPassword = jsonObject.has("password") ? jsonObject.getJSONArray("password") : null;
+                                updateTextViewMessage(jsonArrayPassword, textViewPasswordMessage);
+
+                                JSONArray jsonArrayName = jsonObject.has("name") ? jsonObject.getJSONArray("name") : null;
+                                updateTextViewMessage(jsonArrayName, textViewNameMessage);
+
+                                JSONArray jsonArraySurname = jsonObject.has("surname") ? jsonObject.getJSONArray("surname") : null;
+                                updateTextViewMessage(jsonArraySurname, textViewSurnameMessage);
+
+                                JSONArray jsonArrayEmail = jsonObject.has("email") ? jsonObject.getJSONArray("email") : null;
+                                updateTextViewMessage(jsonArrayEmail, textViewEmailMessage);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                         break;
                     case 404:
                     case 500:
+                    case 501:
                         genericToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
-                        break;
-                    case 422:
-                        genericToast.make(R.drawable.ic_error, getString(R.string.toastErrorField));
                         break;
                     default:
                         break;
                 }
             }
         }
-        }
     };
+
+    /**
+     * @brief Update the hide TextView with specific messages contained on a JSONArray.
+     * @param jsonArray JSON array whit the specific messages.
+     * @param textViewMessage TextView to update.
+     */
+    private void updateTextViewMessage(JSONArray jsonArray, TextView textViewMessage) throws JSONException {
+        if (jsonArray != null) {
+            ArrayList<String> errors = new ArrayList<>();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                errors.add(jsonArray.getString(i));
+            }
+
+            textViewMessage.setVisibility(View.VISIBLE);
+            textViewMessage.setText(String.join("\n", errors));
+        } else {
+            textViewMessage.setVisibility(View.GONE);
+            textViewMessage.setText("");
+        }
+    }
 }

@@ -26,7 +26,7 @@ package it.davidepalladino.airanalyzer.view.activity;
 
 import static it.davidepalladino.airanalyzer.controller.CheckField.checkIPv4;
 import static it.davidepalladino.airanalyzer.controller.ClientSocket.*;
-import static it.davidepalladino.airanalyzer.controller.DatabaseService.*;
+import static it.davidepalladino.airanalyzer.controller.APIService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
@@ -63,11 +63,12 @@ import java.util.ArrayList;
 
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.ClientSocket;
-import it.davidepalladino.airanalyzer.controller.DatabaseService;
+import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.FileManager;
+import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.model.User;
-import it.davidepalladino.airanalyzer.view.widget.GeneralToast;
+import it.davidepalladino.airanalyzer.view.widget.GenericToast;
 
 @SuppressWarnings("deprecation")
 @SuppressLint("NonConstantResourceId")
@@ -77,13 +78,13 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
     private EditText editTextLocalIP;
     private AlertDialog dialogAddDevice;
 
-    private GeneralToast generalToast;
+    private GenericToast generalToast;
 
     private FileManager fileManager;
     private User user;
     private Room roomSelected;
 
-    private DatabaseService databaseService;
+    private APIService databaseService;
 
     private byte attemptsLogin = 1;
 
@@ -110,7 +111,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
     public void onStart() {
         super.onStart();
 
-        generalToast = new GeneralToast(AddRoomActivity.this, getLayoutInflater());
+        generalToast = new GenericToast(AddRoomActivity.this, getLayoutInflater());
 
         fileManager = new FileManager(AddRoomActivity.this);
         user = (User) fileManager.readObject(User.NAMEFILE);
@@ -122,7 +123,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
 
         registerReceiver(broadcastReceiver, new IntentFilter(INTENT_BROADCAST));
 
-        Intent intentDatabaseService = new Intent(AddRoomActivity.this, DatabaseService.class);
+        Intent intentDatabaseService = new Intent(AddRoomActivity.this, APIService.class);
         bindService(intentDatabaseService, serviceConnection, BIND_AUTO_CREATE);
     }
 
@@ -147,7 +148,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonAddRoom:
-                databaseService.activateRoom(user.getAuthorization(), roomSelected.id, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ADD_ROOM);
+                databaseService.activateRoom(Authorization.getInstance().getAuthorization(), roomSelected.id, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ADD_ROOM);
 
                 break;
             case R.id.buttonAddDevice:
@@ -212,10 +213,10 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            DatabaseService.LocalBinder localBinder = (DatabaseService.LocalBinder) service;
+            APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             databaseService = localBinder.getService();
 
-            databaseService.getRooms(user.getAuthorization(), false, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS);
+            databaseService.getRooms(Authorization.getInstance().getAuthorization(), false, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS);
         }
 
         @Override
@@ -233,7 +234,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                         case 200:
                             // INACTIVE ROOMS BROADCAST
                             if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS) == 0) {
-                                ArrayList<Room> arrayListRooms = intentFrom.getParcelableArrayListExtra(SERVICE_RESPONSE);
+                                ArrayList<Room> arrayListRooms = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
                                 /*  Checking the list of rooms to show or not the card about the addition. */
                                 if (!arrayListRooms.isEmpty()) {
                                     linearLayoutAddRoom.setVisibility(View.VISIBLE);
@@ -248,12 +249,12 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
 
                             // ADD ROOM BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ADD_ROOM) == 0) {
-                                databaseService.getRooms(user.getAuthorization(), false, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS);
+                                databaseService.getRooms(Authorization.getInstance().getAuthorization(), false, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS);
                                 generalToast.make(R.drawable.ic_check_circle, getString(R.string.toastRoomAdded));
 
                             // LOGIN BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = intentFrom.getParcelableExtra(SERVICE_RESPONSE);
+                                user = intentFrom.getParcelableExtra(SERVICE_BODY);
                                 fileManager.saveObject(user, User.NAMEFILE);
 
                                 attemptsLogin = 1;
@@ -266,7 +267,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(() -> {
-                                    databaseService.login((User) fileManager.readObject(User.NAMEFILE), AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    databaseService.login(user, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
                                     attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
