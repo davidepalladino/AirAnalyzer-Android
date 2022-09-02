@@ -198,13 +198,19 @@
             android:layout_marginBottom="5dp" />
 
         <!-- Timezone -->
-        <Spinner
+        <com.chivorn.smartmaterialspinner.SmartMaterialSpinner
             android:id="@+id/spinnerTimezone"
-            android:layout_width="330dp"
+            android:layout_width="338dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="50dp"
-            android:entries="@array/spinnerTimezone" />
+            android:entries="@array/spinnerTimezone"
+            app:smsp_isSearchable="true"
+            app:smsp_enableSearchHeader="false"
+            app:smsp_hint="@string/textViewTimezone"
+            app:smsp_hintColor="@color/primaryTextColor"
+            app:smsp_multilineError="false"
+            app:smsp_selectedItemListColor="@color/secondaryColor" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonContinue"

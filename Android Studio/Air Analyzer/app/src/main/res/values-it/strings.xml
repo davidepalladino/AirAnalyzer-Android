@@ -25,6 +25,7 @@
     <string name="textViewNew">Sei nuovo?\u0020</string>
     <string name="textViewSignup">Registrati</string>
     <string name="textViewLogin">Entra</string>
+    <string name="textViewTimezone">Timezone</string>
     <string name="textViewForgotPassword">Password dimenticata</string>
     <string name="textViewSignupComplete">Registrazione completata</string>
     <string name="textViewWelcomeGoodMorning">Buongiorno</string>

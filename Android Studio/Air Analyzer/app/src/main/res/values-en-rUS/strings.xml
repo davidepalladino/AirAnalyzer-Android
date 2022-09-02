@@ -25,6 +25,7 @@
     <string name="textViewNew">New?\u0020</string>
     <string name="textViewSignup">Sign up</string>
     <string name="textViewLogin">Login</string>
+    <string name="textViewTimezone">Timezone</string>
     <string name="textViewForgotPassword">Forgot password</string>
     <string name="textViewSignupComplete">Sign up complete</string>
     <string name="textViewWelcomeGoodMorning">Good morning</string>
