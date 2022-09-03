@@ -1,24 +1,14 @@
 /*
  * This view class provides to show a personal View for the ListView of measures in Main Activity.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
- * @contact me@davidepalladino.com
- * @website www.davidepalladino.com
- * @version 2.0.1
- * @date 25th January, 2022
- *
- * This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public
- *  License as published by the Free Software Foundation; either
- *  version 3.0 of the License, or (at your option) any later version
- *
- * This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU Lesser General Public License for more details.
+ * @contact davidepalladino@hotmail.com
+ * @website https://davidepalladino.github.io/
+ * @version 3.0.0
+ * @date 3rd September, 2022
  *
  */
 
@@ -40,13 +30,13 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import it.davidepalladino.airanalyzer.R;
-import it.davidepalladino.airanalyzer.model.MeasuresTodayLatest;
+import it.davidepalladino.airanalyzer.model.Measure;
 
-public class MeasuresTodayAdapterView extends ArrayAdapter<MeasuresTodayLatest> {
+public class LatestMeasuresAdapterView extends ArrayAdapter<Measure> {
     private final Context context;
     private final int resource;
 
-    public MeasuresTodayAdapterView(@NonNull Context context, @NonNull List<MeasuresTodayLatest> objects) {
+    public LatestMeasuresAdapterView(@NonNull Context context, @NonNull List<Measure> objects) {
         super(context, R.layout.measures_today_adapter_view, objects);
 
         this.context = context;
@@ -59,24 +49,24 @@ public class MeasuresTodayAdapterView extends ArrayAdapter<MeasuresTodayLatest> 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(resource, null);
 
-        TextView textViewID = convertView.findViewById(R.id.textViewID);
-        TextView textViewName = convertView.findViewById(R.id.textViewName);
+        TextView textViewRoomNumber = convertView.findViewById(R.id.textViewRoomNumber);
+        TextView textViewRoomName = convertView.findViewById(R.id.textViewRoomName);
         TextView textViewTime = convertView.findViewById(R.id.textViewTime_MeasuresToday);
         TextView textViewTemperature = convertView.findViewById(R.id.textViewTemperature);
         TextView textViewHumidity = convertView.findViewById(R.id.textViewHumidity);
 
-        MeasuresTodayLatest measuresTodayLatest = getItem(position);
+        Measure measure = getItem(position);
 
         /* Setting the float format. */
         DecimalFormat decimalFormat = new DecimalFormat("##.0");
         decimalFormat.setRoundingMode(RoundingMode.CEILING);
 
         /* Setting the TextViews with the information. */
-        textViewID.setText(String.valueOf(measuresTodayLatest.id));
-        textViewName.setText(measuresTodayLatest.name);
-        textViewTime.setText(measuresTodayLatest.time);
-        textViewTemperature.setText(String.format("%s °C", decimalFormat.format(measuresTodayLatest.temperature)));
-        textViewHumidity.setText(String.format("%s %%", decimalFormat.format(measuresTodayLatest.humidity)));
+        textViewRoomNumber.setText(String.valueOf(measure.roomNumber));
+        textViewRoomName.setText(measure.roomName);
+        textViewTime.setText(measure.when.substring(0, 5));
+        textViewTemperature.setText(String.format("%s °C", decimalFormat.format(measure.temperature)));
+        textViewHumidity.setText(String.format("%s %%", decimalFormat.format(measure.humidity)));
 
         return convertView;
     }

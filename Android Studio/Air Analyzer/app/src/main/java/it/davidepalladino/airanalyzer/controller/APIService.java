@@ -9,7 +9,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 28th August, 2022
+ * @date 3rd September, 2022
  *
  */
 
@@ -27,9 +27,9 @@ import java.util.Calendar;
 
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.model.Authorization;
+import it.davidepalladino.airanalyzer.model.Measure;
 import it.davidepalladino.airanalyzer.model.MeasuresDateAverage;
 import it.davidepalladino.airanalyzer.model.MeasuresDateLatest;
-import it.davidepalladino.airanalyzer.model.MeasuresTodayLatest;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.model.Room;
@@ -174,6 +174,35 @@ public class APIService extends Service {
         });
     }
 
+    /**
+     * @brief This method provides to get the latest measures in a specific date.
+     * @param date Specific date in format YYYY-MM-DD
+     * @param applicantActivity Name of the applicant activity for the broadcast message.
+     */
+    public void getLatestDay(String date, String applicantActivity) {
+        String authorizationToken = Authorization.getInstance().getAuthorization();
+
+        Call<ArrayList<Measure>> call = api.getLatestDay(authorizationToken, date);
+        call.enqueue(new Callback<ArrayList<Measure>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Measure>> call, Response<ArrayList<Measure>> response) {
+                ArrayList<Measure> listMeasures = response.body();
+
+                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
+                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
+                intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
+                intentBroadcast.putParcelableArrayListExtra(SERVICE_BODY, listMeasures);
+                sendBroadcast(intentBroadcast);
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Measure>> call, Throwable t) { }
+        });
+    }
+
+
+
+
 
 
 
@@ -184,57 +213,6 @@ public class APIService extends Service {
 
     // FIXME
 
-    /**
-     * @brief This method provides to check if the username is already exists on the database. Will be launched a message Broadcast, specifically:
-     *  - 201 status code to indicate that the username exists;
-     *  - 204 status code to indicate that the username doesn't exist.
-     * @param username Username to check.
-     * @param applicantActivity Name of the applicant activity for the broadcast message.
-     */
-    public void checkUsername(String username, String applicantActivity) {
-        if (!username.isEmpty()) {
-            Call<ResponseBody> call = api.checkUsername(username);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    Intent intentBroadcast = new Intent(INTENT_BROADCAST);
-                    intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
-                    intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                    sendBroadcast(intentBroadcast);
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                }
-            });
-        }
-    }
-
-    /**
-     * @brief This method provides to check if the username is already exists on the database. Will be launched a message Broadcast, specifically:
-     *  - 201 status code to indicate that the email exists;
-     *  - 204 status code to indicate that the email doesn't exist.
-     * @param email Username to check.
-     * @param applicantActivity Name of the applicant activity for the broadcast message.
-     */
-    public void checkEmail(String email, String applicantActivity) {
-        if (!email.isEmpty()) {
-            Call<ResponseBody> call = api.checkEmail(email);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    Intent intentBroadcast = new Intent(INTENT_BROADCAST);
-                    intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
-                    intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                    sendBroadcast(intentBroadcast);
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                }
-            });
-        }
-    }
 
     /**
      * @brief This method provides to get the rooms active or not. Will be launched a message Broadcast, specifically:
@@ -336,40 +314,6 @@ public class APIService extends Service {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-            }
-        });
-    }
-
-    /**
-     * @brief This method provides to get the last measures in actual date (of the client), considering a specific UTC offset, for all rooms active.
-     *  Will be launched a message Broadcast, specifically:
-     *   - JSON { ID, Name, Time, Temperature, Humidity } with 200 status code to indicate that the information has been returned;
-     *   - 204 to indicate that there are not measures;
-     *   - 401 status code to indicate that the login had error.
-     * @param token Token for the authentication.
-     * @param applicantActivity Name of the applicant activity for the broadcast message.
-     */
-    public void getMeasuresTodayLatest(String token, String applicantActivity) {
-        Calendar calendar = Calendar.getInstance();
-
-        String date = ManageDatetime.createDateFormat(calendar, getString(R.string.timestamp));
-        int utc = ManageDatetime.getUTC(calendar);
-
-        Call<ArrayList<MeasuresTodayLatest>> call = api.getMeasuresTodayLatest(token, date, utc);
-        call.enqueue(new Callback<ArrayList<MeasuresTodayLatest>>() {
-            @Override
-            public void onResponse(Call<ArrayList<MeasuresTodayLatest>> call, Response<ArrayList<MeasuresTodayLatest>> response) {
-                ArrayList<MeasuresTodayLatest> listMeasures = response.body();
-
-                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
-                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
-                intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                intentBroadcast.putParcelableArrayListExtra(SERVICE_BODY, listMeasures);
-                sendBroadcast(intentBroadcast);
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<MeasuresTodayLatest>> call, Throwable t) {
             }
         });
     }

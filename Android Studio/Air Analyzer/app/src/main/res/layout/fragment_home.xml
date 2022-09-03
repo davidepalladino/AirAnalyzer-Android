@@ -54,16 +54,20 @@
                 android:textSize="20sp"
                 tools:text="Davide Palladino" />
 
-            <TextView
-                android:id="@+id/textViewNoMeasures"
-                android:text="@string/textViewNoMeasures"
+            <LinearLayout
+                android:id="@+id/linearLayoutNoMeasures"
                 android:paddingTop="50dp"
-                android:textStyle="italic"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:visibility="gone"
-                tools:visibility="visible" />
+                tools:visibility="visible" >
+
+                <include
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    layout="@layout/no_measures_yet" />
+            </LinearLayout>
 
             <ListView
                 android:id="@+id/listViewMeasuresToday"

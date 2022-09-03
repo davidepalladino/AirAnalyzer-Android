@@ -233,7 +233,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
             date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
             utc = ManageDatetime.getUTC(date);
 
-            textViewDateSelected.setText(ManageDatetime.createDateFormat(date, getString(R.string.localFormatDate)));
+            textViewDateSelected.setText(ManageDatetime.createDateFormat(date, getString(R.string.formatDateLocale)));
 
             updateMeasures();
         };
@@ -254,7 +254,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
         datePickerDialog.getDatePicker().setMaxDate(Calendar.getInstance().getTimeInMillis());
 
         /* Setting the current date. */
-        textViewDateSelected.setText(ManageDatetime.createDateFormat(Calendar.getInstance(), getString(R.string.localFormatDate)));
+        textViewDateSelected.setText(ManageDatetime.createDateFormat(Calendar.getInstance(), getString(R.string.formatDateLocale)));
 
         return layoutFragment;
     }
@@ -318,7 +318,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
 
             updateMeasures();
 
-            textViewDateSelected.setText(ManageDatetime.createDateFormat(date, getString(R.string.localFormatDate)));
+            textViewDateSelected.setText(ManageDatetime.createDateFormat(date, getString(R.string.formatDateLocale)));
 
         // CHIP DATE YESTERDAY
         } else if (id == R.id.chipDateYesterday) {
@@ -328,7 +328,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
 
             updateMeasures();
 
-            textViewDateSelected.setText(ManageDatetime.createDateFormat(date, getString(R.string.localFormatDate)));
+            textViewDateSelected.setText(ManageDatetime.createDateFormat(date, getString(R.string.formatDateLocale)));
 
         // CHIP DATE CUSTOM
         } else if (id == R.id.chipDateCustom) {
@@ -359,7 +359,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
         barChartTemperature.clear();
         barChartHumidity.clear();
 
-        String timestamp = ManageDatetime.createDateFormat(date, getString(R.string.timestamp));
+        String timestamp = ManageDatetime.createDateFormat(date, getString(R.string.formatDateDB));
 
         databaseService.getMeasuresDateLatest(Authorization.getInstance().getAuthorization(), roomSelected.id, timestamp, utc, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_LATEST + roomSelected.id);
         databaseService.getMeasuresDateAverage(Authorization.getInstance().getAuthorization(), roomSelected.id, timestamp, utc, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.id);

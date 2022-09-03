@@ -32,6 +32,7 @@
     <string name="textViewWelcomeGoodAfternoon">Buon pomeriggio</string>
     <string name="textViewWelcomeGoodEvening">Buonasera</string>
     <string name="textViewNoMeasures">Nessuna misurazione ancora registrata</string>
+    <string name="textViewNoMeasuresDescription">Molto probabilemente i dispositivi non stanno registrando ancora nulka. Ricontrolla tra poco</string>
     <string name="textViewNoRoom">Nessuna stanza ancora attiva</string>
     <string name="textViewNoNotification">Nessuna notifica</string>
     <string name="textViewNone">None</string>
@@ -166,6 +167,6 @@
         <item>@string/spinnerNotificationErrorsTime5</item>
     </array>
 
-    <string name="localFormatDate">dd/MM/yyyy</string>
-    <string name="timestamp">yyyy-MM-dd</string>
+    <string name="formatDateLocale">dd/MM/yyyy</string>
+    <string name="formatDateDB">yyyy-MM-dd</string>
 </resources>

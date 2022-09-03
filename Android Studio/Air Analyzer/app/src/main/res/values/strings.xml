@@ -32,6 +32,7 @@
     <string name="textViewWelcomeGoodAfternoon">Good afternoon</string>
     <string name="textViewWelcomeGoodEvening">Good evening</string>
     <string name="textViewNoMeasures">None registered yet</string>
+    <string name="textViewNoMeasuresDescription">Maybe the devices are not registering nothing. Check again later</string>
     <string name="textViewNoRoom">None activated yet</string>
     <string name="textViewNoNotification">No notification</string>
     <string name="textViewNone">None</string>
@@ -515,6 +516,6 @@
         <item>@string/spinnerNotificationErrorsTime5</item>
     </array>
 
-    <string name="localFormatDate">dd/MM/yyyy</string>
-    <string name="timestamp">yyyy-MM-dd</string>
+    <string name="formatDateLocale">dd/MM/yyyy</string>
+    <string name="formatDateDB">yyyy-MM-dd</string>
 </resources>

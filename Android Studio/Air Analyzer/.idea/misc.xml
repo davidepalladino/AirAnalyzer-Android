@@ -88,7 +88,7 @@
         <entry key="app/src/main/res/layout/dialog_signup.xml" value="0.46396396396396394" />
         <entry key="app/src/main/res/layout/fragment_add.xml" value="0.46396396396396394" />
         <entry key="app/src/main/res/layout/fragment_first.xml" value="0.2519736842105263" />
-        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.5" />
         <entry key="app/src/main/res/layout/fragment_notification.xml" value="0.2565789473684211" />
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.2565789473684211" />
         <entry key="app/src/main/res/layout/fragment_room.xml" value="0.33" />
@@ -100,6 +100,7 @@
         <entry key="app/src/main/res/layout/manage_rooms_adapter_view.xml" value="0.35520833333333335" />
         <entry key="app/src/main/res/layout/measures_today_adapter_view.xml" value="0.33980263157894736" />
         <entry key="app/src/main/res/layout/measures_today_list.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/no_measures_yet.xml" value="0.5119791666666667" />
         <entry key="app/src/main/res/layout/notifications_adapter_view.xml" value="0.33980263157894736" />
         <entry key="app/src/main/res/layout/toast_black.xml" value="0.2565789473684211" />
         <entry key="app/src/main/res/layout/toast_blue.xml" value="0.2565789473684211" />

@@ -1,24 +1,14 @@
 /*
  * This view class provides to show a screen, where the user can see the latest measures of all rooms.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
- * @contact me@davidepalladino.com
- * @website www.davidepalladino.com
- * @version 1.0.1
- * @date 25th January, 2022
- *
- * This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public
- *  License as published by the Free Software Foundation; either
- *  version 3.0 of the License, or (at your option) any later version
- *
- * This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU Lesser General Public License for more details.
+ * @contact davidepalladino@hotmail.com
+ * @website https://davidepalladino.github.io/
+ * @version 3.0.0
+ * @date 3rd September, 2022
  *
  */
 
@@ -47,6 +37,7 @@ import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -55,25 +46,26 @@ import java.util.ArrayList;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.FileManager;
-import it.davidepalladino.airanalyzer.model.Authorization;
-import it.davidepalladino.airanalyzer.model.MeasuresTodayLatest;
+import it.davidepalladino.airanalyzer.controller.ManageDatetime;
+import it.davidepalladino.airanalyzer.model.Measure;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.activity.LoginActivity;
-import it.davidepalladino.airanalyzer.view.widget.MeasuresTodayAdapterView;
+import it.davidepalladino.airanalyzer.view.activity.MainActivity;
+import it.davidepalladino.airanalyzer.view.widget.LatestMeasuresAdapterView;
 import it.davidepalladino.airanalyzer.view.widget.GenericToast;
 
 public class HomeFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
-    private TextView textViewNoMeasures;
+    private LinearLayout linearLayoutNoMeasures;
     private TextView textViewHomeNameSurname;
     private ListView listViewHomeMeasuresToday;
 
-    private GenericToast generalToast;
-
     private FileManager fileManager;
+    private GenericToast genericToast;
+
     private User user;
 
-    private APIService databaseService;
+    private APIService apiService;
 
     private byte attemptsLogin = 1;
 
@@ -90,12 +82,11 @@ public class HomeFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        generalToast = new GenericToast(getActivity(), getLayoutInflater());
+        fileManager = new FileManager(requireActivity());
+        genericToast = new GenericToast(requireActivity(), getLayoutInflater());
 
-        fileManager = new FileManager(getContext());
-
-        user = (User) fileManager.readObject(User.NAMEFILE);
         user = User.getInstance();
+
         textViewHomeNameSurname.setText(String.format("%s %s", user.name, user.surname));
     }
 
@@ -122,10 +113,10 @@ public class HomeFragment extends Fragment {
         View layoutFragment = inflater.inflate(R.layout.fragment_home, container, false);
 
         swipeRefreshLayout = layoutFragment.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(() -> databaseService.getMeasuresTodayLatest(Authorization.getInstance().getAuthorization(), HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST));
+        swipeRefreshLayout.setOnRefreshListener(this::getLatestDay);
 
         TextView textViewHomeWelcome = layoutFragment.findViewById(R.id.textViewWelcome);
-        textViewNoMeasures = layoutFragment.findViewById(R.id.textViewNoMeasures);
+        linearLayoutNoMeasures = layoutFragment.findViewById(R.id.linearLayoutNoMeasures);
         textViewHomeNameSurname = layoutFragment.findViewById(R.id.textViewNameSurname);
         listViewHomeMeasuresToday = layoutFragment.findViewById(R.id.listViewMeasuresToday);
 
@@ -150,9 +141,19 @@ public class HomeFragment extends Fragment {
          * Checking the existence of ServiceDatabase object, to prevent the crash of the application
          *  on the premature call of this method by the MainActivity.
          */
-        if (databaseService != null) {
-            databaseService.getMeasuresTodayLatest(Authorization.getInstance().getAuthorization(), HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST);
+        if (apiService != null) {
+            getLatestDay();
         }
+    }
+
+    /**
+     * @brief This method provides to launch the API request to get the latest measures in actual date.
+     */
+    private void getLatestDay() {
+        Calendar calendar = Calendar.getInstance();
+        String date = ManageDatetime.createDateFormat(calendar, getString(R.string.formatDateDB));
+
+        apiService.getLatestDay(date, HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST);
     }
 
     /**
@@ -183,14 +184,13 @@ public class HomeFragment extends Fragment {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
-            databaseService = localBinder.getService();
+            apiService = localBinder.getService();
 
-            databaseService.getMeasuresTodayLatest(Authorization.getInstance().getAuthorization(), HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST);
+            getLatestDay();
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
+        public void onServiceDisconnected(ComponentName name) { }
     };
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -206,31 +206,27 @@ public class HomeFragment extends Fragment {
                                 swipeRefreshLayout.setRefreshing(false);
 
                                 /* Setting the right visibility for the TextView and the ListView. */
-                                textViewNoMeasures.setVisibility(View.GONE);
-                                listViewHomeMeasuresToday.setVisibility(View.VISIBLE);
+                                ArrayList<Measure> latestMeasures = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
+                                if (latestMeasures.size() > 0) {
+                                    linearLayoutNoMeasures.setVisibility(View.GONE);
+                                    listViewHomeMeasuresToday.setVisibility(View.VISIBLE);
 
-                                /* Getting the measures and setting the ListView. */
-                                ArrayList<MeasuresTodayLatest> measuresTodayLatest = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
-                                MeasuresTodayAdapterView adapterViewMeasureToday = new MeasuresTodayAdapterView(requireActivity().getApplicationContext(), measuresTodayLatest);
-                                listViewHomeMeasuresToday.setAdapter(adapterViewMeasureToday);
+                                    /* Getting the measures and setting the ListView. */
+                                    LatestMeasuresAdapterView adapterViewMeasureToday = new LatestMeasuresAdapterView(requireActivity().getApplicationContext(), latestMeasures);
+                                    listViewHomeMeasuresToday.setAdapter(adapterViewMeasureToday);
+                                } else {
+                                    linearLayoutNoMeasures.setVisibility(View.VISIBLE);
+                                    listViewHomeMeasuresToday.setVisibility(View.GONE);
+                                }
 
                             // LOGIN BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = intentFrom.getParcelableExtra(SERVICE_BODY);
-                                fileManager.saveObject(user, User.NAMEFILE);
-
+                                apiService.getMe(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME);
                                 attemptsLogin = 1;
-                            }
-
-                            break;
-                        case 204:
-                            // MEASURES TODAY LATEST BROADCAST
-                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST) == 0) {
-                                swipeRefreshLayout.setRefreshing(false);
-
-                                /* Setting the right visibility for the TextView and the ListView. */
-                                textViewNoMeasures.setVisibility(View.VISIBLE);
-                                listViewHomeMeasuresToday.setVisibility(View.GONE);
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME) == 0) {
+                                String passwordStored = user.password;
+                                User.setInstance(intentFrom.getParcelableExtra(SERVICE_BODY));
+                                user.password = passwordStored;
                             }
 
                             break;
@@ -240,17 +236,17 @@ public class HomeFragment extends Fragment {
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(() -> {
-                                    databaseService.login(user, HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    apiService.login(user, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
                                     attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
-                                goToLogin(getString(R.string.toastUserError));
+                                goToLogin(getString(R.string.toastIncorrectUsernamePassword));
                             }
 
                             break;
                         case 404:
                         case 500:
-                            generalToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
+                            genericToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
                             break;
                         default:
                             break;

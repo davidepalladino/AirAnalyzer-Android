@@ -1,6 +1,6 @@
 /*
- * This view class provides to show a screen, where will be executed the login or the redirection to the
- *  Login activity.
+ * This view class provides to show a screen, where will be executed the login or the redirection
+ *  to the Login activity.
  *
  * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
@@ -9,7 +9,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 28th August, 2022
+ * @date 3rd September, 2022
  *
  */
 
@@ -163,6 +163,7 @@ public class SplashActivity extends AppCompatActivity {
                         intentTo.putExtra(INTENT_TOAST_MESSAGE, getString(R.string.toastIncorrectUsernamePassword));
 
                         break;
+                    case 404:
                     case 500:
                         intentTo = new Intent(SplashActivity.this, LoginActivity.class);
                         intentTo.putExtra(INTENT_TOAST_MESSAGE, getString(R.string.toastServerOffline));

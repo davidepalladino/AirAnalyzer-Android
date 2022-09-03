@@ -1,24 +1,14 @@
 /*
  * This view class provides to show a screen, where the user can see the several measures for room.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
- * @contact me@davidepalladino.com
- * @website www.davidepalladino.com
- * @version 2.0.1
- * @date 8th January, 2022
- *
- * This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public
- *  License as published by the Free Software Foundation; either
- *  version 3.0 of the License, or (at your option) any later version
- *
- * This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU Lesser General Public License for more details.
+ * @contact davidepalladino@hotmail.com
+ * @website https://davidepalladino.github.io/
+ * @version 3.0.0
+ * @date 3rd September, 2022
  *
  */
 
@@ -48,8 +38,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import it.davidepalladino.airanalyzer.controller.AirAnalyzerApplication;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.APIService;
+import it.davidepalladino.airanalyzer.controller.FileManager;
 import it.davidepalladino.airanalyzer.controller.NotificationErrorWorker;
-import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.fragment.HomeFragment;
@@ -57,7 +47,6 @@ import it.davidepalladino.airanalyzer.view.fragment.NotificationFragment;
 import it.davidepalladino.airanalyzer.view.fragment.SettingFragment;
 import it.davidepalladino.airanalyzer.view.fragment.RoomFragment;
 import it.davidepalladino.airanalyzer.view.widget.GenericToast;
-import it.davidepalladino.airanalyzer.controller.FileManager;
 
 import static it.davidepalladino.airanalyzer.controller.APIService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
@@ -78,12 +67,12 @@ public class MainActivity extends AppCompatActivity {
     private SettingFragment fragmentSetting;
     private Fragment fragmentActive;
 
-    private GenericToast generalToast;
-
     private FileManager fileManager;
+    private GenericToast genericToast;
+
     private User user;
 
-    private APIService databaseService;
+    private APIService apiService;
 
     private byte attemptsLogin = 1;
 
@@ -100,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
 
             // HOME
             if (id == R.id.menuItemHome) {
-
                 fragmentManager.beginTransaction().hide(fragmentActive).show(fragmentHome).commit();
                 fragmentActive = fragmentHome;
                 ((HomeFragment) fragmentActive).updateMeasures();
@@ -159,13 +147,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        generalToast = new GenericToast(MainActivity.this, getLayoutInflater());
-
         fileManager = new FileManager(MainActivity.this);
-        user = (User) fileManager.readObject(User.NAMEFILE);
+        genericToast = new GenericToast(MainActivity.this, getLayoutInflater());
+
+        user = User.getInstance();
 
         WorkManager workManager = WorkManager.getInstance(MainActivity.this);
-        PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest.Builder(NotificationErrorWorker.class, fileManager.readPreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_ERROR_TIME), TimeUnit.MINUTES)
+        PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest.Builder(
+                NotificationErrorWorker.class,
+                fileManager.readPreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_ERROR_TIME),
+                TimeUnit.MINUTES
+        )
                 .build();
         workManager.enqueueUniquePeriodicWork(NotificationErrorWorker.tag, KEEP, notificationRequest);
     }
@@ -259,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
      *  there will be not any Toast.
      */
     private void goToLogin(String toastMessage) {
-        /* Deleting the information for the login. */
+        /* Deleting the information and doing the login. */
         user.password = "";
         fileManager.saveObject(user, User.NAMEFILE);
 
@@ -277,14 +269,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
-            databaseService = localBinder.getService();
-
-            databaseService.getRooms(Authorization.getInstance().getAuthorization(), true, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
+            apiService = localBinder.getService();
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
+        public void onServiceDisconnected(ComponentName name) { }
     };
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -297,30 +286,31 @@ public class MainActivity extends AppCompatActivity {
                         case 200:
                             // LOGIN BROADCAST
                             if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = intentFrom.getParcelableExtra(SERVICE_BODY);
-                                fileManager.saveObject(user, User.NAMEFILE);
-
+                                apiService.getMe(MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME);
                                 attemptsLogin = 1;
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME) == 0) {
+                                String passwordStored = user.password;
+                                User.setInstance(intentFrom.getParcelableExtra(SERVICE_BODY));
+                                user.password = passwordStored;
                             }
 
                             break;
 
-                        // LOGIN BROADCAST
                         case 401:
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(() -> {
-                                    databaseService.login(user, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    apiService.login(user, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
                                     attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
-                                goToLogin(getString(R.string.toastUserError));
+                                goToLogin(getString(R.string.toastIncorrectUsernamePassword));
                             }
 
                             break;
                         case 404:
                         case 500:
-                            generalToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
+                            genericToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
                             break;
                         default:
                             break;

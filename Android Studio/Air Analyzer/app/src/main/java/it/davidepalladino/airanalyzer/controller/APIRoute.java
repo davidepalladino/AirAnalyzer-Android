@@ -11,7 +11,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 28th August, 2022
+ * @date 3rd September, 2022
  *
  */
 
@@ -22,9 +22,9 @@ import com.google.gson.JsonArray;
 import java.util.ArrayList;
 
 import it.davidepalladino.airanalyzer.model.Authorization;
+import it.davidepalladino.airanalyzer.model.Measure;
 import it.davidepalladino.airanalyzer.model.MeasuresDateAverage;
 import it.davidepalladino.airanalyzer.model.MeasuresDateLatest;
-import it.davidepalladino.airanalyzer.model.MeasuresTodayLatest;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.model.Room;
@@ -52,7 +52,8 @@ public interface APIRoute {
     @Headers({"Content-Type: application/json"})
     Call<User> signup(@Body User user);
 
-
+    @GET("measure/getLatestDay")
+    Call<ArrayList<Measure>> getLatestDay(@Header("Authorization") String token, @Query("date") String date);
 
 
 
@@ -67,12 +68,6 @@ public interface APIRoute {
 
     // FIXME
 
-    @GET("user/checkUsername")
-    Call<ResponseBody> checkUsername(@Query("username") String username);
-
-    @GET("user/checkEmail")
-    Call<ResponseBody> checkEmail(@Query("email") String email);
-
     @GET("api/airanalyzer/getRooms")
     Call<ArrayList<Room>> getRooms(@Header("Authorization") String token, @Query("IsActive") byte isActive);
 
@@ -85,8 +80,7 @@ public interface APIRoute {
     @POST("api/airanalyzer/deactivateRoom")
     Call<ResponseBody> deactivateRoom(@Header("Authorization") String token, @Query("ID") byte roomID);
 
-    @GET("api/airanalyzer/getMeasuresTodayLatest")
-    Call<ArrayList<MeasuresTodayLatest>> getMeasuresTodayLatest(@Header("Authorization") String token, @Query("Date") String date, @Query("UTC") int utc);
+
 
     @GET("api/airanalyzer/getMeasuresDateLatest")
     Call<MeasuresDateLatest> getMeasuresDateLatest(@Header("Authorization") String token, @Query("Room") byte roomID, @Query("Date") String date, @Query("UTC") int utc);
