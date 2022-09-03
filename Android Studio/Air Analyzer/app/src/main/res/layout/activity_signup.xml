@@ -207,9 +207,9 @@
             android:entries="@array/spinnerTimezone"
             app:smsp_isSearchable="true"
             app:smsp_enableSearchHeader="false"
-            app:smsp_hint="@string/textViewTimezone"
-            app:smsp_hintColor="@color/primaryTextColor"
             app:smsp_multilineError="false"
+            app:smsp_hint="@string/textViewTimezone"
+            app:smsp_hintColor="@color/hintSpinnerTimezoneSingUp"
             app:smsp_selectedItemListColor="@color/secondaryColor" />
 
         <androidx.appcompat.widget.AppCompatButton

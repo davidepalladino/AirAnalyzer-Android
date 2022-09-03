@@ -8,6 +8,8 @@
 
     <color name="typeNotificationTextColor">#383838</color>
 
+    <color name="hintSpinnerTimezoneSingUp">#666666</color>
+
     <color name="background">#FEFFFFFF</color>
     <color name="error">#FF5722</color>
 
