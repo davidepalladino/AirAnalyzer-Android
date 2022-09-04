@@ -8,7 +8,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 3rd September, 2022
+ * @date 4th September, 2022
  *
  */
 
@@ -153,7 +153,7 @@ public class HomeFragment extends Fragment {
         Calendar calendar = Calendar.getInstance();
         String date = ManageDatetime.createDateFormat(calendar, getString(R.string.formatDateDB));
 
-        apiService.getLatestDay(date, HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST);
+        apiService.getLatestDayMeasures(date, null, HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST);
     }
 
     /**
@@ -236,7 +236,7 @@ public class HomeFragment extends Fragment {
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(() -> {
-                                    apiService.login(user, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    apiService.login(user, HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
                                     attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {

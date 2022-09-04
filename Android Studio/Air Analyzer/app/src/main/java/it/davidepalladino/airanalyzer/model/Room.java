@@ -1,24 +1,14 @@
 /*
  * This model class provides to store the information about the room, get from an API request.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
- * @contact me@davidepalladino.com
- * @website www.davidepalladino.com
- * @version 2.0.0
- * @date 16th October, 2021
- *
- * This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public
- *  License as published by the Free Software Foundation; either
- *  version 3.0 of the License, or (at your option) any later version
- *
- * This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU Lesser General Public License for more details.
+ * @contact davidepalladino@hotmail.com
+ * @website https://davidepalladino.github.io/
+ * @version 3.0.0
+ * @date 4th September, 2022
  *
  */
 
@@ -34,18 +24,16 @@ import java.io.Serializable;
 public class Room implements Parcelable, Serializable {
     public static final String NAMEFILE = "room.dat";
 
-    @SerializedName("ID")
-    public byte id;
-    @SerializedName("Name")
+    public byte number;
     public String name;
-    @SerializedName("LocalIP")
+    @SerializedName("local_ip")
     public String localIP;
 
     public Room() {}
 
     // PARCELIZATION
     protected Room(Parcel in) {
-        id = in.readByte();
+        number = in.readByte();
         name = in.readString();
         localIP = in.readString();
     }
@@ -64,7 +52,7 @@ public class Room implements Parcelable, Serializable {
 
     @Override
     public String toString() {
-        String idToString = Byte.toString(id);
+        String idToString = Byte.toString(number);
 
         if (name != null) {
             idToString += " | " + name;
@@ -82,7 +70,7 @@ public class Room implements Parcelable, Serializable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeByte(id);
+        parcel.writeByte(number);
         parcel.writeString(name);
         parcel.writeString(localIP);
     }

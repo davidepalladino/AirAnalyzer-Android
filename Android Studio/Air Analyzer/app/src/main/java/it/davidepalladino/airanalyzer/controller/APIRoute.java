@@ -11,7 +11,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 3rd September, 2022
+ * @date 4th September, 2022
  *
  */
 
@@ -23,11 +23,9 @@ import java.util.ArrayList;
 
 import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.Measure;
-import it.davidepalladino.airanalyzer.model.MeasuresDateAverage;
-import it.davidepalladino.airanalyzer.model.MeasuresDateLatest;
 import it.davidepalladino.airanalyzer.model.Notification;
-import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.model.Room;
+import it.davidepalladino.airanalyzer.model.User;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -53,9 +51,13 @@ public interface APIRoute {
     Call<User> signup(@Body User user);
 
     @GET("measure/getLatestDay")
-    Call<ArrayList<Measure>> getLatestDay(@Header("Authorization") String token, @Query("date") String date);
+    Call<ArrayList<Measure>> getLatestDayMeasures(@Header("Authorization") String token, @Query("date") String date, @Query("room_number") Integer roomNumber);
 
+    @GET("measure/getAverageDay")
+    Call<ArrayList<Measure>> getAverageDayMeasures(@Header("Authorization") String token, @Query("date") String date, @Query("room_number") Integer roomNumber);
 
+    @GET("room/getAll")
+    Call<ArrayList<Room>> getAllRooms(@Header("Authorization") String token, @Query("is_active") byte isActive);
 
 
 
@@ -68,9 +70,6 @@ public interface APIRoute {
 
     // FIXME
 
-    @GET("api/airanalyzer/getRooms")
-    Call<ArrayList<Room>> getRooms(@Header("Authorization") String token, @Query("IsActive") byte isActive);
-
     @POST("api/airanalyzer/renameRoom")
     Call<ResponseBody> renameRoom(@Header("Authorization") String token, @Query("ID") byte roomID, @Query("Name") String roomName);
 
@@ -79,14 +78,6 @@ public interface APIRoute {
 
     @POST("api/airanalyzer/deactivateRoom")
     Call<ResponseBody> deactivateRoom(@Header("Authorization") String token, @Query("ID") byte roomID);
-
-
-
-    @GET("api/airanalyzer/getMeasuresDateLatest")
-    Call<MeasuresDateLatest> getMeasuresDateLatest(@Header("Authorization") String token, @Query("Room") byte roomID, @Query("Date") String date, @Query("UTC") int utc);
-
-    @GET("api/airanalyzer/getMeasuresDateAverage")
-    Call<ArrayList<MeasuresDateAverage>> getMeasuresDateAverage(@Header("Authorization") String token, @Query("Room") byte roomID, @Query("Date") String date, @Query("UTC") int utc);
 
     @GET("api/airanalyzer/getNotificationsLatest")
     Call<ArrayList<Notification>> getNotificationsLatest(@Header("Authorization") String token, @Query("UTC") int utc);

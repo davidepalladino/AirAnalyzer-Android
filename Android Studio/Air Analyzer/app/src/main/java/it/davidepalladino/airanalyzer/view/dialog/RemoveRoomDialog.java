@@ -1,24 +1,14 @@
 /*
  * This view class provides to show a personal dialog for a remove room request.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
- * @contact me@davidepalladino.com
- * @website www.davidepalladino.com
- * @version 2.0.1
- * @date 24th November, 2021
- *
- * This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public
- *  License as published by the Free Software Foundation; either
- *  version 3.0 of the License, or (at your option) any later version
- *
- * This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU Lesser General Public License for more details.
+ * @contact davidepalladino@hotmail.com
+ * @website https://davidepalladino.github.io/
+ * @version 3.0.0
+ * @date 4th September, 2022
  *
  */
 
@@ -36,17 +26,17 @@ import androidx.fragment.app.DialogFragment;
 import java.util.Objects;
 
 import it.davidepalladino.airanalyzer.R;
-import it.davidepalladino.airanalyzer.model.Room;
+import it.davidepalladino.airanalyzer.model.Room_OldClass;
 import it.davidepalladino.airanalyzer.view.activity.ManageRoomActivity;
 
 public class RemoveRoomDialog extends DialogFragment {
     @SuppressWarnings("unused")
     public interface RemoveRoomDialogCallback {
-        void onPushOkButtonRemoveRoomDialog(Room room);
+        void onPushOkButtonRemoveRoomDialog(Room_OldClass room);
     }
 
     private ManageRoomActivity context;
-    public Room room;
+    public Room_OldClass room;
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = requireActivity().getLayoutInflater();

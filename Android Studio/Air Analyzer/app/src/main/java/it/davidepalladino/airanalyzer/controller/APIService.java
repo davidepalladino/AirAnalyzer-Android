@@ -9,7 +9,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 3rd September, 2022
+ * @date 4th September, 2022
  *
  */
 
@@ -23,16 +23,12 @@ import android.os.Parcelable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 
-import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.Measure;
-import it.davidepalladino.airanalyzer.model.MeasuresDateAverage;
-import it.davidepalladino.airanalyzer.model.MeasuresDateLatest;
 import it.davidepalladino.airanalyzer.model.Notification;
-import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.model.Room;
+import it.davidepalladino.airanalyzer.model.User;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -175,14 +171,15 @@ public class APIService extends Service {
     }
 
     /**
-     * @brief This method provides to get the latest measures in a specific date.
+     * @brief This method provides to get the latest measures in a specific date. Is possible to specify a room.
      * @param date Specific date in format YYYY-MM-DD
+     * @param roomNumber Specific room.
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
-    public void getLatestDay(String date, String applicantActivity) {
+    public void getLatestDayMeasures(String date, Integer roomNumber, String applicantActivity) {
         String authorizationToken = Authorization.getInstance().getAuthorization();
 
-        Call<ArrayList<Measure>> call = api.getLatestDay(authorizationToken, date);
+        Call<ArrayList<Measure>> call = api.getLatestDayMeasures(authorizationToken, date, roomNumber);
         call.enqueue(new Callback<ArrayList<Measure>>() {
             @Override
             public void onResponse(Call<ArrayList<Measure>> call, Response<ArrayList<Measure>> response) {
@@ -200,30 +197,42 @@ public class APIService extends Service {
         });
     }
 
+    /**
+     * @brief This method provides to get the hour average about the measures on specific date. Is possible to specify a room.
+     * @param date Specific date in format YYYY-MM-DD
+     * @param roomNumber Specific room.
+     * @param applicantActivity Name of the applicant activity for the broadcast message.
+     */
+    public void getAverageDayMeasures(String date, int roomNumber, String applicantActivity) {
+        String authorizationToken = Authorization.getInstance().getAuthorization();
 
+        Call<ArrayList<Measure>> call = api.getAverageDayMeasures(authorizationToken, date, roomNumber);
+        call.enqueue(new Callback<ArrayList<Measure>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Measure>> call, Response<ArrayList<Measure>> response) {
+                ArrayList<Measure> listMeasures = response.body();
 
+                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
+                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
+                intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
+                intentBroadcast.putParcelableArrayListExtra(SERVICE_BODY, listMeasures);
+                sendBroadcast(intentBroadcast);
+            }
 
-
-
-
-
-
-
-
-
-    // FIXME
-
+            @Override
+            public void onFailure(Call<ArrayList<Measure>> call, Throwable t) { }
+        });
+    }
 
     /**
-     * @brief This method provides to get the rooms active or not. Will be launched a message Broadcast, specifically:
-     *  - JSON { ID, Name, LocalIP } with 200 status code to indicate that the information has been returned;
-     *  - 401 status code to indicate that the request is not authorized.
-     * @param token Token for the authentication.
+     * @brief This method provides to get the rooms active or not.
      * @param isActive Active rooms (with "true" value) or not (with "false" value).
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
-    public void getRooms(String token, boolean isActive, String applicantActivity) {
-        Call<ArrayList<Room>> call = api.getRooms(token, isActive ? (byte) 1 : (byte) 0);
+    public void getAllRooms(boolean isActive, String applicantActivity) {
+        String authorizationToken = Authorization.getInstance().getAuthorization();
+
+        Call<ArrayList<Room>> call = api.getAllRooms(authorizationToken, isActive ? (byte) 1 : (byte) 0);
         call.enqueue(new Callback<ArrayList<Room>>() {
             @Override
             public void onResponse(Call<ArrayList<Room>> call, Response<ArrayList<Room>> response) {
@@ -241,6 +250,18 @@ public class APIService extends Service {
             }
         });
     }
+
+
+
+
+
+
+
+
+
+
+    // FIXME
+
 
     /**
      * @brief This method provides to rename a specific room. Will be launched a message Broadcast, specifically:
@@ -314,71 +335,6 @@ public class APIService extends Service {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-            }
-        });
-    }
-
-    /**
-     * @brief This method provides to get the last measures on specific date, considering a specific UTC offset, for a specific room.
-     *  Will be launched a message Broadcast, specifically:
-     *   - JSON { Time, Temperature, Humidity } with 200 status code to indicate that the information has been returned;
-     *   - 204 to indicate that there are not measures.
-     *   - 401 status code to indicate that the request is not authorized.
-     * @param token Token for the authentication.
-     * @param roomID Room to get the measures.
-     * @param date Date in format YYYY-MM-DD.
-     * @param utc UTC in format +/-HH:00.
-     * @param applicantActivity Name of the applicant activity for the broadcast message.
-     */
-    public void getMeasuresDateLatest(String token, byte roomID, String date, int utc, String applicantActivity) {
-        Call<MeasuresDateLatest> call = api.getMeasuresDateLatest(token, roomID, date, utc);
-        call.enqueue(new Callback<MeasuresDateLatest>() {
-            @Override
-            public void onResponse(Call<MeasuresDateLatest> call, Response<MeasuresDateLatest> response) {
-                MeasuresDateLatest measuresDateLatest = response.body();
-
-                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
-                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
-                intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                intentBroadcast.putExtra(SERVICE_BODY, measuresDateLatest);
-                sendBroadcast(intentBroadcast);
-            }
-
-            @Override
-            public void onFailure(Call<MeasuresDateLatest> call, Throwable t) {
-
-            }
-        });
-    }
-
-    /**
-     * @brief This method provides to get the hour average about the measures on specific date, considering a specific UTC offset, for a specific room.
-     *  Will be launched a message Broadcast, specifically:
-     *   - JSON { Hour, Temperature, Humidity } with 200 status code to indicate that the information has been returned;
-     *   - 204 to indicate that there are not measures.
-     *   - 401 status code to indicate that the request is not authorized.
-     * @param token Token for the authentication.
-     * @param roomID Room to get the measures.
-     * @param date Date in format YYYY-MM-DD.
-     * @param utc UTC in format +/-HH:00.
-     * @param applicantActivity Name of the applicant activity for the broadcast message.
-     */
-    public void getMeasuresDateAverage(String token, byte roomID, String date, int utc, String applicantActivity) {
-        Call<ArrayList<MeasuresDateAverage>> call = api.getMeasuresDateAverage(token, roomID, date, utc);
-        call.enqueue(new Callback<ArrayList<MeasuresDateAverage>>() {
-            @Override
-            public void onResponse(Call<ArrayList<MeasuresDateAverage>> call, Response<ArrayList<MeasuresDateAverage>> response) {
-                ArrayList<MeasuresDateAverage> listMeasures = response.body();
-
-                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
-                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
-                intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                intentBroadcast.putParcelableArrayListExtra(SERVICE_BODY, listMeasures);
-                sendBroadcast(intentBroadcast);
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<MeasuresDateAverage>> call, Throwable t) {
             }
         });
     }

@@ -1,24 +1,14 @@
 /*
  * This view class provides to show a personal View for the ListView of rooms in ManageRoom Activity.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
- * @contact me@davidepalladino.com
- * @website www.davidepalladino.com
- * @version 2.0.1
- * @date 23th January, 2022
- *
- * This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public
- *  License as published by the Free Software Foundation; either
- *  version 3.0 of the License, or (at your option) any later version
- *
- * This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU Lesser General Public License for more details.
+ * @contact davidepalladino@hotmail.com
+ * @website https://davidepalladino.github.io/
+ * @version 3.0.0
+ * @date 4th September, 2022
  *
  */
 
@@ -40,20 +30,20 @@ import androidx.annotation.Nullable;
 import java.util.List;
 
 import it.davidepalladino.airanalyzer.R;
-import it.davidepalladino.airanalyzer.model.Room;
+import it.davidepalladino.airanalyzer.model.Room_OldClass;
 import it.davidepalladino.airanalyzer.view.activity.ManageRoomActivity;
 
-public class ManageRoomsAdapterView extends ArrayAdapter<Room> {
+public class ManageRoomsAdapterView extends ArrayAdapter<Room_OldClass> {
     @SuppressWarnings("unused")
     public interface ManageRoomsAdapterViewCallback {
-        void onPushAcceptButtonManageRoomsAdapterView(Room room);
-        void onPushDeleteButtonManageRoomsAdapterView(Room room);
+        void onPushAcceptButtonManageRoomsAdapterView(Room_OldClass room);
+        void onPushDeleteButtonManageRoomsAdapterView(Room_OldClass room);
     }
 
     private final ManageRoomActivity context;
     private final int resource;
 
-    public ManageRoomsAdapterView(@NonNull Context context, @NonNull List<Room> objects) {
+    public ManageRoomsAdapterView(@NonNull Context context, @NonNull List<Room_OldClass> objects) {
         super(context, R.layout.manage_rooms_adapter_view, objects);
 
         if (context instanceof ManageRoomActivity) {
@@ -71,7 +61,7 @@ public class ManageRoomsAdapterView extends ArrayAdapter<Room> {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(resource, null);
 
-            Room room = getItem(position);
+            Room_OldClass room = getItem(position);
 
             TextView textViewID = convertView.findViewById(R.id.textViewID_ManageRoom);
             textViewID.setText(String.valueOf(room.id));
