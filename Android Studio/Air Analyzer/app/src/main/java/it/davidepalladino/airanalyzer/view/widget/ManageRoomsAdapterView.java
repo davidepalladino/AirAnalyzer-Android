@@ -30,20 +30,20 @@ import androidx.annotation.Nullable;
 import java.util.List;
 
 import it.davidepalladino.airanalyzer.R;
-import it.davidepalladino.airanalyzer.model.Room_OldClass;
+import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.view.activity.ManageRoomActivity;
 
-public class ManageRoomsAdapterView extends ArrayAdapter<Room_OldClass> {
+public class ManageRoomsAdapterView extends ArrayAdapter<Room> {
     @SuppressWarnings("unused")
     public interface ManageRoomsAdapterViewCallback {
-        void onPushAcceptButtonManageRoomsAdapterView(Room_OldClass room);
-        void onPushDeleteButtonManageRoomsAdapterView(Room_OldClass room);
+        void onPushAcceptButtonManageRoomsAdapterView(Room room);
+        void onPressDeleteButtonManageRoomsAdapterView(Room room);
     }
 
     private final ManageRoomActivity context;
     private final int resource;
 
-    public ManageRoomsAdapterView(@NonNull Context context, @NonNull List<Room_OldClass> objects) {
+    public ManageRoomsAdapterView(@NonNull Context context, @NonNull List<Room> objects) {
         super(context, R.layout.manage_rooms_adapter_view, objects);
 
         if (context instanceof ManageRoomActivity) {
@@ -61,10 +61,10 @@ public class ManageRoomsAdapterView extends ArrayAdapter<Room_OldClass> {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(resource, null);
 
-            Room_OldClass room = getItem(position);
+            Room room = getItem(position);
 
             TextView textViewID = convertView.findViewById(R.id.textViewID_ManageRoom);
-            textViewID.setText(String.valueOf(room.id));
+            textViewID.setText(String.valueOf(room.number));
 
             TextView textViewRoom = convertView.findViewById(R.id.textViewRoom_ManageRoom);
             textViewRoom.setText(room.name);
@@ -91,7 +91,7 @@ public class ManageRoomsAdapterView extends ArrayAdapter<Room_OldClass> {
             });
 
             // REMOVE BUTTON
-            imageViewRemove.setOnClickListener(v -> context.onPushDeleteButtonManageRoomsAdapterView(room));
+            imageViewRemove.setOnClickListener(v -> context.onPressDeleteButtonManageRoomsAdapterView(room));
 
             // ACCEPT BUTTON
             imageViewAccept.setOnClickListener(v -> {

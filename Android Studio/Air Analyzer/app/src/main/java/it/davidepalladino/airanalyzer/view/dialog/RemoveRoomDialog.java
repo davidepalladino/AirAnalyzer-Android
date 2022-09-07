@@ -26,17 +26,17 @@ import androidx.fragment.app.DialogFragment;
 import java.util.Objects;
 
 import it.davidepalladino.airanalyzer.R;
-import it.davidepalladino.airanalyzer.model.Room_OldClass;
+import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.view.activity.ManageRoomActivity;
 
 public class RemoveRoomDialog extends DialogFragment {
     @SuppressWarnings("unused")
     public interface RemoveRoomDialogCallback {
-        void onPushOkButtonRemoveRoomDialog(Room_OldClass room);
+        void onPressOkButtonRemoveRoomDialog(Room room);
     }
 
     private ManageRoomActivity context;
-    public Room_OldClass room;
+    public Room room;
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
@@ -55,7 +55,7 @@ public class RemoveRoomDialog extends DialogFragment {
         builder.setView(layout)
                 .setPositiveButton(R.string.buttonOk, (dialog, id) -> {
                     if (context != null) {
-                        context.onPushOkButtonRemoveRoomDialog(room);
+                        context.onPressOkButtonRemoveRoomDialog(room);
                     }
                 })
 

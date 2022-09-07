@@ -153,11 +153,12 @@ public class MainActivity extends AppCompatActivity {
         user = User.getInstance();
 
         WorkManager workManager = WorkManager.getInstance(MainActivity.this);
-        PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest.Builder(
-                NotificationErrorWorker.class,
-                fileManager.readPreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_ERROR_TIME),
-                TimeUnit.MINUTES
-        )
+        PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest
+                .Builder(
+                    NotificationErrorWorker.class,
+                    fileManager.readPreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_ERROR_TIME),
+                    TimeUnit.MINUTES
+                )
                 .build();
         workManager.enqueueUniquePeriodicWork(NotificationErrorWorker.tag, KEEP, notificationRequest);
     }
@@ -296,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
 
                             break;
 
+                        // LOGIN BROADCAST
                         case 401:
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {

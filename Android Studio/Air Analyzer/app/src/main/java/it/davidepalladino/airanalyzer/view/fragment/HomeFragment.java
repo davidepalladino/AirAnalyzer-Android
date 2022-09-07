@@ -50,7 +50,6 @@ import it.davidepalladino.airanalyzer.controller.ManageDatetime;
 import it.davidepalladino.airanalyzer.model.Measure;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.activity.LoginActivity;
-import it.davidepalladino.airanalyzer.view.activity.MainActivity;
 import it.davidepalladino.airanalyzer.view.widget.LatestMeasuresAdapterView;
 import it.davidepalladino.airanalyzer.view.widget.GenericToast;
 

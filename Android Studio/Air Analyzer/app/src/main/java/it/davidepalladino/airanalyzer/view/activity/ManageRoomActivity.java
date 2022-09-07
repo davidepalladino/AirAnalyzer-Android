@@ -45,7 +45,7 @@ import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.FileManager;
 import it.davidepalladino.airanalyzer.model.Authorization;
-import it.davidepalladino.airanalyzer.model.Room_OldClass;
+import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.dialog.RemoveRoomDialog;
 import it.davidepalladino.airanalyzer.view.widget.GenericToast;
@@ -55,12 +55,12 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
     private TextView textViewNoRoom;
     private ListView listViewRoom;
 
-    private GenericToast generalToast;
-
     private FileManager fileManager;
+    private GenericToast genericToast;
+
     private User user;
 
-    private APIService databaseService;
+    private APIService apiService;
 
     private byte attemptsLogin = 1;
 
@@ -80,10 +80,9 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
     protected void onStart() {
         super.onStart();
 
-        generalToast = new GenericToast(ManageRoomActivity.this, getLayoutInflater());
+        genericToast = new GenericToast(ManageRoomActivity.this, getLayoutInflater());
 
-        fileManager = new FileManager(ManageRoomActivity.this);
-        user = (User) fileManager.readObject(User.NAMEFILE);
+        user = User.getInstance();
     }
 
     @Override
@@ -128,29 +127,29 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
     }
 
     @Override
-    public void onPushAcceptButtonManageRoomsAdapterView(Room_OldClass room) {
-        databaseService.renameRoom(Authorization.getInstance().getAuthorization(), room.id, room.name, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_RENAME_ROOM);
+    public void onPushAcceptButtonManageRoomsAdapterView(Room room) {
+        apiService.changeNameRoom(room.number, room.name, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_RENAME_ROOM);
     }
 
     @Override
-    public void onPushDeleteButtonManageRoomsAdapterView(Room_OldClass room) {
+    public void onPressDeleteButtonManageRoomsAdapterView(Room room) {
         RemoveRoomDialog removeRoomDialog = new RemoveRoomDialog();
         removeRoomDialog.room = room;
         removeRoomDialog.show(getSupportFragmentManager(), "");
     }
 
     @Override
-    public void onPushOkButtonRemoveRoomDialog(Room_OldClass room) {
-        databaseService.deactivateRoom(Authorization.getInstance().getAuthorization(), room.id, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_REMOVE_ROOM);
+    public void onPressOkButtonRemoveRoomDialog(Room room) {
+        apiService.deactivateRoom(Authorization.getInstance().getAuthorization(), room.number, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_REMOVE_ROOM);
     }
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
-            databaseService = localBinder.getService();
+            apiService = localBinder.getService();
 
-            databaseService.getAllRooms(true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
+            apiService.getAllRooms(true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
         }
 
         @Override
@@ -168,7 +167,7 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
                         case 200:
                             // ACTIVE ROOMS BROADCAST
                             if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS) == 0) {
-                                ArrayList<Room_OldClass> arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
+                                ArrayList<Room> arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
 
                                 /*  Checking the list of rooms to update or not the ListView dedicated. */
                                 if (!arrayListRoom.isEmpty()) {
@@ -185,20 +184,22 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
 
                             // RENAME ROOM BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_RENAME_ROOM) == 0) {
-                                databaseService.getAllRooms( true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
-                                generalToast.make(R.drawable.ic_check_circle, getString(R.string.toastRoomRenamed));
+                                apiService.getAllRooms( true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
+                                genericToast.make(R.drawable.ic_check_circle, getString(R.string.toastRoomRenamed));
 
                             // REMOVE ROOM BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_REMOVE_ROOM) == 0) {
-                                databaseService.getAllRooms(true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
-                                generalToast.make(R.drawable.ic_check_circle, getString(R.string.toastRoomRemoved));
+                                apiService.getAllRooms(true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
+                                genericToast.make(R.drawable.ic_check_circle, getString(R.string.toastRoomRemoved));
 
                             // LOGIN BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = (User) intentFrom.getParcelableExtra(SERVICE_BODY);
-                                fileManager.saveObject(user, User.NAMEFILE);
-
+                                apiService.getMe(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME);
                                 attemptsLogin = 1;
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME) == 0) {
+                                String passwordStored = user.password;
+                                User.setInstance(intentFrom.getParcelableExtra(SERVICE_BODY));
+                                user.password = passwordStored;
                             }
 
                             break;
@@ -208,7 +209,7 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(() -> {
-                                    databaseService.login(user, MainActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    apiService.login(user, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
                                     attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
@@ -218,7 +219,7 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
                             break;
                         case 404:
                         case 500:
-                            generalToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
+                            genericToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
                             break;
                         default:
                             break;

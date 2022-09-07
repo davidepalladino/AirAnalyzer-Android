@@ -152,9 +152,7 @@ public class APIService extends Service {
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
     public void getMe(@NonNull String applicantActivity) {
-        String authorizationToken = Authorization.getInstance().getAuthorization();
-
-        Call<User> call = api.getMe(authorizationToken);
+        Call<User> call = api.getMe(Authorization.getInstance().getAuthorization());
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
@@ -177,9 +175,7 @@ public class APIService extends Service {
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
     public void getLatestDayMeasures(String date, Integer roomNumber, String applicantActivity) {
-        String authorizationToken = Authorization.getInstance().getAuthorization();
-
-        Call<ArrayList<Measure>> call = api.getLatestDayMeasures(authorizationToken, date, roomNumber);
+        Call<ArrayList<Measure>> call = api.getLatestDayMeasures(Authorization.getInstance().getAuthorization(), date, roomNumber);
         call.enqueue(new Callback<ArrayList<Measure>>() {
             @Override
             public void onResponse(Call<ArrayList<Measure>> call, Response<ArrayList<Measure>> response) {
@@ -204,9 +200,7 @@ public class APIService extends Service {
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
     public void getAverageDayMeasures(String date, int roomNumber, String applicantActivity) {
-        String authorizationToken = Authorization.getInstance().getAuthorization();
-
-        Call<ArrayList<Measure>> call = api.getAverageDayMeasures(authorizationToken, date, roomNumber);
+        Call<ArrayList<Measure>> call = api.getAverageDayMeasures(Authorization.getInstance().getAuthorization(), date, roomNumber);
         call.enqueue(new Callback<ArrayList<Measure>>() {
             @Override
             public void onResponse(Call<ArrayList<Measure>> call, Response<ArrayList<Measure>> response) {
@@ -229,10 +223,7 @@ public class APIService extends Service {
      * @param isActive Active rooms (with "true" value) or not (with "false" value).
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
-    public void getAllRooms(boolean isActive, String applicantActivity) {
-        String authorizationToken = Authorization.getInstance().getAuthorization();
-
-        Call<ArrayList<Room>> call = api.getAllRooms(authorizationToken, isActive ? (byte) 1 : (byte) 0);
+    public void getAllRooms(boolean isActive, String applicantActivity) {Call<ArrayList<Room>> call = api.getAllRooms(Authorization.getInstance().getAuthorization(), isActive ? (byte) 1 : (byte) 0);
         call.enqueue(new Callback<ArrayList<Room>>() {
             @Override
             public void onResponse(Call<ArrayList<Room>> call, Response<ArrayList<Room>> response) {
@@ -251,7 +242,30 @@ public class APIService extends Service {
         });
     }
 
+    /**
+     * @brief This method provides to rename a specific room.
+     * @param number ID of room to rename.
+     * @param name New name for room.
+     * @param applicantActivity Name of the applicant activity for the broadcast message.
+     */
+    public void changeNameRoom(int number, String name, String applicantActivity) {
+        Call<Room> call = api.changeNameRoom(Authorization.getInstance().getAuthorization(), number, name);
+        call.enqueue(new Callback<Room>() {
+            @Override
+            public void onResponse(Call<Room> call, Response<Room> response) {
+                Room room = response.body();
 
+                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
+                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
+                intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
+                intentBroadcast.putExtra(SERVICE_BODY, (Parcelable) room);
+                sendBroadcast(intentBroadcast);
+            }
+
+            @Override
+            public void onFailure(Call<Room> call, Throwable t) { }
+        });
+    }
 
 
 
@@ -262,32 +276,6 @@ public class APIService extends Service {
 
     // FIXME
 
-
-    /**
-     * @brief This method provides to rename a specific room. Will be launched a message Broadcast, specifically:
-     *  - 200 status code to indicate that the name of room has been changed;
-     *  - 401 status code to indicate that the request is not authorized.
-     * @param token Token for the authentication.
-     * @param roomID ID of room to rename.
-     * @param roomName New name of room.
-     * @param applicantActivity Name of the applicant activity for the broadcast message.
-     */
-    public void renameRoom(String token, byte roomID, String roomName, String applicantActivity) {
-        Call<ResponseBody> call = api.renameRoom(token, roomID, roomName);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
-                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
-                intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
-                sendBroadcast(intentBroadcast);
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-            }
-        });
-    }
 
     /**
      * @brief This method provides to activate a specific room. Will be launched a message Broadcast, specifically:
