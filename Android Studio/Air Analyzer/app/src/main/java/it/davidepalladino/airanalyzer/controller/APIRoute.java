@@ -30,6 +30,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
@@ -39,7 +40,8 @@ import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 public interface APIRoute {
-    String BASE_URL = "http://192.168.0.4:10000/";
+//    String BASE_URL = "http://192.168.0.4:10000/";
+    String BASE_URL = "http://10.11.11.117:10000/";
 
     @POST("user/login")
     @Headers({"Content-Type: application/json"})
@@ -61,8 +63,9 @@ public interface APIRoute {
     @GET("room/getAll")
     Call<ArrayList<Room>> getAllRooms(@Header("Authorization") String token, @Query("is_active") byte isActive);
 
+    @FormUrlEncoded
     @PATCH("/room/changeName")
-    Call<Room> changeNameRoom(@Header("Authorization") String token, int number, String name);
+    Call<Room> changeNameRoom(@Header("Authorization") String token, @Field("number") int number, @Field("name") String name);
 
 
 
