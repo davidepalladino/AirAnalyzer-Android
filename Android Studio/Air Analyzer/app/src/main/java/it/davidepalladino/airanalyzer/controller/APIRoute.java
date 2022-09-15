@@ -55,10 +55,10 @@ public interface APIRoute {
     Call<User> signup(@Body User user);
 
     @GET("measure/getLatestDay")
-    Call<ArrayList<Measure>> getLatestDayMeasures(@Header("Authorization") String token, @Query("date") String date, @Query("room_number") Integer roomNumber);
+    Call<ArrayList<Measure>> getLatestDayMeasures(@Header("Authorization") String token, @Query("date") String date, @Query("room_number") Byte roomNumber);
 
     @GET("measure/getAverageDay")
-    Call<ArrayList<Measure>> getAverageDayMeasures(@Header("Authorization") String token, @Query("date") String date, @Query("room_number") Integer roomNumber);
+    Call<ArrayList<Measure>> getAverageDayMeasures(@Header("Authorization") String token, @Query("date") String date, @Query("room_number") Byte roomNumber);
 
     @GET("room/getAll")
     Call<ArrayList<Room>> getAllRooms(@Header("Authorization") String token, @Query("is_active") byte isActive);
@@ -67,7 +67,9 @@ public interface APIRoute {
     @PATCH("/room/changeName")
     Call<Room> changeNameRoom(@Header("Authorization") String token, @Field("number") int number, @Field("name") String name);
 
-
+    @FormUrlEncoded
+    @PATCH("/room/changeStatusActivation")
+    Call<Room> changeStatusActivation(@Header("Authorization") String token, @Field("number") int number, @Field("is_active") byte isActive);
 
 
 

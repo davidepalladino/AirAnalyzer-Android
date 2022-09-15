@@ -43,8 +43,6 @@ import java.util.ArrayList;
 
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.APIService;
-import it.davidepalladino.airanalyzer.controller.FileManager;
-import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.dialog.RemoveRoomDialog;
@@ -55,7 +53,6 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
     private TextView textViewNoRoom;
     private ListView listViewRoom;
 
-    private FileManager fileManager;
     private GenericToast genericToast;
 
     private User user;
@@ -140,7 +137,7 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
 
     @Override
     public void onPressOkButtonRemoveRoomDialog(Room room) {
-        apiService.deactivateRoom(Authorization.getInstance().getAuthorization(), room.number, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_REMOVE_ROOM);
+        apiService.changeStatusActivation((byte) room.number, false,ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_REMOVE_ROOM);
     }
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
@@ -153,8 +150,7 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
+        public void onServiceDisconnected(ComponentName name) { }
     };
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {

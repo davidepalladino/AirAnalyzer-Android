@@ -54,8 +54,7 @@ import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.ClientSocket;
 import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.FileManager;
-import it.davidepalladino.airanalyzer.model.Authorization;
-import it.davidepalladino.airanalyzer.model.Room_OldClass;
+import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.widget.GenericToast;
 
@@ -69,7 +68,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
 
     private FileManager fileManager;
     private User user;
-    private Room_OldClass roomSelected;
+    private Room roomSelected;
 
     private APIService databaseService;
 
@@ -124,7 +123,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        roomSelected = (Room_OldClass) parent.getItemAtPosition(position);
+        roomSelected = (Room) parent.getItemAtPosition(position);
     }
 
     @Override
@@ -135,7 +134,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonAddRoom:
-                databaseService.activateRoom(Authorization.getInstance().getAuthorization(), roomSelected.id, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ADD_ROOM);
+                databaseService.changeStatusActivation((byte) roomSelected.number, true, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ADD_ROOM);
 
                 break;
             case R.id.buttonAddDevice:
@@ -221,12 +220,12 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                         case 200:
                             // INACTIVE ROOMS BROADCAST
                             if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS) == 0) {
-                                ArrayList<Room_OldClass> arrayListRooms = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
+                                ArrayList<Room> arrayListRooms = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
                                 /*  Checking the list of rooms to show or not the card about the addition. */
                                 if (!arrayListRooms.isEmpty()) {
                                     linearLayoutAddRoom.setVisibility(View.VISIBLE);
 
-                                    ArrayAdapter<Room_OldClass> arrayAdapterRoom = new ArrayAdapter<>(AddRoomActivity.this, R.layout.item_spinner, arrayListRooms);
+                                    ArrayAdapter<Room> arrayAdapterRoom = new ArrayAdapter<>(AddRoomActivity.this, R.layout.item_spinner, arrayListRooms);
                                     arrayAdapterRoom.setDropDownViewResource(R.layout.item_spinner_dropdown);
 
                                     spinnerRooms.setAdapter(arrayAdapterRoom);

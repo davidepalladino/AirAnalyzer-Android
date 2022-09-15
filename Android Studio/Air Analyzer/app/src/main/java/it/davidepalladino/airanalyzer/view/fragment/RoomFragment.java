@@ -343,8 +343,8 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
 
         String date = ManageDatetime.createDateFormat(this.date, getString(R.string.formatDateDB));
 
-        apiService.getLatestDayMeasures(date, (int) roomSelected.number, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_LATEST + roomSelected.number);
-        apiService.getAverageDayMeasures(date, (int) roomSelected.number, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.number);
+        apiService.getLatestDayMeasures(date, (byte) roomSelected.number, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_LATEST + roomSelected.number);
+        apiService.getAverageDayMeasures(date, (byte) roomSelected.number, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.number);
     }
 
     /**
