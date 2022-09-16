@@ -32,7 +32,7 @@
     <string name="textViewWelcomeGoodAfternoon">Good afternoon</string>
     <string name="textViewWelcomeGoodEvening">Good evening</string>
     <string name="textViewNoMeasure">None registered yet</string>
-    <string name="textViewNoMeasureDescription">Maybe the devices are not registering nothing. Check again later</string>
+    <string name="textViewNoMeasureDescription">Maybe the devices are not registering nothing. Check again later.</string>
     <string name="textViewNoRoom">None activated yet</string>
     <string name="textViewNoNotification">No notification</string>
     <string name="textViewNone">None</string>
@@ -130,10 +130,13 @@
 
     <string name="notificationErrorChannelName">Errors</string>
     <string name="notificationErrorChannelDescription">Error of connection or measures from device.</string>
-    <string name="notificationErrorTypeNotUpdated">Error connection device</string>
-    <string name="notificationErrorTypeMeasure">Error measurement</string>
-    <string name="notificationErrorMessageNotUpdated">is not revealing any measure. Please, check the device.</string>
-    <string name="notificationErrorMessageMeasure">has revealed a strange measure.</string>
+
+    <string name="notificationTypeDevice_SubTypeDisconnected">Error connection device</string>
+    <string name="notificationTypeDevice_SubTypeDisconnected_Body">is not revealing any measure from</string>
+    <string name="notificationTypeDevice_SubTypeValidationFailed">Error measurement</string>
+    <string name="notificationTypeDevice_SubTypeValidationFailed_Body">has revealed a strange measure for</string>
+
+    <string name="notificationTypeDevice_End">Please, check the device.</string>
 
     <array name="spinnerSignupQuestions1">
         <item>@string/spinnerSignupQuestion1</item>

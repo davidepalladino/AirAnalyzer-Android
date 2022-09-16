@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.ClientSocket;
 import it.davidepalladino.airanalyzer.controller.APIService;
+import it.davidepalladino.airanalyzer.controller.consts.BroadcastConst;
 import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.widget.GenericToast;
@@ -131,7 +132,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonAddRoom:
-                apiService.changeStatusActivation((byte) roomSelected.number, true, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ADD_ROOM);
+                apiService.changeStatusActivationRoom((byte) roomSelected.number, true, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ROOM_CHANGE_STATUS_ACTIVATION);
 
                 break;
             case R.id.buttonAddDevice:
@@ -199,7 +200,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             apiService = localBinder.getService();
 
-            apiService.getAllRooms(false, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS);
+            apiService.getAllRooms(false, AddRoomActivity.class.getSimpleName() + BroadcastConst.BROADCAST_REQUEST_CODE_EXTENSION_ROOM_GET_ALL);
         }
 
         @Override
@@ -215,7 +216,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                     switch (statusCode) {
                         case 200:
                             // GET ALL (INACTIVE) ROOMS BROADCAST
-                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS) == 0) {
+                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(AddRoomActivity.class.getSimpleName() + BroadcastConst.BROADCAST_REQUEST_CODE_EXTENSION_ROOM_GET_ALL) == 0) {
                                 ArrayList<Room> arrayListRooms = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
 
                                 /*  Checking the list of rooms to show or not the card about the addition. */
@@ -231,15 +232,15 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                                 }
 
                             // CHANGE STATUS ROOM BROADCAST
-                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ADD_ROOM) == 0) {
-                                apiService.getAllRooms(false, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS);
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ROOM_CHANGE_STATUS_ACTIVATION) == 0) {
+                                apiService.getAllRooms(false, AddRoomActivity.class.getSimpleName() + BroadcastConst.BROADCAST_REQUEST_CODE_EXTENSION_ROOM_GET_ALL);
                                 genericToast.make(R.drawable.ic_check_circle, getString(R.string.toastRoomAdded));
 
                             // LOGIN BROADCAST
-                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                apiService.getMe(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME);
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN) == 0) {
+                                apiService.getMe(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_GET_ME);
                                 attemptsLogin = 1;
-                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME) == 0) {
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_GET_ME) == 0) {
                                 String passwordStored = user.password;
                                 User.setInstance(intentFrom.getParcelableExtra(SERVICE_BODY));
                                 user.password = passwordStored;
@@ -252,7 +253,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(() -> {
-                                    apiService.login(user, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    apiService.login(user, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN);
                                     attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {

@@ -9,7 +9,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 3rd September, 2022
+ * @date 16th September, 2022
  *
  */
 
@@ -124,7 +124,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 FileManager fileManager = new FileManager(LoginActivity.this);
                 fileManager.saveObject(User.getInstance(), User.NAMEFILE);
 
-                apiService.login(user, LoginActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                apiService.login(user, LoginActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN);
 
                 break;
             case R.id.buttonSignUp:
@@ -157,9 +157,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                 switch (statusCode) {
                     case 200:
-                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(LoginActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                            apiService.getMe(LoginActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME);
-                        } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(LoginActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME) == 0) {
+                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(LoginActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN) == 0) {
+                            apiService.getMe(LoginActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_GET_ME);
+                        } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(LoginActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_GET_ME) == 0) {
                             String passwordStored = User.getInstance().password;
                             User.setInstance(intentFrom.getParcelableExtra(SERVICE_BODY));
                             User.getInstance().password = passwordStored;

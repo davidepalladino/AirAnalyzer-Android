@@ -1,24 +1,14 @@
 /*
  * This view class provides to show a personal View for the ListView of notifications in Main Activity.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
- * @contact me@davidepalladino.com
- * @website www.davidepalladino.com
- * @version 2.0.1
- * @date 26th January, 2022
- *
- * This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public
- *  License as published by the Free Software Foundation; either
- *  version 3.0 of the License, or (at your option) any later version
- *
- * This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU Lesser General Public License for more details.
+ * @contact davidepalladino@hotmail.com
+ * @website https://davidepalladino.github.io/
+ * @version 3.0.0
+ * @date 16th September, 2022
  *
  */
 
@@ -40,8 +30,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -64,26 +59,80 @@ public class NotificationsAdapterView extends ArrayAdapter<Notification> {
 
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(resource, null);
-
-        notification = getItem(position);
 
         ImageView imageViewTypeNotification = convertView.findViewById(R.id.imageViewType);
         TextView textViewType = convertView.findViewById(R.id.textViewType);
         TextView textViewMessage = convertView.findViewById(R.id.textViewMessage);
         TextView textViewDateAndTime = convertView.findViewById(R.id.textViewDateAndTime);
 
-        /* Setting the right icon and message based of the type of notification. */
-        if (notification.type.compareTo("ERROR_NOT_UPDATED") == 0) {
-            imageViewTypeNotification.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_link_off));
-            textViewType.setText(context.getString(R.string.notificationErrorTypeNotUpdated));
-            textViewMessage.setText(String.format("%s %s %s", context.getString(R.string.textViewNotificationDevice), notification.name,  context.getString(R.string.notificationErrorMessageNotUpdated)));
-        } else if (notification.type.compareTo("ERROR_MEASURE") == 0) {
-            imageViewTypeNotification.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_question_mark));
-            textViewType.setText(context.getString(R.string.notificationErrorTypeMeasure));
-            textViewMessage.setText(String.format("%s %s %s", context.getString(R.string.textViewNotificationDevice), notification.name,  context.getString(R.string.notificationErrorMessageMeasure)));
+        notification = getItem(position);
+
+        JSONObject contentJSON = null;
+        switch (notification.type) {
+            case Notification.TYPE_DEVICE:
+                try {
+                    contentJSON = new JSONObject(notification.content);
+                } catch (JSONException e) { e.printStackTrace(); }
+
+                break;
         }
+
+        try {
+            if (contentJSON != null) {
+                switch (contentJSON.getString("subcategory")) {
+                    case Notification.SUBTYPE_DEVICE_DISCONNECTED:
+                        imageViewTypeNotification.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_link_off));
+                        textViewType.setText(context.getString(R.string.notificationTypeDevice_SubTypeDisconnected));
+                        textViewMessage.setText(
+                            String.format(
+                                "%s %s %s. %s",
+                                contentJSON.getString("room_name"),
+                                context.getString(R.string.notificationTypeDevice_SubTypeDisconnected_Body),
+                                createSimpleDate(simpleDateFormat.parse(contentJSON.getString("last_datetime")).getTime(), Calendar.getInstance().getTimeInMillis()),
+                                context.getString(R.string.notificationTypeDevice_End)
+                            )
+                        );
+                        break;
+
+                    case Notification.SUBTYPE_DEVICE_VALIDATION_FAILED_MEASURE:
+                        imageViewTypeNotification.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_question_mark));
+                        textViewType.setText(context.getString(R.string.notificationTypeDevice_SubTypeValidationFailed));
+
+                        JSONArray errorInfo = contentJSON.getJSONArray("error_info");
+                        JSONObject valuesReceived = contentJSON.getJSONObject("values_received");
+
+                        ArrayList<String> measures = new ArrayList<>();
+                        for (int e = 0; e < errorInfo.length(); e++) {
+                            String measure = "";
+                            switch ((String) errorInfo.get(e)) {
+                                case "temperature":
+                                    measure += context.getString(R.string.temperature) + " (" + (String) valuesReceived.get((String) errorInfo.get(e)) + " °C)";
+                                    break;
+                                case "humidity":
+                                    measure += context.getString(R.string.humidity) + " (" + (String) valuesReceived.get((String) errorInfo.get(e)) + " %)";
+                                    break;
+                            }
+
+                            measures.add(measure);
+
+                        }
+
+                        textViewMessage.setText(
+                            String.format(
+                                "%s %s %s. %s",
+                                contentJSON.getString("room_name"),
+                                context.getString(R.string.notificationTypeDevice_SubTypeValidationFailed_Body),
+                                String.join(", ", String.join(", ", measures)),
+                                context.getString(R.string.notificationTypeDevice_End)
+                            )
+                        );
+                }
+            }
+        } catch (JSONException|ParseException e) { e.printStackTrace(); }
 
         /* Setting the right style of TextView based of the status of notification. */
         if (notification.isSeen == 0) {
@@ -94,22 +143,16 @@ public class NotificationsAdapterView extends ArrayAdapter<Notification> {
             textViewMessage.setTypeface(null, NORMAL);
         }
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date;
         try {
-            date = simpleDateFormat.parse(notification.dateAndTime);
-            assert date != null;
+            Date date = simpleDateFormat.parse(notification.when);
             textViewDateAndTime.setText(createSimpleDate(date.getTime(), Calendar.getInstance().getTimeInMillis()));
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        } catch (ParseException e) { e.printStackTrace(); }
 
         return convertView;
     }
 
     /**
-     * @brief This method provides to create a simple date like into notification sections of Social Network apps.
+     * @brief This method provides to create a simple date like notification sections of Social Network apps.
      * @param previousDate Previous date in millis format.
      * @param actualDate Actual date in millis format.
      * @return Simple date in string format, with number and unit ("s" for seconds, "m" for minutes, "h" for hours, "d" for days, "w" for week.

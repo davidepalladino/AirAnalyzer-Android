@@ -65,6 +65,7 @@ import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.ManageDatetime;
 import it.davidepalladino.airanalyzer.controller.FileManager;
+import it.davidepalladino.airanalyzer.controller.consts.BroadcastConst;
 import it.davidepalladino.airanalyzer.model.Measure;
 import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.model.User;
@@ -87,6 +88,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
     private LinearLayout linearLayoutChipDate;
     private LinearLayout linearLayoutNoRoom;
     private LinearLayout linearLayoutRoom;
+    private View viewLineSeparator;
     private SwipeRefreshLayout swipeRefreshLayout;
     private NestedScrollView nestedScrollView;
     private ChipGroup chipGroupRoom;
@@ -175,8 +177,10 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
         linearLayoutNoRoom = layoutFragment.findViewById(R.id.linearLayoutNoRoom);
         linearLayoutRoom = layoutFragment.findViewById(R.id.linearLayoutRoom);
 
+        viewLineSeparator = layoutFragment.findViewById(R.id.viewLineSeparator);
+
         swipeRefreshLayout = layoutFragment.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(() -> apiService.getAllRooms(true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS));
+        swipeRefreshLayout.setOnRefreshListener(() -> apiService.getAllRooms(true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ROOM_GET_ALL));
 
         nestedScrollView = layoutFragment.findViewById(R.id.nestedScrollView);
 
@@ -345,8 +349,8 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
 
         String date = ManageDatetime.createDateFormat(this.date, getString(R.string.formatDateDB));
 
-        apiService.getLatestDayMeasures(date, (byte) roomSelected.number, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_LATEST + roomSelected.number);
-        apiService.getAverageDayMeasures(date, (byte) roomSelected.number, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.number);
+        apiService.getLatestDayMeasures(date, (byte) roomSelected.number, RoomFragment.class.getSimpleName() + BroadcastConst.BROADCAST_REQUEST_CODE_EXTENSION_MEASURES_GET_LATEST_DAY + roomSelected.number);
+        apiService.getAverageDayMeasures(date, (byte) roomSelected.number, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_MEASURES_GET_AVERAGE_DAY + roomSelected.number);
     }
 
     /**
@@ -519,7 +523,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             apiService = localBinder.getService();
 
-            apiService.getAllRooms(true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
+            apiService.getAllRooms(true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ROOM_GET_ALL);
         }
 
         @Override
@@ -535,7 +539,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
                     switch (statusCode) {
                         case 200:
                             // GET ACTIVE ROOMS BROADCAST
-                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS) == 0) {
+                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ROOM_GET_ALL) == 0) {
                                 swipeRefreshLayout.setRefreshing(false);
 
                                 arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
@@ -553,12 +557,17 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
                                     linearLayoutNoRoom.setVisibility(View.VISIBLE);
                                     linearLayoutRoom.setVisibility(View.GONE);
 
+                                    viewLineSeparator.setVisibility(View.GONE);
+
                                     nestedScrollView.setVisibility(View.GONE);
                                 } else {
                                     /* Showing the Toolbar, the menus and the report boxes. */
                                     toolbar.setVisibility(View.VISIBLE);
                                     linearLayoutNoRoom.setVisibility(View.GONE);
                                     linearLayoutRoom.setVisibility(View.VISIBLE);
+
+                                    viewLineSeparator.setVisibility(View.VISIBLE);
+
                                     nestedScrollView.setVisibility(View.VISIBLE);
 
                                     chipGroupRoom.removeAllViews();
@@ -604,7 +613,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
                             }
 
                             // MEASURES DATE LATEST BROADCAST
-                            else if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_LATEST + roomSelected.number) == 0) {
+                            else if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BroadcastConst.BROADCAST_REQUEST_CODE_EXTENSION_MEASURES_GET_LATEST_DAY + roomSelected.number) == 0) {
                                 ArrayList<Measure> arrayListMeasuresDateLatest = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
 
                                 /* Setting the right visibility for the TextView and the Graph. */
@@ -627,7 +636,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
                                 }
 
                             // MEASURES DATE AVERAGE BROADCAST
-                            } else if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_DATE_AVERAGE + roomSelected.number) == 0) {
+                            } else if (roomSelected != null && intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_MEASURES_GET_AVERAGE_DAY + roomSelected.number) == 0) {
                                 ArrayList<Measure> arrayListMeasuresDateAverage = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
 
                                 /* Setting the right visibility for the TextView and the Graph. */
@@ -652,10 +661,10 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
 
 
                             // LOGIN BROADCAST
-                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                apiService.getMe(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME);
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN) == 0) {
+                                apiService.getMe(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_GET_ME);
                                 attemptsLogin = 1;
-                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME) == 0) {
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_GET_ME) == 0) {
                                 String passwordStored = user.password;
                                 User.setInstance(intentFrom.getParcelableExtra(SERVICE_BODY));
                                 user.password = passwordStored;
@@ -668,7 +677,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(() -> {
-                                    apiService.login(user, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    apiService.login(user, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN);
                                     attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {

@@ -26,5 +26,5 @@ package it.davidepalladino.airanalyzer.controller.consts;
 
 public interface IntentConst {
     String INTENT_BROADCAST = "it.davidepalladino.airanalyzer.broadcast";
-    String INTENT_TOAST_MESSAGE = "ToastMessage";
+    String INTENT_TOAST_MESSAGE = "toastMessage";
 }

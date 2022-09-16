@@ -152,7 +152,7 @@ public class HomeFragment extends Fragment {
         Calendar calendar = Calendar.getInstance();
         String date = ManageDatetime.createDateFormat(calendar, getString(R.string.formatDateDB));
 
-        apiService.getLatestDayMeasures(date, null, HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST);
+        apiService.getLatestDayMeasures(date, null, HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_MEASURES_GET_LATEST_DAY);
     }
 
     /**
@@ -201,7 +201,7 @@ public class HomeFragment extends Fragment {
                     switch (statusCode) {
                         case 200:
                             // MEASURES TODAY LATEST BROADCAST
-                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_MEASURES_TODAY_LATEST) == 0) {
+                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_MEASURES_GET_LATEST_DAY) == 0) {
                                 swipeRefreshLayout.setRefreshing(false);
 
                                 /* Setting the right visibility for the TextView and the ListView. */
@@ -219,10 +219,10 @@ public class HomeFragment extends Fragment {
                                 }
 
                             // LOGIN BROADCAST
-                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                apiService.getMe(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME);
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN) == 0) {
+                                apiService.getMe(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_GET_ME);
                                 attemptsLogin = 1;
-                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME) == 0) {
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_GET_ME) == 0) {
                                 String passwordStored = user.password;
                                 User.setInstance(intentFrom.getParcelableExtra(SERVICE_BODY));
                                 user.password = passwordStored;
@@ -235,7 +235,7 @@ public class HomeFragment extends Fragment {
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(() -> {
-                                    apiService.login(user, HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    apiService.login(user, HomeFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN);
                                     attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {

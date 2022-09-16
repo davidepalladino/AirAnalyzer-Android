@@ -105,8 +105,9 @@
         <entry key="app/src/main/res/layout/measures_today_list.xml" value="0.5" />
         <entry key="app/src/main/res/layout/no_measure_yet.xml" value="0.2890625" />
         <entry key="app/src/main/res/layout/no_measures_yet.xml" value="0.5119791666666667" />
+        <entry key="app/src/main/res/layout/no_notification_yet.xml" value="0.2890625" />
         <entry key="app/src/main/res/layout/no_room_yet.xml" value="0.2890625" />
-        <entry key="app/src/main/res/layout/notifications_adapter_view.xml" value="0.33980263157894736" />
+        <entry key="app/src/main/res/layout/notifications_adapter_view.xml" value="0.33" />
         <entry key="app/src/main/res/layout/toast_black.xml" value="0.2565789473684211" />
         <entry key="app/src/main/res/layout/toast_blue.xml" value="0.2565789473684211" />
         <entry key="app/src/main/res/layout/toast_blue_measure.xml" value="0.2565789473684211" />

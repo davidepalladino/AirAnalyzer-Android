@@ -1,24 +1,14 @@
 /*
  * This view class provides to show a screen, where the user can see the latest notifications.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
- * @contact me@davidepalladino.com
- * @website www.davidepalladino.com
- * @version 1.0.1
- * @date 26th January, 2022
- *
- * This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public
- *  License as published by the Free Software Foundation; either
- *  version 3.0 of the License, or (at your option) any later version
- *
- * This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU Lesser General Public License for more details.
+ * @contact davidepalladino@hotmail.com
+ * @website https://davidepalladino.github.io/
+ * @version 2.0.0
+ * @date 16th September, 2022
  *
  */
 
@@ -39,7 +29,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -47,24 +36,17 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.os.Handler;
 import android.os.IBinder;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonObject;
-
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.APIService;
-import it.davidepalladino.airanalyzer.controller.ManageDatetime;
 import it.davidepalladino.airanalyzer.controller.FileManager;
-import it.davidepalladino.airanalyzer.model.Authorization;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.activity.LoginActivity;
@@ -74,20 +56,20 @@ import it.davidepalladino.airanalyzer.view.widget.NotificationsAdapterView;
 
 public class NotificationFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
-    private TextView textViewNoNotification;
+    private LinearLayout linearLayoutNoNotification;
     private ListView listViewNotificationsLatest;
     private NotificationsAdapterView adapterViewNotificationsLatest;
 
-    private GenericToast generalToast;
-
     private FileManager fileManager;
+    private GenericToast genericToast;
+
     private User user;
     public ArrayList<Notification> arrayListNotificationsLatest;
 
-    private int utc;
+    private APIService apiService;
 
-    private APIService databaseService;
-
+    private int offsetNotifications = 0;
+    private int limitNotifications = 100;
     private byte attemptsLogin = 1;
 
     public static NotificationFragment newInstance() {
@@ -103,13 +85,10 @@ public class NotificationFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        generalToast = new GenericToast(getActivity(), getLayoutInflater());
-
+        genericToast = new GenericToast(getActivity(), getLayoutInflater());
         fileManager = new FileManager(getContext());
-        user = (User) fileManager.readObject(User.NAMEFILE);
 
-        Calendar date = Calendar.getInstance();
-        utc = ManageDatetime.getUTC(date);
+        user = User.getInstance();
     }
 
     @Override
@@ -137,27 +116,19 @@ public class NotificationFragment extends Fragment {
         Toolbar toolbar = layoutFragment.findViewById(R.id.toolbar);
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         toolbar.inflateMenu(R.menu.menu_notification);
+        toolbar.setVisibility(View.GONE);               // Delete it when there is least one item of menu.
 
         swipeRefreshLayout = layoutFragment.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(() -> databaseService.getNotificationsLatest(Authorization.getInstance().getAuthorization(), utc, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST));
+        swipeRefreshLayout.setOnRefreshListener(() -> apiService.getAllNotifications(offsetNotifications, limitNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL));
 
-        textViewNoNotification = layoutFragment.findViewById(R.id.textViewNoNotification);
+        linearLayoutNoNotification = layoutFragment.findViewById(R.id.linearLayoutNoNotification);
         listViewNotificationsLatest = layoutFragment.findViewById(R.id.listViewNotifications);
         listViewNotificationsLatest.setOnItemClickListener((parent, view, position, id) -> {
             Notification notificationSelected = arrayListNotificationsLatest.get(position);
 
             /* Checking if the item selected is unseen. */
             if (notificationSelected.isSeen == 0) {
-                notificationSelected.isSeen = 1;
-
-                /* Creating the JSON Array to send with the API request. */
-                JsonArray jsonArrayNotifications = new JsonArray();
-                try {
-                    jsonArrayNotifications.add(generateJsonObjectNotification(notificationSelected));
-                } catch (JsonIOException e) {
-                    e.printStackTrace();
-                }
-                databaseService.setStatusNotifications(Authorization.getInstance().getAuthorization(), jsonArrayNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSIONS_SET_STATUS_NOTIFICATIONS);
+                apiService.changeStatusViewNotification(notificationSelected.id, true, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_CHANGE_STATUS_VIEW);
 
                 /* Updating the texts style of TextView and store the status for next update of database. */
                 TextView textViewType = view.findViewById(R.id.textViewType);
@@ -170,44 +141,6 @@ public class NotificationFragment extends Fragment {
         return layoutFragment;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-
-        // MARK ALL READ
-        if (id == R.id.menuItemMarkAllRead) {
-            JsonArray jsonArrayNotifications = new JsonArray();
-            try {
-                /* Creating the JSON Array to send with the API request. */
-                for (Notification notificationSelected:arrayListNotificationsLatest) {
-                    if (notificationSelected.isSeen == 0) {
-                        notificationSelected.isSeen = 1;
-                        jsonArrayNotifications.add(generateJsonObjectNotification(notificationSelected));
-                    }
-                }
-            } catch (JsonIOException e) {
-                e.printStackTrace();
-            }
-
-            databaseService.setStatusNotifications(Authorization.getInstance().getAuthorization(), jsonArrayNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSIONS_SET_STATUS_NOTIFICATIONS);
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * @brief This method provides to generate a JSON message for sending to the server, about the updating of notification status in seen.
-     * @param notificationSelected Notification that you want to update
-     * @return JSON message with the information.
-     */
-    @NonNull
-    private JsonObject generateJsonObjectNotification(Notification notificationSelected) {
-        JsonObject jsonObjectNotification = new JsonObject();
-        jsonObjectNotification.addProperty("ID", notificationSelected.id);
-        jsonObjectNotification.addProperty("IsSeen", 1);
-        return jsonObjectNotification;
-    }
-
     /**
      * @brief This method provides to update the ListView.
      * @param arrayListNotificationsLatest List of elements to use for the ListView.
@@ -216,12 +149,17 @@ public class NotificationFragment extends Fragment {
         this.arrayListNotificationsLatest = arrayListNotificationsLatest;
 
         /* Setting the right visibility for the TextView and the ListView. */
-        textViewNoNotification.setVisibility(View.GONE);
-        listViewNotificationsLatest.setVisibility(View.VISIBLE);
+        if (arrayListNotificationsLatest.isEmpty()) {
+            linearLayoutNoNotification.setVisibility(View.VISIBLE);
+            listViewNotificationsLatest.setVisibility(View.GONE);
+        } else {
+            linearLayoutNoNotification.setVisibility(View.GONE);
+            listViewNotificationsLatest.setVisibility(View.VISIBLE);
 
-        /* Updating the ListView with the AdapterView. */
-        adapterViewNotificationsLatest = new NotificationsAdapterView(requireActivity().getApplicationContext(), arrayListNotificationsLatest);
-        listViewNotificationsLatest.setAdapter(adapterViewNotificationsLatest);
+            /* Updating the ListView with the AdapterView. */
+            adapterViewNotificationsLatest = new NotificationsAdapterView(requireActivity().getApplicationContext(), arrayListNotificationsLatest);
+            listViewNotificationsLatest.setAdapter(adapterViewNotificationsLatest);
+        }
     }
 
     /**
@@ -252,14 +190,13 @@ public class NotificationFragment extends Fragment {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
-            databaseService = localBinder.getService();
+            apiService = localBinder.getService();
 
-            databaseService.getNotificationsLatest(Authorization.getInstance().getAuthorization(), utc, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST);
+            apiService.getAllNotifications(offsetNotifications, limitNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL);
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
+        public void onServiceDisconnected(ComponentName name) { }
     };
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -270,8 +207,8 @@ public class NotificationFragment extends Fragment {
                     int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                     switch (statusCode) {
                         case 200:
-                            // NOTIFICATIONS LATEST BROADCAST
-                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST) == 0) {
+                            // GET ALL NOTIFICATIONS BROADCAST
+                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL) == 0) {
                                 swipeRefreshLayout.setRefreshing(false);
 
                                 /* Getting the measures and updating the ListView. */
@@ -281,27 +218,14 @@ public class NotificationFragment extends Fragment {
                                     ((MainActivity) getContext()).updateBadge(arrayListNotificationsLatest);
                                 }
 
-                            // SET STATUS NOTIFICATIONS BROADCAST
-                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSIONS_SET_STATUS_NOTIFICATIONS) == 0) {
-                                adapterViewNotificationsLatest.notifyDataSetChanged();
-
                             // LOGIN BROADCAST
-                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = intentFrom.getParcelableExtra(SERVICE_BODY);
-                                fileManager.saveObject(user, User.NAMEFILE);
-
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN) == 0) {
+                                apiService.getMe(Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_GET_ME);
                                 attemptsLogin = 1;
-                            }
-
-                            break;
-                        case 204:
-                        // NOTIFICATIONS LATEST BROADCAST
-                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST) == 0) {
-                                swipeRefreshLayout.setRefreshing(false);
-
-                                /* Setting the right visibility for the TextView and the ListView. */
-                                textViewNoNotification.setVisibility(View.VISIBLE);
-                                listViewNotificationsLatest.setVisibility(View.GONE);
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_GET_ME) == 0) {
+                                String passwordStored = user.password;
+                                User.setInstance(intentFrom.getParcelableExtra(SERVICE_BODY));
+                                user.password = passwordStored;
                             }
 
                             break;
@@ -311,17 +235,17 @@ public class NotificationFragment extends Fragment {
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(() -> {
-                                    databaseService.login(user, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    apiService.login(user, NotificationFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN);
                                     attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
-                                goToLogin(getString(R.string.toastUserError));
+                                goToLogin(getString(R.string.toastIncorrectUsernamePassword));
                             }
 
                             break;
                         case 404:
                         case 500:
-                            generalToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
+                            genericToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
                             break;
                         default:
                             break;

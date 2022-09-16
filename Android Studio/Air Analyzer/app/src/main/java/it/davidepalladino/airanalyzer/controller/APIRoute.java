@@ -4,9 +4,6 @@
  * Copyright (c) 2020 Davide Palladino.
  * All right reserved.
  *
- * Copyright (c) 2022 Davide Palladino.
- * All right reserved.
- *
  * @author Davide Palladino
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
@@ -69,21 +66,12 @@ public interface APIRoute {
 
     @FormUrlEncoded
     @PATCH("/room/changeStatusActivation")
-    Call<Room> changeStatusActivation(@Header("Authorization") String token, @Field("number") int number, @Field("is_active") byte isActive);
+    Call<Room> changeStatusActivationRoom(@Header("Authorization") String token, @Field("number") int number, @Field("is_active") byte isActive);
 
+    @GET("/notification/getAll")
+    Call<ArrayList<Notification>> getAllNotifications(@Header("Authorization") String token, @Query("offset") Integer offset, @Query("limit") Integer limit);
 
-
-
-
-
-
-
-    // FIXME
-
-    @GET("api/airanalyzer/getNotificationsLatest")
-    Call<ArrayList<Notification>> getNotificationsLatest(@Header("Authorization") String token, @Query("UTC") int utc);
-
-    @Headers({"Accept: application/json"})
-    @PUT("api/airanalyzer/setStatusNotifications")
-    Call<ResponseBody> setStatusNotifications(@Header("Authorization") String token, @Body JsonArray notifications);
+    @FormUrlEncoded
+    @PATCH("/notification/changeStatusView")
+    Call<Notification> changeStatusViewNotification(@Header("Authorization") String token, @Field("id") int id, @Field("is_seen") byte isSeen);
 }

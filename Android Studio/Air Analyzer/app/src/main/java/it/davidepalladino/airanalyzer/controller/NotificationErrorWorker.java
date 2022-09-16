@@ -29,9 +29,7 @@ import static it.davidepalladino.airanalyzer.controller.APIService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
-import static it.davidepalladino.airanalyzer.model.Notification.*;
 
-import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -46,18 +44,13 @@ import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import it.davidepalladino.airanalyzer.R;
-import it.davidepalladino.airanalyzer.model.Authorization;
-import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
-import it.davidepalladino.airanalyzer.view.activity.MainActivity;
 
 public class NotificationErrorWorker extends Worker {
     public static final String tag = "NotificationErrorWorker";
@@ -132,7 +125,7 @@ public class NotificationErrorWorker extends Worker {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             databaseService = localBinder.getService();
 
-            databaseService.getNotificationsLatest(Authorization.getInstance().getAuthorization(), utc, NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST);
+//            databaseService.getNotificationsLatest(Authorization.getInstance().getAuthorization(), utc, NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST);
         }
 
         @Override
@@ -149,77 +142,77 @@ public class NotificationErrorWorker extends Worker {
                     switch (statusCode) {
                         case 200:
                             // GET NOTIFICATIONS LATEST BROADCAST
-                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST) == 0) {
-                                Log.d(NotificationErrorWorker.class.getSimpleName(), "Get latest notification.");
-
-                                ArrayList<Notification> arrayListNotificationsLatest = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
-
-                                /* Updating the badge and the NotificationFragment if the current Activity is the MainActivity. */
-                                Activity currentActivity = ((AirAnalyzerApplication) contextFrom).getCurrentActivity();
-                                if (currentActivity instanceof MainActivity) {
-                                    ((MainActivity) currentActivity).updateListNotificationFragment(arrayListNotificationsLatest);
-                                    ((MainActivity) currentActivity).updateBadge(arrayListNotificationsLatest);
-                                }
-
-                                /* Searching the latest notification not seen. */
-                                int latestID = fileManager.readPreferenceNotificationID(NAMEFILE, PREFERENCE_NOTIFICATION_LATEST_ID_WORKER);
-                                for (Notification notification: arrayListNotificationsLatest) {
-                                    if (latestID < notification.id && notification.isSeen == 0) {
-                                        byte notificationManagerID = 0;
-
-                                        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(contextFrom, channelID);
-
-                                        /* Preparing the right notification based of the type of error. */
-                                        if (notification.type.equals("ERROR_NOT_UPDATED")) {
-                                            notificationManagerID = 1;
-
-                                            notificationBuilder.setContentTitle(contextFrom.getString(R.string.notificationErrorTypeNotUpdated))
-                                                    .setContentText(String.format("%s %s", notification.name, contextFrom.getString(R.string.notificationErrorMessageNotUpdated)))
-                                                    .setSmallIcon(R.drawable.ic_link_off)
-                                                    .setStyle(new NotificationCompat.BigTextStyle()
-                                                            .bigText(String.format("%s %s", notification.name, contextFrom.getString(R.string.notificationErrorMessageNotUpdated)))
-                                                    );
-                                        } else if (notification.type.equals("ERROR_MEASURE")) {
-                                            notificationManagerID = 2;
-
-                                            notificationBuilder.setContentTitle(contextFrom.getString(R.string.notificationErrorTypeNotUpdated))
-                                                    .setContentText(String.format("%s %s", notification.name, contextFrom.getString(R.string.notificationErrorMessageMeasure)))
-                                                    .setSmallIcon(R.drawable.ic_question_mark)
-                                                    .setStyle(new NotificationCompat.BigTextStyle()
-                                                            .bigText(String.format("%s %s", notification.name, contextFrom.getString(R.string.notificationErrorMessageMeasure)))
-                                                    );
-                                        }
-
-                                        notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH)
-                                                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                                                .setAutoCancel(true)
-                                                .setChannelId(channelID);
-
-                                        NotificationManager notificationManager = (NotificationManager) contextFrom.getSystemService(Context.NOTIFICATION_SERVICE);
-
-                                        if (Build.VERSION.SDK_INT > 25) {
-                                            notificationManager.createNotificationChannel(notificationChannel);
-                                        }
-
-                                        notificationManager.notify(notificationManagerID, notificationBuilder.build());
-
-                                        fileManager.savePreferenceNotificationID(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_LATEST_ID_WORKER, notification.id);
-
-                                        contextFrom.unbindService(serviceConnection);
-                                        contextFrom.unregisterReceiver(broadcastReceiver);
-
-                                        break;
-                                    }
-                                }
+                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL) == 0) {
+//                                Log.d(NotificationErrorWorker.class.getSimpleName(), "Get latest notification.");
+//
+//                                ArrayList<Notification> arrayListNotificationsLatest = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
+//
+//                                /* Updating the badge and the NotificationFragment if the current Activity is the MainActivity. */
+//                                Activity currentActivity = ((AirAnalyzerApplication) contextFrom).getCurrentActivity();
+//                                if (currentActivity instanceof MainActivity) {
+//                                    ((MainActivity) currentActivity).updateListNotificationFragment(arrayListNotificationsLatest);
+//                                    ((MainActivity) currentActivity).updateBadge(arrayListNotificationsLatest);
+//                                }
+//
+//                                /* Searching the latest notification not seen. */
+//                                int latestID = fileManager.readPreferenceNotificationID(NAMEFILE, PREFERENCE_NOTIFICATION_LATEST_ID_WORKER);
+//                                for (Notification notification: arrayListNotificationsLatest) {
+//                                    if (latestID < notification.id && notification.isSeen == 0) {
+//                                        byte notificationManagerID = 0;
+//
+//                                        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(contextFrom, channelID);
+//
+//                                        /* Preparing the right notification based of the type of error. */
+//                                        if (notification.type.equals("ERROR_NOT_UPDATED")) {
+//                                            notificationManagerID = 1;
+//
+//                                            notificationBuilder.setContentTitle(contextFrom.getString(R.string.notificationTypeDevice_SubTypeDisconnected))
+//                                                    .setContentText(String.format("%s %s", notification.name, contextFrom.getString(R.string.notificationTypeDevice_SubTypeDisconnected_Body)))
+//                                                    .setSmallIcon(R.drawable.ic_link_off)
+//                                                    .setStyle(new NotificationCompat.BigTextStyle()
+//                                                            .bigText(String.format("%s %s", notification.name, contextFrom.getString(R.string.notificationTypeDevice_SubTypeDisconnected_Body)))
+//                                                    );
+//                                        } else if (notification.type.equals("ERROR_MEASURE")) {
+//                                            notificationManagerID = 2;
+//
+//                                            notificationBuilder.setContentTitle(contextFrom.getString(R.string.notificationTypeDevice_SubTypeDisconnected))
+//                                                    .setContentText(String.format("%s %s", notification.name, contextFrom.getString(R.string.notificationErrorMessageMeasure)))
+//                                                    .setSmallIcon(R.drawable.ic_question_mark)
+//                                                    .setStyle(new NotificationCompat.BigTextStyle()
+//                                                            .bigText(String.format("%s %s", notification.name, contextFrom.getString(R.string.notificationErrorMessageMeasure)))
+//                                                    );
+//                                        }
+//
+//                                        notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH)
+//                                                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+//                                                .setAutoCancel(true)
+//                                                .setChannelId(channelID);
+//
+//                                        NotificationManager notificationManager = (NotificationManager) contextFrom.getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//                                        if (Build.VERSION.SDK_INT > 25) {
+//                                            notificationManager.createNotificationChannel(notificationChannel);
+//                                        }
+//
+//                                        notificationManager.notify(notificationManagerID, notificationBuilder.build());
+//
+//                                        fileManager.savePreferenceNotificationID(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_LATEST_ID_WORKER, notification.id);
+//
+//                                        contextFrom.unbindService(serviceConnection);
+//                                        contextFrom.unregisterReceiver(broadcastReceiver);
+//
+//                                        break;
+//                                    }
+//                                }
 
                             // LOGIN BROADCAST
-                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN) == 0) {
                                 Log.d(NotificationErrorWorker.class.getSimpleName(), "Executed login.");
 
                                 user = intentFrom.getParcelableExtra(SERVICE_BODY);
                                 fileManager.saveObject(user, User.NAMEFILE);
 
-                                databaseService.getNotificationsLatest(Authorization.getInstance().getAuthorization(), utc, NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST);
+//                                databaseService.getNotificationsLatest(Authorization.getInstance().getAuthorization(), utc, NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_NOTIFICATIONS_LATEST);
 
                                 attemptsLogin = 1;
                             }
@@ -233,7 +226,7 @@ public class NotificationErrorWorker extends Worker {
                             /* Checking the attempts for executing another login, or for unbinding the DatabaseService and the BroadcastReceiver. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(() -> {
-                                    databaseService.login(user, NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    databaseService.login(user, NotificationErrorWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN);
                                     attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {

@@ -21,6 +21,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.Parcelable;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -274,8 +275,8 @@ public class APIService extends Service {
      * @param isActive Status of activation with "true" to activate and "false" to deactivate.
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
-    public void changeStatusActivation(byte roomNumber, boolean isActive, String applicantActivity) {
-        Call<Room> call = api.changeStatusActivation(Authorization.getInstance().getAuthorization(), roomNumber, isActive ? (byte) 1 : (byte) 0);
+    public void changeStatusActivationRoom(byte roomNumber, boolean isActive, String applicantActivity) {
+        Call<Room> call = api.changeStatusActivationRoom(Authorization.getInstance().getAuthorization(), roomNumber, isActive ? (byte) 1 : (byte) 0);
         call.enqueue(new Callback<Room>() {
             @Override
             public void onResponse(Call<Room> call, Response<Room> response) {
@@ -294,25 +295,14 @@ public class APIService extends Service {
         });
     }
 
-
-
-
-
-
-    // FIXME
-
     /**
      * @brief This method provides to get 100 latest notifications.
-     *  Will be launched a message Broadcast, specifically:
-     *   - JSON { ID, DateAndTime, Type, Name, IsSeen } with 200 status code to indicate that the notifications has been get.
-     *   - 204 to indicate that there are not notifications;
-     *   - 401 status code to indicate that the request is not authorized. Is expected a JSON format.
-     * @param token Token for the authentication.
-     * @param utc UTC in format +/-HH:00.
+     * @param offset Number of notifications to skip.
+     * @param limit Number of notifications to consider.
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
-    public void getNotificationsLatest(String token, int utc, String applicantActivity) {
-        Call<ArrayList<Notification>> call = api.getNotificationsLatest(token, utc);
+    public void getAllNotifications(Integer offset, Integer limit, String applicantActivity) {
+        Call<ArrayList<Notification>> call = api.getAllNotifications(Authorization.getInstance().getAuthorization(), offset, limit);
         call.enqueue(new Callback<ArrayList<Notification>>() {
             @Override
             public void onResponse(Call<ArrayList<Notification>> call, Response<ArrayList<Notification>> response) {
@@ -326,35 +316,32 @@ public class APIService extends Service {
             }
 
             @Override
-            public void onFailure(Call<ArrayList<Notification>> call, Throwable t) {
-            }
+            public void onFailure(Call<ArrayList<Notification>> call, Throwable t) { }
         });
     }
 
     /**
      * @brief This method provides to change the status of notification, between seen and unseen.
-     *  Will be launched a message Broadcast, specifically:
-     *   - 200 status code to indicate that the notifications has been changed.
-     *   - 401 status code to indicate that the request is not authorized. Is expected a JSON format.
-     *   - 406 status code to indicate that the request is not correct;
-     * @param token Token for the authentication.
-     * @param notifications JSON with the notifications.
+     * @param id ID of notification.
+     * @param isSeen Status of notification as "true" for viewed, else "false".
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
-    public void setStatusNotifications(String token, JsonArray notifications, String applicantActivity) {
-        Call<ResponseBody> call = api.setStatusNotifications(token, notifications);
-        call.enqueue(new Callback<ResponseBody>() {
+    public void changeStatusViewNotification(int id, boolean isSeen, String applicantActivity) {
+        Call<Notification> call = api.changeStatusViewNotification(Authorization.getInstance().getAuthorization(), id, isSeen ? (byte) 1 : (byte) 0);
+        call.enqueue(new Callback<Notification>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<Notification> call, Response<Notification> response) {
+                Notification notification = response.body();
+
                 Intent intentBroadcast = new Intent(INTENT_BROADCAST);
                 intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
                 intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
+                intentBroadcast.putExtra(SERVICE_BODY, notification);
                 sendBroadcast(intentBroadcast);
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-            }
+            public void onFailure(Call<Notification> call, Throwable t) { }
         });
     }
 }

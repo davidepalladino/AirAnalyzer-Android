@@ -8,7 +8,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 3rd September, 2022
+ * @date 16th September, 2022
  *
  */
 
@@ -108,7 +108,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
             user.surname = editTextSurname.getText().toString();
             user.timezone = timezoneSelected;
 
-            apiService.signup(user, SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP);
+            apiService.signup(user, SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_SIGNUP);
         });
     }
 
@@ -167,7 +167,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
                 int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                 switch (statusCode) {
                     case 200:
-                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
+                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN) == 0) {
                             Intent intentTo = new Intent(SignupActivity.this, MainActivity.class);
                             startActivity(intentTo);
                             finish();
@@ -175,16 +175,16 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
 
                         break;
                     case 201:
-                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP) == 0) {
+                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_SIGNUP) == 0) {
                             FileManager fileManager = new FileManager(SignupActivity.this);
                             fileManager.saveObject(user, User.NAMEFILE);
 
-                            apiService.login(user, SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                            apiService.login(user, SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN);
                         }
 
                         break;
                     case 409:
-                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_SIGNUP) == 0) {
+                        if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SignupActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_SIGNUP) == 0) {
                             String response = intentFrom.getStringExtra(SERVICE_BODY);
 
                             try {

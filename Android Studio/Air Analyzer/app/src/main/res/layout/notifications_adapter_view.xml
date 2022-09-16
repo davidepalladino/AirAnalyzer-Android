@@ -44,7 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/typeNotificationTextColor"
-                    tools:text="@string/notificationErrorTypeMeasure" />
+                    tools:text="@string/notificationTypeDevice_SubTypeDisconnected" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -62,11 +62,11 @@
 
                 <TextView
                     android:id="@+id/textViewMessage"
-                    android:layout_width="330dp"
+                    android:layout_width="325dp"
                     android:layout_height="wrap_content"
                     android:scrollHorizontally="false"
                     android:textColor="@color/primaryTextColor"
-                    tools:text="The device 'Stanzetta' is not revealing any measure. Please, check the device." />
+                    tools:text="Stanzetta is not revealing any measure. Please, check the device." />
         </LinearLayout>
     </GridLayout>
 </LinearLayout>

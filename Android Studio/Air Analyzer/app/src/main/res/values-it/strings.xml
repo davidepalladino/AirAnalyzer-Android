@@ -32,7 +32,7 @@
     <string name="textViewWelcomeGoodAfternoon">Buon pomeriggio</string>
     <string name="textViewWelcomeGoodEvening">Buonasera</string>
     <string name="textViewNoMeasure">Nessuna misurazione ancora registrata</string>
-    <string name="textViewNoMeasureDescription">Molto probabilemente i dispositivi non stanno registrando ancora nulla. Ricontrolla tra poco</string>
+    <string name="textViewNoMeasureDescription">Molto probabilemente i dispositivi non stanno registrando ancora nulla. Ricontrolla tra poco.</string>
     <string name="textViewNoRoom">Nessuna stanza ancora attiva</string>
     <string name="textViewNoNotification">Nessuna notifica</string>
     <string name="textViewNone">None</string>
@@ -130,10 +130,14 @@
 
     <string name="notificationErrorChannelName">Errori</string>
     <string name="notificationErrorChannelDescription">Errori di connessione o misura dal dispositivo.</string>
-    <string name="notificationErrorTypeNotUpdated">Errore connessione dispositivo</string>
-    <string name="notificationErrorTypeMeasure">Errore misurazione</string>
-    <string name="notificationErrorMessageNotUpdated">non sta registrando alcuna misura. Si prega di verificare.</string>
-    <string name="notificationErrorMessageMeasure">ha rilevato una strana misurazione.</string>
+
+    <string name="notificationTypeDevice_SubTypeDisconnected">Errore connessione dispositivo</string>
+    <string name="notificationTypeDevice_SubTypeDisconnected_Body">non sta registrando alcuna misura da</string>
+    <string name="notificationTypeDevice_SubTypeValidationFailed">Errore misurazione</string>
+    <string name="notificationTypeDevice_SubTypeValidationFailed_Body">ha rilevato una strana misurazione per</string>
+
+    <string name="notificationTypeDevice_End">Si prega di verificare.</string>
+
 
     <array name="spinnerSignupQuestions1">
         <item>@string/spinnerSignupQuestion1</item>
