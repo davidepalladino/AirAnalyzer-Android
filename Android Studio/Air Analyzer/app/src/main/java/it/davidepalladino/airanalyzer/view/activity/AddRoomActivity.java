@@ -8,7 +8,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 4th September, 2022
+ * @date 16th September, 2022
  *
  */
 
@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.ClientSocket;
 import it.davidepalladino.airanalyzer.controller.APIService;
-import it.davidepalladino.airanalyzer.controller.FileManager;
 import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.widget.GenericToast;
@@ -64,13 +63,12 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
     private EditText editTextLocalIP;
     private AlertDialog dialogAddDevice;
 
-    private GenericToast generalToast;
+    private GenericToast genericToast;
 
-    private FileManager fileManager;
     private User user;
     private Room roomSelected;
 
-    private APIService databaseService;
+    private APIService apiService;
 
     private byte attemptsLogin = 1;
 
@@ -97,10 +95,9 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
     public void onStart() {
         super.onStart();
 
-        generalToast = new GenericToast(AddRoomActivity.this, getLayoutInflater());
+        genericToast = new GenericToast(AddRoomActivity.this, getLayoutInflater());
 
-        fileManager = new FileManager(AddRoomActivity.this);
-        user = (User) fileManager.readObject(User.NAMEFILE);
+        user = User.getInstance();
     }
 
     @Override
@@ -134,7 +131,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonAddRoom:
-                databaseService.changeStatusActivation((byte) roomSelected.number, true, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ADD_ROOM);
+                apiService.changeStatusActivation((byte) roomSelected.number, true, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ADD_ROOM);
 
                 break;
             case R.id.buttonAddDevice:
@@ -163,11 +160,11 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                         JSONObject requestJSON = new JSONObject();
                         JSONObject messageJSON = new JSONObject();
                         try {
-                            messageJSON.put("Username", user.username);
-                            messageJSON.put("Password", user.password);
+                            messageJSON.put("username", user.username);
+                            messageJSON.put("password", user.password);
 
-                            requestJSON.put("Request code", "1");
-                            requestJSON.put("Message", messageJSON);
+                            requestJSON.put("request_code", "1");
+                            requestJSON.put("message", messageJSON);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -181,10 +178,10 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                         ClientSocket clientSocket = new ClientSocket(AddRoomActivity.this, editTextLocalIP.getText().toString(), 60000);
                         clientSocket.write(serializedJSON, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_SOCKET_WRITE_CREDENTIALS);
                     } else {
-                        generalToast.make(R.drawable.ic_error, getString(R.string.toastErrorLocalNetwork));
+                        genericToast.make(R.drawable.ic_error, getString(R.string.toastErrorLocalNetwork));
                     }
                 } else {
-                    generalToast.make(R.drawable.ic_error, getString(R.string.toastEmptyFieldLocalNetwork));
+                    genericToast.make(R.drawable.ic_error, getString(R.string.toastEmptyFieldLocalNetwork));
                 }
 
                 break;
@@ -200,14 +197,13 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
-            databaseService = localBinder.getService();
+            apiService = localBinder.getService();
 
-            databaseService.getAllRooms(false, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS);
+            apiService.getAllRooms(false, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS);
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
+        public void onServiceDisconnected(ComponentName name) { }
     };
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -218,9 +214,10 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                     int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                     switch (statusCode) {
                         case 200:
-                            // INACTIVE ROOMS BROADCAST
+                            // GET ALL (INACTIVE) ROOMS BROADCAST
                             if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS) == 0) {
                                 ArrayList<Room> arrayListRooms = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
+
                                 /*  Checking the list of rooms to show or not the card about the addition. */
                                 if (!arrayListRooms.isEmpty()) {
                                     linearLayoutAddRoom.setVisibility(View.VISIBLE);
@@ -233,17 +230,19 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                                     linearLayoutAddRoom.setVisibility(View.GONE);
                                 }
 
-                            // ADD ROOM BROADCAST
+                            // CHANGE STATUS ROOM BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ADD_ROOM) == 0) {
-                                databaseService.getAllRooms(false, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS);
-                                generalToast.make(R.drawable.ic_check_circle, getString(R.string.toastRoomAdded));
+                                apiService.getAllRooms(false, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_INACTIVE_ROOMS);
+                                genericToast.make(R.drawable.ic_check_circle, getString(R.string.toastRoomAdded));
 
                             // LOGIN BROADCAST
-                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
-                                user = intentFrom.getParcelableExtra(SERVICE_BODY);
-                                fileManager.saveObject(user, User.NAMEFILE);
-
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN) == 0) {
+                                apiService.getMe(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME);
                                 attemptsLogin = 1;
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ME) == 0) {
+                                String passwordStored = user.password;
+                                User.setInstance(intentFrom.getParcelableExtra(SERVICE_BODY));
+                                user.password = passwordStored;
                             }
 
                             break;
@@ -253,7 +252,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                             /* Checking the attempts for executing another login, or for launching the Login Activity. */
                             if (attemptsLogin <= MAX_ATTEMPTS_LOGIN) {
                                 new Handler().postDelayed(() -> {
-                                    databaseService.login(user, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
+                                    apiService.login(user, AddRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_LOGIN);
                                     attemptsLogin++;
                                 }, TIME_LOGIN_TIMEOUT);
                             } else {
@@ -263,7 +262,7 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                             break;
                         case 404:
                         case 500:
-                            generalToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
+                            genericToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
                             break;
                         default:
                             break;
@@ -278,11 +277,11 @@ public class AddRoomActivity extends AppCompatActivity implements AdapterView.On
                          */
                         if (!intentFrom.getBooleanExtra(ERROR_SOCKET, true)) {
                             new Handler().postDelayed(() -> {
-                                generalToast.make(R.drawable.ic_check_circle, getString(R.string.toastDeviceAdded));
+                                genericToast.make(R.drawable.ic_check_circle, getString(R.string.toastDeviceAdded));
                                 dialogAddDevice.dismiss();
                             }, TIME_ADD_DEVICE);
                         } else {
-                            generalToast.make(R.drawable.ic_error, getString(R.string.toastErrorConnectionDevice));
+                            genericToast.make(R.drawable.ic_error, getString(R.string.toastErrorConnectionDevice));
                             dialogAddDevice.dismiss();
                         }
                     }

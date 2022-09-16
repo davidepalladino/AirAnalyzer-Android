@@ -9,7 +9,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 4th September, 2022
+ * @date 16th September, 2022
  *
  */
 
@@ -161,7 +161,7 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
                     int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
                     switch (statusCode) {
                         case 200:
-                            // ACTIVE ROOMS BROADCAST
+                            // GET ALL (ACTIVE) ROOMS BROADCAST
                             if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS) == 0) {
                                 ArrayList<Room> arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
 
@@ -178,12 +178,12 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
                                     listViewRoom.setVisibility(View.GONE);
                                 }
 
-                            // RENAME ROOM BROADCAST
+                            // CHANGE NAME ROOM BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_RENAME_ROOM) == 0) {
                                 apiService.getAllRooms( true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
                                 genericToast.make(R.drawable.ic_check_circle, getString(R.string.toastRoomRenamed));
 
-                            // REMOVE ROOM BROADCAST
+                            // CHANGE STATUS ROOM BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_REMOVE_ROOM) == 0) {
                                 apiService.getAllRooms(true, ManageRoomActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS);
                                 genericToast.make(R.drawable.ic_check_circle, getString(R.string.toastRoomRemoved));

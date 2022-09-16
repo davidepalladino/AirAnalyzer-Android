@@ -8,7 +8,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 4th September, 2022
+ * @date 16th September, 2022
  *
  */
 

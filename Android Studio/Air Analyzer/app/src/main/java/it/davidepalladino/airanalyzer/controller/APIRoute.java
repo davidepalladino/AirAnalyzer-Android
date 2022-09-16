@@ -11,7 +11,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 4th September, 2022
+ * @date 16th September, 2022
  *
  */
 
@@ -79,15 +79,6 @@ public interface APIRoute {
 
 
     // FIXME
-
-    @POST("api/airanalyzer/renameRoom")
-    Call<ResponseBody> renameRoom(@Header("Authorization") String token, @Query("ID") byte roomID, @Query("Name") String roomName);
-
-    @POST("api/airanalyzer/activateRoom")
-    Call<ResponseBody> activateRoom(@Header("Authorization") String token, @Query("ID") byte roomID);
-
-    @POST("api/airanalyzer/deactivateRoom")
-    Call<ResponseBody> deactivateRoom(@Header("Authorization") String token, @Query("ID") byte roomID);
 
     @GET("api/airanalyzer/getNotificationsLatest")
     Call<ArrayList<Notification>> getNotificationsLatest(@Header("Authorization") String token, @Query("UTC") int utc);
