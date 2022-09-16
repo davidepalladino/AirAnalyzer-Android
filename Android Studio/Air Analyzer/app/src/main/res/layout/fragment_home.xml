@@ -55,31 +55,31 @@
                 tools:text="Davide Palladino" />
 
             <LinearLayout
-                android:id="@+id/linearLayoutNoMeasures"
+                android:id="@+id/linearLayoutNoMeasure"
                 android:paddingTop="50dp"
-                android:layout_width="300dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:visibility="gone"
-                tools:visibility="visible" >
+                tools:visibility="gone" >
 
                 <include
+                    layout="@layout/no_measure_yet"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    layout="@layout/no_measures_yet" />
+                    android:layout_height="match_parent" />
             </LinearLayout>
 
             <ListView
-                android:id="@+id/listViewMeasuresToday"
+                android:id="@+id/listViewMeasureToday"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingHorizontal="20dp"
                 android:paddingBottom="56dp"
                 android:divider="@android:color/transparent"
                 android:dividerHeight="15.0sp"
-                android:visibility="gone"
                 android:nestedScrollingEnabled="true"
-                tools:visibility="visible" />
+                android:visibility="gone"
+                tools:visibility="gone" />
         </LinearLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </LinearLayout>

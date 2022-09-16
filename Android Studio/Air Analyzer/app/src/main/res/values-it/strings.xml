@@ -31,8 +31,8 @@
     <string name="textViewWelcomeGoodMorning">Buongiorno</string>
     <string name="textViewWelcomeGoodAfternoon">Buon pomeriggio</string>
     <string name="textViewWelcomeGoodEvening">Buonasera</string>
-    <string name="textViewNoMeasures">Nessuna misurazione ancora registrata</string>
-    <string name="textViewNoMeasuresDescription">Molto probabilemente i dispositivi non stanno registrando ancora nulla. Ricontrolla tra poco</string>
+    <string name="textViewNoMeasure">Nessuna misurazione ancora registrata</string>
+    <string name="textViewNoMeasureDescription">Molto probabilemente i dispositivi non stanno registrando ancora nulla. Ricontrolla tra poco</string>
     <string name="textViewNoRoom">Nessuna stanza ancora attiva</string>
     <string name="textViewNoNotification">Nessuna notifica</string>
     <string name="textViewNone">None</string>

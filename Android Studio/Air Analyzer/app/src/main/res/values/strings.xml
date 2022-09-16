@@ -31,8 +31,8 @@
     <string name="textViewWelcomeGoodMorning">Good morning</string>
     <string name="textViewWelcomeGoodAfternoon">Good afternoon</string>
     <string name="textViewWelcomeGoodEvening">Good evening</string>
-    <string name="textViewNoMeasures">None registered yet</string>
-    <string name="textViewNoMeasuresDescription">Maybe the devices are not registering nothing. Check again later</string>
+    <string name="textViewNoMeasure">None registered yet</string>
+    <string name="textViewNoMeasureDescription">Maybe the devices are not registering nothing. Check again later</string>
     <string name="textViewNoRoom">None activated yet</string>
     <string name="textViewNoNotification">No notification</string>
     <string name="textViewNone">None</string>

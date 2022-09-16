@@ -8,7 +8,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 4th September, 2022
+ * @date 16th September, 2022
  *
  */
 
@@ -86,6 +86,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
     private LinearLayout linearLayoutChipRoom;
     private LinearLayout linearLayoutChipDate;
     private LinearLayout linearLayoutNoRoom;
+    private LinearLayout linearLayoutRoom;
     private SwipeRefreshLayout swipeRefreshLayout;
     private NestedScrollView nestedScrollView;
     private ChipGroup chipGroupRoom;
@@ -172,6 +173,7 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
         linearLayoutChipRoom = layoutFragment.findViewById(R.id.linearLayoutChipRoom);
 
         linearLayoutNoRoom = layoutFragment.findViewById(R.id.linearLayoutNoRoom);
+        linearLayoutRoom = layoutFragment.findViewById(R.id.linearLayoutRoom);
 
         swipeRefreshLayout = layoutFragment.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(() -> apiService.getAllRooms(true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_GET_ACTIVE_ROOMS));
@@ -549,12 +551,14 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
                                     linearLayoutChipRoom.setVisibility(View.GONE);
                                     linearLayoutChipDate.setVisibility(View.GONE);
                                     linearLayoutNoRoom.setVisibility(View.VISIBLE);
+                                    linearLayoutRoom.setVisibility(View.GONE);
 
                                     nestedScrollView.setVisibility(View.GONE);
                                 } else {
                                     /* Showing the Toolbar, the menus and the report boxes. */
                                     toolbar.setVisibility(View.VISIBLE);
                                     linearLayoutNoRoom.setVisibility(View.GONE);
+                                    linearLayoutRoom.setVisibility(View.VISIBLE);
                                     nestedScrollView.setVisibility(View.VISIBLE);
 
                                     chipGroupRoom.removeAllViews();

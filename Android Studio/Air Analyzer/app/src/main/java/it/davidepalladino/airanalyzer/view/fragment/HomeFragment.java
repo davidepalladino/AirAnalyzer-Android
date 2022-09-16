@@ -8,7 +8,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 4th September, 2022
+ * @date 16th September, 2022
  *
  */
 
@@ -55,9 +55,9 @@ import it.davidepalladino.airanalyzer.view.widget.GenericToast;
 
 public class HomeFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
-    private LinearLayout linearLayoutNoMeasures;
+    private LinearLayout linearLayoutNoMeasure;
     private TextView textViewHomeNameSurname;
-    private ListView listViewHomeMeasuresToday;
+    private ListView listViewHomeMeasureToday;
 
     private FileManager fileManager;
     private GenericToast genericToast;
@@ -115,9 +115,9 @@ public class HomeFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(this::getLatestDay);
 
         TextView textViewHomeWelcome = layoutFragment.findViewById(R.id.textViewWelcome);
-        linearLayoutNoMeasures = layoutFragment.findViewById(R.id.linearLayoutNoMeasures);
+        linearLayoutNoMeasure = layoutFragment.findViewById(R.id.linearLayoutNoMeasure);
         textViewHomeNameSurname = layoutFragment.findViewById(R.id.textViewNameSurname);
-        listViewHomeMeasuresToday = layoutFragment.findViewById(R.id.listViewMeasuresToday);
+        listViewHomeMeasureToday = layoutFragment.findViewById(R.id.listViewMeasureToday);
 
         Calendar datetimeActual = Calendar.getInstance();
         byte hour = (byte) datetimeActual.get(Calendar.HOUR_OF_DAY);
@@ -207,15 +207,15 @@ public class HomeFragment extends Fragment {
                                 /* Setting the right visibility for the TextView and the ListView. */
                                 ArrayList<Measure> latestMeasures = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
                                 if (latestMeasures.size() > 0) {
-                                    linearLayoutNoMeasures.setVisibility(View.GONE);
-                                    listViewHomeMeasuresToday.setVisibility(View.VISIBLE);
+                                    linearLayoutNoMeasure.setVisibility(View.GONE);
+                                    listViewHomeMeasureToday.setVisibility(View.VISIBLE);
 
                                     /* Getting the measures and setting the ListView. */
                                     LatestMeasuresAdapterView adapterViewMeasureToday = new LatestMeasuresAdapterView(requireActivity().getApplicationContext(), latestMeasures);
-                                    listViewHomeMeasuresToday.setAdapter(adapterViewMeasureToday);
+                                    listViewHomeMeasureToday.setAdapter(adapterViewMeasureToday);
                                 } else {
-                                    linearLayoutNoMeasures.setVisibility(View.VISIBLE);
-                                    listViewHomeMeasuresToday.setVisibility(View.GONE);
+                                    linearLayoutNoMeasure.setVisibility(View.VISIBLE);
+                                    listViewHomeMeasureToday.setVisibility(View.GONE);
                                 }
 
                             // LOGIN BROADCAST

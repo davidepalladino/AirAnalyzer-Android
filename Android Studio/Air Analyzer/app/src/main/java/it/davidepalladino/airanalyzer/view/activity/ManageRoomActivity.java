@@ -50,7 +50,6 @@ import it.davidepalladino.airanalyzer.view.widget.GenericToast;
 import it.davidepalladino.airanalyzer.view.widget.ManageRoomsAdapterView;
 
 public class ManageRoomActivity extends AppCompatActivity implements ManageRoomsAdapterView.ManageRoomsAdapterViewCallback, RemoveRoomDialog.RemoveRoomDialogCallback {
-    private TextView textViewNoRoom;
     private ListView listViewRoom;
 
     private GenericToast genericToast;
@@ -69,7 +68,6 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        textViewNoRoom = findViewById(R.id.textViewNoRoom);
         listViewRoom = findViewById(R.id.listViewRoom);
     }
 
@@ -167,15 +165,11 @@ public class ManageRoomActivity extends AppCompatActivity implements ManageRooms
 
                                 /*  Checking the list of rooms to update or not the ListView dedicated. */
                                 if (!arrayListRoom.isEmpty()) {
-                                    textViewNoRoom.setVisibility(View.GONE);
-                                    listViewRoom.setVisibility(View.VISIBLE);
-
                                     arrayListRoom = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
                                     ManageRoomsAdapterView adapterViewManageRooms = new ManageRoomsAdapterView(ManageRoomActivity.this, arrayListRoom);
                                     listViewRoom.setAdapter(adapterViewManageRooms);
                                 } else {
-                                    textViewNoRoom.setVisibility(View.VISIBLE);
-                                    listViewRoom.setVisibility(View.GONE);
+                                    finish();
                                 }
 
                             // CHANGE NAME ROOM BROADCAST
