@@ -20,6 +20,8 @@ import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.TimesConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 import static it.davidepalladino.airanalyzer.model.Notification.PREFERENCE_NOTIFICATION_LATEST_ID_WORKER;
+import static it.davidepalladino.airanalyzer.view.fragment.NotificationFragment.limitNotifications;
+import static it.davidepalladino.airanalyzer.view.fragment.NotificationFragment.offsetNotifications;
 
 import android.app.Activity;
 import android.app.NotificationChannel;
@@ -124,8 +126,15 @@ public class NotificationDeviceWorker extends Worker {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             apiService = localBinder.getService();
 
-//            apiService.login((User) fileManager.readObject(User.NAMEFILE), NotificationFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN);
-            apiService.getAllNotifications(null, null, NotificationDeviceWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL, Notification.TYPE_DEVICE);
+            /* Executing the right API request based on teh status of application. */
+            Activity currentActivity = ((AirAnalyzerApplication) context).getCurrentActivity();
+            if (currentActivity instanceof MainActivity) {
+                Log.i(NotificationDeviceWorker.class.getSimpleName(), "Get latest notification.");
+                apiService.getAllNotifications(null, null, NotificationDeviceWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL, Notification.TYPE_DEVICE);
+            } else {
+                Log.i(NotificationDeviceWorker.class.getSimpleName(), "Requested login.");
+                apiService.login((User) fileManager.readObject(User.NAMEFILE), NotificationDeviceWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN);
+            }
         }
 
         @Override
@@ -142,15 +151,12 @@ public class NotificationDeviceWorker extends Worker {
                         case 200:
                             // GET ALL NOTIFICATIONS BROADCAST
                             if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(NotificationDeviceWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL) == 0) {
-                                Log.i(NotificationDeviceWorker.class.getSimpleName(), "Get latest notification.");
-
                                 ArrayList<Notification> arrayListNotificationsLatest = intentFrom.getParcelableArrayListExtra(SERVICE_BODY);
 
                                 /* Updating the badge and the NotificationFragment if the current Activity is the MainActivity. */
                                 Activity currentActivity = ((AirAnalyzerApplication) contextFrom).getCurrentActivity();
                                 if (currentActivity instanceof MainActivity) {
-                                    ((MainActivity) currentActivity).updateListNotificationFragment(arrayListNotificationsLatest);
-                                    ((MainActivity) currentActivity).updateBadge(arrayListNotificationsLatest);
+                                    apiService.getAllNotifications(offsetNotifications, limitNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL, null);
                                 }
 
                                 /* Searching the latest notification not seen. */
@@ -241,6 +247,10 @@ public class NotificationDeviceWorker extends Worker {
 
                                         contextFrom.unbindService(serviceConnection);
                                         contextFrom.unregisterReceiver(broadcastReceiver);
+
+                                        if (!(currentActivity instanceof MainActivity)) {
+                                            apiService.logout(NotificationDeviceWorker.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGOUT);
+                                        }
 
                                         break;
                                     }

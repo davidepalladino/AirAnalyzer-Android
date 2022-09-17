@@ -21,6 +21,7 @@ import it.davidepalladino.airanalyzer.model.Measure;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.model.User;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -39,6 +40,9 @@ public interface APIRoute {
     @POST("user/login")
     @Headers({"Content-Type: application/json"})
     Call<Authorization> login(@Body User user);
+
+    @GET("user/logout")
+    Call<ResponseBody> logout(@Header("Authorization") String token);
 
     @GET("user/getMe")
     Call<User> getMe(@Header("Authorization") String token);

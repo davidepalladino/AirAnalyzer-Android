@@ -8,7 +8,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 2.0.0
- * @date 16th September, 2022
+ * @date 17th September, 2022
  *
  */
 
@@ -68,17 +68,12 @@ public class NotificationFragment extends Fragment {
 
     private APIService apiService;
 
-    private int offsetNotifications = 0;
-    private int limitNotifications = 100;
+    public static int offsetNotifications = 0;
+    public static int limitNotifications = 100;
     private byte attemptsLogin = 1;
 
     public static NotificationFragment newInstance() {
         return new NotificationFragment();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override

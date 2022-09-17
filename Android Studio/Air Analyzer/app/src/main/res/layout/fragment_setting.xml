@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:paddingVertical="10dp"
         android:paddingHorizontal="15dp"
-        android:text="Notifications"
+        android:text="@string/textViewCategoryNotification"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_gravity="center_vertical"
-                android:text="@string/textViewErrorsDevice"
+                android:text="@string/textViewNotificationDevice"
                 android:textSize="16sp" />
 
             <Spinner

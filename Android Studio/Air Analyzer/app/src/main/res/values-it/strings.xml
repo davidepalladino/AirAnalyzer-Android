@@ -43,8 +43,7 @@
     <string name="textViewAddRoomDescription">Per aggiungere una stanza, selezionane una dalla lista e premi \'OK\' per confermare.</string>
     <string name="textViewAddDeviceDescription">Per aggiungere un nuovo dispositivo, segui prima l\'installazione su di esso e quando verrà visualizzato l\'IP locale (ad esempio 192.168.0.100), copialo in questo campo e premi \'OK\' per confermare.</string>
     <string name="textViewAddDeviceRemember">Ricorda: i dispositivi devono essere connessi sulla stessa rete locale.</string>
-    <string name="textViewNotificationDevice">Il dispositivo</string>
-    <string name="textViewErrorsDevice">Errori del dispositivo</string>
+    <string name="textViewNotificationDevice">Stato del dispositivo</string>
     <string name="textViewCategoryNotification">Notifiche</string>
     <string name="textViewCategoryInformation">Informazioni</string>
     <string name="textViewVersion">Versione</string>
@@ -56,22 +55,6 @@
     <string name="buttonOk">OK</string>
     <string name="buttonCancel">Annulla</string>
     <string name="buttonAdd">Aggiungi</string>
-
-    <string name="spinnerSignupQuestion1">Il primo animale domestico di un tuo genitore?</string>
-    <string name="spinnerSignupQuestion2">In quale città si sono conosciuti i tuoi nonni?</string>
-    <string name="spinnerSignupQuestion3">Il primo lavoro di tuo\o nonno\a?</string>
-    <string name="spinnerSignupQuestion4">Qual\'è stato il primo viaggio di un tuo parente?</string>
-    <string name="spinnerSignupQuestion5">Come si chiama il primo amico del cuore di tuo padre?</string>
-    <string name="spinnerSignupQuestion6">Qual\'è il primo insegnante che ti ha dato il massimo dei voti?</string>
-    <string name="spinnerSignupQuestion7">Qual\'è il tempo libero di tuo zio?</string>
-    <string name="spinnerSignupQuestion8">In quale città si trovava la prima casa dei tuoi nonni?</string>
-    <string name="spinnerSignupQuestion9">Chi è il primo laureato in famiglia?</string>
-    <string name="spinnerSignupQuestion10">In quale nazione si voleva trasferire un tuo parente?</string>
-    <string name="spinnerSignupQuestion11">Qual\'è stata la vacanza più interessante di un tuo conoscente?</string>
-    <string name="spinnerSignupQuestion12">In quale anno un tuo parente ha avuto la patente?</string>
-    <string name="spinnerSignupQuestion13">Come si chiama la prima amica del cuore di tua madre?</string>
-    <string name="spinnerSignupQuestion14">In quale occasione un tuo genitore ha ricevuto la prima multa?</string>
-    <string name="spinnerSignupQuestion15">Qual\'è la prima auto di un tuo parente?</string>
 
     <string name="spinnerNotificationErrorsTime1">15 minuti</string>
     <string name="spinnerNotificationErrorsTime2">30 minuti</string>

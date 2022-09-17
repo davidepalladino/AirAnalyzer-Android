@@ -8,7 +8,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 16th September, 2022
+ * @date 17th September, 2022
  *
  */
 
@@ -70,11 +70,6 @@ public class HomeFragment extends Fragment {
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override

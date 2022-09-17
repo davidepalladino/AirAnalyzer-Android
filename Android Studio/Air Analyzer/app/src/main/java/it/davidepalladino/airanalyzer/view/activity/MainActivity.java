@@ -189,18 +189,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * @brief This method provides to update the list of notifications if the actual fragment is NotificationFragment.
-     * @param arrayListNotificationsLatest ArrayList of notifications that is necessary for the fragment.
-     */
-    public void updateListNotificationFragment(ArrayList<Notification> arrayListNotificationsLatest) {
-        if (fragmentActive instanceof NotificationFragment) {
-            saveLatestNotificationID(arrayListNotificationsLatest);
-        }
-
-        fragmentNotification.updateListView(arrayListNotificationsLatest);
-    }
-
-    /**
      * @brief This method provides to update the badge with the number of unread notifications.
      * @param arrayListNotificationsLatest ArrayList of notifications where will be searched the unseen notification.
      */

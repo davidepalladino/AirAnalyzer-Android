@@ -10,7 +10,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 32
         versionCode 6
-        versionName "2.0.1"
+        versionName "3.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "boolean", "DEVELOPER_APP", "false"
@@ -28,14 +28,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-
-        developer {
-            debuggable true
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            applicationIdSuffix ".developer"
-            versionNameSuffix "-developer"
         }
     }
 

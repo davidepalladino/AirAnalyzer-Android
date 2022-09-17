@@ -18,8 +18,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import java.io.Serializable;
 
-import com.google.gson.annotations.SerializedName;
-
 public class User implements Parcelable, Serializable {
     public static final String NAMEFILE = "user.dat";
 

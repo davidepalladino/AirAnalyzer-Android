@@ -21,7 +21,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.Parcelable;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -41,8 +40,6 @@ import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 
 import androidx.annotation.NonNull;
-
-import com.google.gson.JsonArray;
 
 public class APIService extends Service {
     public static final String SERVICE_STATUS_CODE = "SERVICE_STATUS_CODE";
@@ -116,6 +113,27 @@ public class APIService extends Service {
 
             @Override
             public void onFailure(Call<Authorization> call, Throwable t) { }
+        });
+    }
+
+
+    /**
+     * @brief This method provides to logout the user.
+     * @param applicantActivity Name of the applicant activity for the broadcast message.
+     */
+    public void logout(@NonNull String applicantActivity) {
+        Call<ResponseBody> call = api.logout(Authorization.getInstance().getAuthorization());
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
+                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
+                intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
+                sendBroadcast(intentBroadcast);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) { }
         });
     }
 

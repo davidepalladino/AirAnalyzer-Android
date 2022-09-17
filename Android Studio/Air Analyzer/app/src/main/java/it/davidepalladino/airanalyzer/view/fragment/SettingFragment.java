@@ -1,32 +1,33 @@
 /*
  * This view class provides to show a screen, where the user can manage several settings.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
- * @contact me@davidepalladino.com
- * @website www.davidepalladino.com
- * @version 1.0.1
- * @date 8th January, 2022
- *
- * This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public
- *  License as published by the Free Software Foundation; either
- *  version 3.0 of the License, or (at your option) any later version
- *
- * This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU Lesser General Public License for more details.
+ * @contact davidepalladino@hotmail.com
+ * @website https://davidepalladino.github.io/
+ * @version 2.0.0
+ * @date 17th September, 2022
  *
  */
 
 package it.davidepalladino.airanalyzer.view.fragment;
 
+import static android.content.Context.BIND_AUTO_CREATE;
 import static androidx.work.ExistingPeriodicWorkPolicy.REPLACE;
 
+import static it.davidepalladino.airanalyzer.controller.APIService.SERVICE_STATUS_CODE;
+import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY;
+import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGOUT;
+import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.INTENT_BROADCAST;
+
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -36,6 +37,7 @@ import androidx.fragment.app.Fragment;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
+import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,15 +51,19 @@ import java.util.concurrent.TimeUnit;
 
 import it.davidepalladino.airanalyzer.BuildConfig;
 import it.davidepalladino.airanalyzer.R;
+import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.FileManager;
 import it.davidepalladino.airanalyzer.controller.NotificationDeviceWorker;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.activity.LoginActivity;
+import it.davidepalladino.airanalyzer.view.widget.GenericToast;
 
 public class SettingFragment extends Fragment {
     private FileManager fileManager;
-    private User user;
+    private GenericToast genericToast;
+
+    private APIService apiService;
 
     private int[] timesNotificationErrors;
     private int latestPositionSpinnerNotificationErrors;
@@ -67,15 +73,28 @@ public class SettingFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onResume() {
+        super.onResume();
 
+        requireActivity().registerReceiver(broadcastReceiver, new IntentFilter(INTENT_BROADCAST));
+
+        Intent intentDatabaseService = new Intent(getActivity(), APIService.class);
+        requireActivity().bindService(intentDatabaseService, serviceConnection, BIND_AUTO_CREATE);
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        requireActivity().unbindService(serviceConnection);
+        requireActivity().unregisterReceiver(broadcastReceiver);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         fileManager = new FileManager(getContext());
-        user = (User) fileManager.readObject(User.NAMEFILE);
+        genericToast = new GenericToast(requireActivity(), getLayoutInflater());
 
         timesNotificationErrors = requireActivity().getResources().getIntArray(R.array.timesNotificationErrors);
 
@@ -93,9 +112,9 @@ public class SettingFragment extends Fragment {
 
         /* Searching the position of latest time minutes set, to select the right element into spinner. */
         long savedTimeNotificationErrors = fileManager.readPreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_TYPE_DEVICE_TIME);
-        for (int p = 0; p < timesNotificationErrors.length; p++) {
-            if (timesNotificationErrors[p] == savedTimeNotificationErrors) {
-                latestPositionSpinnerNotificationErrors = p;
+        for (int t = 0; t < timesNotificationErrors.length; t++) {
+            if (timesNotificationErrors[t] == savedTimeNotificationErrors) {
+                latestPositionSpinnerNotificationErrors = t;
                 spinnerNotificationErrors.setSelection(latestPositionSpinnerNotificationErrors);
                 break;
             }
@@ -110,15 +129,15 @@ public class SettingFragment extends Fragment {
                     fileManager.savePreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_TYPE_DEVICE_TIME, timesNotificationErrors[position]);
 
                     WorkManager workManager = WorkManager.getInstance(requireActivity());
-                    PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest.Builder(NotificationDeviceWorker.class, timesNotificationErrors[position], TimeUnit.MINUTES)
+                    PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest
+                            .Builder(NotificationDeviceWorker.class, timesNotificationErrors[position], TimeUnit.MINUTES)
                             .build();
                     workManager.enqueueUniquePeriodicWork(NotificationDeviceWorker.tag, REPLACE, notificationRequest);
                 }
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
+            public void onNothingSelected(AdapterView<?> parent) { }
         });
 
         TextView textViewVersionName = layoutFragment.findViewById(R.id.textViewVersionName);
@@ -127,7 +146,7 @@ public class SettingFragment extends Fragment {
         TextView textViewDeveloperName = layoutFragment.findViewById(R.id.textViewDeveloperName);
         textViewDeveloperName.setOnClickListener(v -> {
             Intent intentEmail = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"));
-            intentEmail.putExtra(Intent.EXTRA_EMAIL, new String[] { "me@davidepalladino.com" });
+            intentEmail.putExtra(Intent.EXTRA_EMAIL, new String[] { "davidepalladino@hotmail.com" });
             startActivity(intentEmail);
         });
 
@@ -152,15 +171,54 @@ public class SettingFragment extends Fragment {
      */
     private void goToLogin() {
         /* Deleting the information for the login. */
+        User user = (User) fileManager.readObject(User.NAMEFILE);
         user.password = "";
         fileManager.saveObject(user, User.NAMEFILE);
 
-        Intent intentTo = new Intent(getActivity(), LoginActivity.class);
-
-        /* Starting the Login Activity and finishing the hosting Activity for this fragment. */
-        startActivity(intentTo);
-        if (getActivity() != null) {
-            getActivity().finish();
-        }
+        apiService.logout(SettingFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGOUT);
     }
+
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
+            apiService = localBinder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) { }
+    };
+
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context contextFrom, Intent intentFrom) {
+            if (intentFrom != null) {
+                if (intentFrom.hasExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY) && intentFrom.hasExtra(SERVICE_STATUS_CODE)) {
+                    int statusCode = intentFrom.getIntExtra(SERVICE_STATUS_CODE, 0);
+                    switch (statusCode) {
+                        case 200:
+                            // LOGOUT BROADCAST
+                            if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(SettingFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGOUT) == 0) {
+                                Intent intentTo = new Intent(getActivity(), LoginActivity.class);
+
+                                /* Starting the Login Activity and finishing the hosting Activity for this fragment. */
+                                startActivity(intentTo);
+                                if (getActivity() != null) {
+                                    getActivity().finish();
+                                }
+                            }
+
+                            break;
+
+                        case 404:
+                        case 500:
+                            genericToast.make(R.drawable.ic_error, getString(R.string.toastServerOffline));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+    };
 }
