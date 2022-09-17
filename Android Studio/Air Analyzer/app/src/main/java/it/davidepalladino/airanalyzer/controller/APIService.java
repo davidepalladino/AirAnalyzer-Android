@@ -9,7 +9,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 16th September, 2022
+ * @date 17th September, 2022
  *
  */
 
@@ -301,8 +301,8 @@ public class APIService extends Service {
      * @param limit Number of notifications to consider.
      * @param applicantActivity Name of the applicant activity for the broadcast message.
      */
-    public void getAllNotifications(Integer offset, Integer limit, String applicantActivity) {
-        Call<ArrayList<Notification>> call = api.getAllNotifications(Authorization.getInstance().getAuthorization(), offset, limit);
+    public void getAllNotifications(Integer offset, Integer limit, String applicantActivity, String type) {
+        Call<ArrayList<Notification>> call = api.getAllNotifications(Authorization.getInstance().getAuthorization(), offset, limit, type);
         call.enqueue(new Callback<ArrayList<Notification>>() {
             @Override
             public void onResponse(Call<ArrayList<Notification>> call, Response<ArrayList<Notification>> response) {

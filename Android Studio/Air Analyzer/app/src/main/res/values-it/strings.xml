@@ -128,8 +128,8 @@
     <string name="menuItemMarkAllRead">Segna tutte come lette</string>
     <string name="menuItemLogout">Esci</string>
 
-    <string name="notificationErrorChannelName">Errori</string>
-    <string name="notificationErrorChannelDescription">Errori di connessione o misura dal dispositivo.</string>
+    <string name="notificationChannelName_Device">Dispositivo</string>
+    <string name="notificationChannelDescription_Device">Stato del dispositivo, come la connessione o eccezzioni nella misurazione.</string>
 
     <string name="notificationTypeDevice_SubTypeDisconnected">Errore connessione dispositivo</string>
     <string name="notificationTypeDevice_SubTypeDisconnected_Body">non sta registrando alcuna misura da</string>

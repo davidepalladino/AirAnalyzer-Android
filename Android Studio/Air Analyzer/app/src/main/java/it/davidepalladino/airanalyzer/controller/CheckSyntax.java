@@ -1,5 +1,5 @@
 /*
- * This control class provides to check a complex Edit Text syntax, like password and email.
+ * This control class provides to check the semantic of text like the IPv4.
  *
  * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
@@ -8,7 +8,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 16th September, 2022
+ * @date 17th September, 2022
  *
  */
 
@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-public class CheckField {
+public class CheckSyntax {
     private static final String REGEX_IPV4 =
             "^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\." +
                     "([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\." +

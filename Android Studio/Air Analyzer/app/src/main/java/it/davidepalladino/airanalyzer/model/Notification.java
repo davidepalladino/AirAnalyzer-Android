@@ -21,9 +21,10 @@ import com.google.gson.annotations.SerializedName;
 
 public class Notification implements Parcelable {
     public static final String NAMEFILE = "notification.dat";
+
     public static final String PREFERENCE_NOTIFICATION_LATEST_ID_BADGE = "preferenceNotificationLatestID_Badge";
     public static final String PREFERENCE_NOTIFICATION_LATEST_ID_WORKER = "preferenceNotificationLatestID_Worker";
-    public static final String PREFERENCE_NOTIFICATION_ERROR_TIME = "preferenceNotificationErrorTime";
+    public static final String PREFERENCE_NOTIFICATION_TYPE_DEVICE_TIME = "preferenceNotificationTypeDevice_Time";
 
     public static final String TYPE_DEVICE = "DEVICE";
     public static final String SUBTYPE_DEVICE_ERROR_SAVE_MEASURE = "ERROR_SAVE";

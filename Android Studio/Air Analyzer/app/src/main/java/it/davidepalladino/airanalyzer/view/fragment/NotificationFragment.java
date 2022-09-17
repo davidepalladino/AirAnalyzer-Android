@@ -119,7 +119,7 @@ public class NotificationFragment extends Fragment {
         toolbar.setVisibility(View.GONE);               // Delete it when there is least one item of menu.
 
         swipeRefreshLayout = layoutFragment.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(() -> apiService.getAllNotifications(offsetNotifications, limitNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL));
+        swipeRefreshLayout.setOnRefreshListener(() -> apiService.getAllNotifications(offsetNotifications, limitNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL, null));
 
         linearLayoutNoNotification = layoutFragment.findViewById(R.id.linearLayoutNoNotification);
         listViewNotificationsLatest = layoutFragment.findViewById(R.id.listViewNotifications);
@@ -192,7 +192,7 @@ public class NotificationFragment extends Fragment {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             apiService = localBinder.getService();
 
-            apiService.getAllNotifications(offsetNotifications, limitNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL);
+            apiService.getAllNotifications(offsetNotifications, limitNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL, null);
         }
 
         @Override

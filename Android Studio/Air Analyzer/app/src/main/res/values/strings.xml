@@ -112,8 +112,8 @@
     <string name="menuItemMarkAllRead">Mark all read</string>
     <string name="menuItemLogout">Logout</string>
 
-    <string name="notificationErrorChannelName">Errors</string>
-    <string name="notificationErrorChannelDescription">Error of connection or measures from device.</string>
+    <string name="notificationChannelName_Device">Device</string>
+    <string name="notificationChannelDescription_Device">Status of the devices, like connection and measure exception.</string>
 
     <string name="notificationTypeDevice_SubTypeDisconnected">Error connection device</string>
     <string name="notificationTypeDevice_SubTypeDisconnected_Body">is not revealing any measure from</string>

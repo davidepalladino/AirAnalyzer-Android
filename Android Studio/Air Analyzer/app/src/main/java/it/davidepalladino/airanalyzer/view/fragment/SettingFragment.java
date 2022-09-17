@@ -50,8 +50,7 @@ import java.util.concurrent.TimeUnit;
 import it.davidepalladino.airanalyzer.BuildConfig;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.FileManager;
-import it.davidepalladino.airanalyzer.controller.NotificationErrorWorker;
-import it.davidepalladino.airanalyzer.model.Authorization;
+import it.davidepalladino.airanalyzer.controller.NotificationDeviceWorker;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.activity.LoginActivity;
@@ -93,7 +92,7 @@ public class SettingFragment extends Fragment {
         spinnerNotificationErrors.setAdapter(adapterNotificationErrors);
 
         /* Searching the position of latest time minutes set, to select the right element into spinner. */
-        long savedTimeNotificationErrors = fileManager.readPreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_ERROR_TIME);
+        long savedTimeNotificationErrors = fileManager.readPreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_TYPE_DEVICE_TIME);
         for (int p = 0; p < timesNotificationErrors.length; p++) {
             if (timesNotificationErrors[p] == savedTimeNotificationErrors) {
                 latestPositionSpinnerNotificationErrors = p;
@@ -108,12 +107,12 @@ public class SettingFragment extends Fragment {
                 /* The changing will be apply only if there is a difference between the latest and new position. */
                 if (position != latestPositionSpinnerNotificationErrors) {
                     latestPositionSpinnerNotificationErrors = position;
-                    fileManager.savePreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_ERROR_TIME, timesNotificationErrors[position]);
+                    fileManager.savePreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_TYPE_DEVICE_TIME, timesNotificationErrors[position]);
 
                     WorkManager workManager = WorkManager.getInstance(requireActivity());
-                    PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest.Builder(NotificationErrorWorker.class, timesNotificationErrors[position], TimeUnit.MINUTES)
+                    PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest.Builder(NotificationDeviceWorker.class, timesNotificationErrors[position], TimeUnit.MINUTES)
                             .build();
-                    workManager.enqueueUniquePeriodicWork(NotificationErrorWorker.tag, REPLACE, notificationRequest);
+                    workManager.enqueueUniquePeriodicWork(NotificationDeviceWorker.tag, REPLACE, notificationRequest);
                 }
             }
 

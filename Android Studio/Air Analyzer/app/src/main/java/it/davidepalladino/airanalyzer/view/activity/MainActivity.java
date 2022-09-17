@@ -15,6 +15,7 @@
 package it.davidepalladino.airanalyzer.view.activity;
 
 import static androidx.work.ExistingPeriodicWorkPolicy.KEEP;
+import static androidx.work.ExistingPeriodicWorkPolicy.REPLACE;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -39,7 +40,7 @@ import it.davidepalladino.airanalyzer.controller.AirAnalyzerApplication;
 import it.davidepalladino.airanalyzer.R;
 import it.davidepalladino.airanalyzer.controller.APIService;
 import it.davidepalladino.airanalyzer.controller.FileManager;
-import it.davidepalladino.airanalyzer.controller.NotificationErrorWorker;
+import it.davidepalladino.airanalyzer.controller.NotificationDeviceWorker;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.User;
 import it.davidepalladino.airanalyzer.view.fragment.HomeFragment;
@@ -155,12 +156,12 @@ public class MainActivity extends AppCompatActivity {
         WorkManager workManager = WorkManager.getInstance(MainActivity.this);
         PeriodicWorkRequest notificationRequest = new PeriodicWorkRequest
                 .Builder(
-                    NotificationErrorWorker.class,
-                    fileManager.readPreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_ERROR_TIME),
+                    NotificationDeviceWorker.class,
+                    fileManager.readPreferenceNotificationTime(Notification.NAMEFILE, Notification.PREFERENCE_NOTIFICATION_TYPE_DEVICE_TIME),
                     TimeUnit.MINUTES
                 )
                 .build();
-        workManager.enqueueUniquePeriodicWork(NotificationErrorWorker.tag, KEEP, notificationRequest);
+        workManager.enqueueUniquePeriodicWork(NotificationDeviceWorker.tag, KEEP, notificationRequest);
     }
 
     @Override

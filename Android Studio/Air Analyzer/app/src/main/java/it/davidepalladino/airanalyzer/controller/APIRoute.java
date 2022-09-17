@@ -1,20 +1,18 @@
 /*
  * This control class provides several constants for the API communication with the Server.
  *
- * Copyright (c) 2020 Davide Palladino.
+ * Copyright (c) 2022 Davide Palladino.
  * All right reserved.
  *
  * @author Davide Palladino
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 16th September, 2022
+ * @date 17th September, 2022
  *
  */
 
 package it.davidepalladino.airanalyzer.controller;
-
-import com.google.gson.JsonArray;
 
 import java.util.ArrayList;
 
@@ -23,7 +21,6 @@ import it.davidepalladino.airanalyzer.model.Measure;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.model.User;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -33,12 +30,11 @@ import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
-import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 public interface APIRoute {
-//    String BASE_URL = "http://192.168.0.4:10000/";
-    String BASE_URL = "http://10.11.11.117:10000/";
+    String BASE_URL = "http://192.168.0.4:10000/";
+//    String BASE_URL = "http://10.11.11.117:10000/";
 
     @POST("user/login")
     @Headers({"Content-Type: application/json"})
@@ -69,7 +65,7 @@ public interface APIRoute {
     Call<Room> changeStatusActivationRoom(@Header("Authorization") String token, @Field("number") int number, @Field("is_active") byte isActive);
 
     @GET("/notification/getAll")
-    Call<ArrayList<Notification>> getAllNotifications(@Header("Authorization") String token, @Query("offset") Integer offset, @Query("limit") Integer limit);
+    Call<ArrayList<Notification>> getAllNotifications(@Header("Authorization") String token, @Query("offset") Integer offset, @Query("limit") Integer limit, @Query("type") String type);
 
     @FormUrlEncoded
     @PATCH("/notification/changeStatusView")

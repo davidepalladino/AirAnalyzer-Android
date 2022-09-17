@@ -14,7 +14,7 @@
 
 package it.davidepalladino.airanalyzer.view.activity;
 
-import static it.davidepalladino.airanalyzer.controller.CheckField.checkIPv4;
+import static it.davidepalladino.airanalyzer.controller.CheckSyntax.checkIPv4;
 import static it.davidepalladino.airanalyzer.controller.ClientSocket.*;
 import static it.davidepalladino.airanalyzer.controller.APIService.*;
 import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
