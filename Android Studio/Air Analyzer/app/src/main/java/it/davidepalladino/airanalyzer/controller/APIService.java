@@ -9,7 +9,7 @@
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
  * @version 3.0.0
- * @date 17th September, 2022
+ * @date 24th September, 2022
  *
  */
 
@@ -22,6 +22,7 @@ import android.os.IBinder;
 import android.os.Parcelable;
 
 import java.io.IOException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 
 import it.davidepalladino.airanalyzer.model.Authorization;
@@ -29,7 +30,9 @@ import it.davidepalladino.airanalyzer.model.Measure;
 import it.davidepalladino.airanalyzer.model.Notification;
 import it.davidepalladino.airanalyzer.model.Room;
 import it.davidepalladino.airanalyzer.model.User;
+import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,6 +43,13 @@ import static it.davidepalladino.airanalyzer.controller.consts.BroadcastConst.*;
 import static it.davidepalladino.airanalyzer.controller.consts.IntentConst.*;
 
 import androidx.annotation.NonNull;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class APIService extends Service {
     public static final String SERVICE_STATUS_CODE = "SERVICE_STATUS_CODE";
@@ -361,5 +371,49 @@ public class APIService extends Service {
             @Override
             public void onFailure(Call<Notification> call, Throwable t) { }
         });
+    }
+
+    public static class UnsafeOkHttpClient {
+        public static OkHttpClient getUnsafeOkHttpClient() {
+            try {
+                // Create a trust manager that does not validate certificate chains
+                final TrustManager[] trustAllCerts = new TrustManager[]{
+                        new X509TrustManager() {
+                            @Override
+                            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                            }
+
+                            @Override
+                            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                            }
+
+                            @Override
+                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                                return new java.security.cert.X509Certificate[]{};
+                            }
+                        }
+                };
+
+                /* Install the all-trusting trust manager. */
+                final SSLContext sslContext = SSLContext.getInstance("SSL");
+                sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+
+                /* Create an SSL socket factory with our all-trusting manager. */
+                final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+                /* Create the logging interceptor for debugging. */
+                HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+                interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+                OkHttpClient.Builder builder = new OkHttpClient.Builder();
+                builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
+                builder.hostnameVerifier((hostname, session) -> true);
+
+                OkHttpClient okHttpClient = builder.build();
+                return okHttpClient;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

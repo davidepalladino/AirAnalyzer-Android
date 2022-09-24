@@ -9,7 +9,7 @@ android {
         applicationId "it.davidepalladino.airanalyzer"
         minSdkVersion 23
         targetSdkVersion 32
-        versionCode 6
+        versionCode 7
         versionName "3.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

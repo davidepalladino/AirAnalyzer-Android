@@ -34,8 +34,8 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface APIRoute {
-    String BASE_URL = "http://192.168.0.4:10000/";
-//    String BASE_URL = "http://10.11.11.117:10000/";
+//    String BASE_URL = "http://192.168.0.4:10000/";
+    String BASE_URL = "https://airanalyzer.servehttp.com:444/";
 
     @POST("user/login")
     @Headers({"Content-Type: application/json"})

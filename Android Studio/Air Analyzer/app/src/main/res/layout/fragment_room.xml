@@ -221,7 +221,7 @@
                                     android:gravity="center"
                                     android:textColor="@color/secondaryTextColor"
                                     android:textSize="11sp"
-                                    android:text="@string/latestTime" />
+                                    android:text="@string/latestHour" />
                             </LinearLayout>
 
                             <!-- TEMPERATURE BOX -->

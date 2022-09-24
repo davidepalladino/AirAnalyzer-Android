@@ -121,7 +121,7 @@
                 android:textAlignment="textEnd"
                 android:textSize="16sp"
                 android:textColor="@color/secondaryColor"
-                android:text="@string/appDeveloperEmail" />
+                android:text="davidepalladino@hotmail.com" />
 
         </LinearLayout>
     </LinearLayout>

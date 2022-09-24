@@ -1,33 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="appName">Air Analyzer</string>
-    <string name="appDeveloperEmail">me@davidepalladino.com</string>
 
     <string name="addDevice">Add device</string>
     <string name="temperature">Temperature</string>
     <string name="humidity">Humidity</string>
-    <string name="dateSeparator">/</string>
     <string name="time">Hours</string>
-    <string name="latestTime">Latest hour</string>
+    <string name="latestHour">Latest hour</string>
 
-    <string name="editTextSignIn">Sign up</string>
     <string name="editTextUsername">Username</string>
     <string name="editTextPassword">Password</string>
     <string name="editTextEmail">Email</string>
     <string name="editTextName">Name</string>
     <string name="editTextSurname">Surname</string>
-    <string name="editTextAnswer">Answer</string>
     <string name="editTextLocalIP">Local IP</string>
 
-    <string name="textViewQuestion1">Question #1</string>
-    <string name="textViewQuestion2">Question #2</string>
-    <string name="textViewQuestion3">Question #3</string>
     <string name="textViewNew">New?\u0020</string>
     <string name="textViewSignup">Sign up</string>
     <string name="textViewLogin">Login</string>
     <string name="textViewTimezone">Timezone</string>
     <string name="textViewForgotPassword">Forgot password</string>
-    <string name="textViewSignupComplete">Sign up complete</string>
     <string name="textViewWelcomeGoodMorning">Good morning</string>
     <string name="textViewWelcomeGoodAfternoon">Good afternoon</string>
     <string name="textViewWelcomeGoodEvening">Good evening</string>
@@ -36,15 +28,12 @@
     <string name="textViewNoRoom">None activated yet</string>
     <string name="textViewNoNotification">No notification</string>
     <string name="textViewNone">None</string>
-    <string name="textViewLatestMeasurement">Latest measurement</string>
-    <string name="textViewDateSelected">Date selected</string>
     <string name="textViewAddRoom">Add room</string>
     <string name="textViewRemoveRoom">Do you want remove</string>
     <string name="textViewAddRoomDescription">To add a room, please select one from the list and confirm it.</string>
     <string name="textViewAddDeviceDescription">To add a new device, firstly follow the setup on it and when is viewed an local IP (e.g. 192.168.0.100), copy it in this field and confirm it.</string>
     <string name="textViewAddDeviceRemember">Remember: your devices will have to be connected to the same local network.</string>
     <string name="textViewCategoryNotification">Notifications</string>
-    <string name="textViewCategoryInformation">Info</string>
     <string name="textViewNotificationDevice">Status of the device</string>
     <string name="textViewVersion">Version</string>
     <string name="textViewDeveloper">Developer</string>
@@ -56,38 +45,21 @@
     <string name="buttonCancel">Cancel</string>
     <string name="buttonAdd">Add</string>
 
-    <string name="spinnerNotificationErrorsTime1">15 minuti</string>
-    <string name="spinnerNotificationErrorsTime2">30 minuti</string>
-    <string name="spinnerNotificationErrorsTime3">1 ora</string>
-    <string name="spinnerNotificationErrorsTime4">2 ore</string>
-    <string name="spinnerNotificationErrorsTime5">4 ore</string>
+    <string name="spinnerNotificationErrorsTime1">15 minutes</string>
+    <string name="spinnerNotificationErrorsTime2">30 minutes</string>
+    <string name="spinnerNotificationErrorsTime3">1 hour</string>
+    <string name="spinnerNotificationErrorsTime4">2 hours</string>
+    <string name="spinnerNotificationErrorsTime5">4 hours</string>
 
     <string name="chipRoomDateToday">Today</string>
     <string name="chipRoomDateYesterday">Yesterday</string>
     <string name="chipRoomDateCustom">Custom</string>
 
-    <string name="emptyFieldUsername">Enter the username</string>
-    <string name="emptyFieldPassword">Enter the password</string>
-    <string name="errorEmail">Enter the email</string>
-    <string name="errorName">Enter the name</string>
-    <string name="errorSurname">Enter the surname</string>
-    <string name="errorAnswer">Enter the answer</string>
-    <string name="existsUsername">This username already exists. Try another!</string>
-    <string name="existsEmail">This email already exists. Try another!</string>
-
-    <string name="wrongSyntaxUsername">Username should be 5–20 characters long and can contain \"-\" and \"_\" like special characters.</string>
-    <string name="wrongSyntaxPassword">Password should be 8–24 characters long and must contain one upper case letter, one numeric character and one special character (@$!%*?&amp;.#).</string>
-    <string name="noticeEmail">Enter the correct email</string>
-    <string name="noticeGraphTryAgain">Please try again at the\u0020</string>
     <string name="noticeGraphNoMeasure">No measures in this date</string>
 
-    <string name="toastErrorField">There are some error on some field</string>
     <string name="toastServerOffline">Server offline, try again later</string>
-    <string name="toastUserNotValidated">This user is not validated</string>
     <string name="toastUserError">There is some error with authentication</string>
-    <string name="toastUserUnauthorized">This user is not This user is not validated</string>
     <string name="toastIncorrectUsernamePassword">Incorrect username or password</string>
-    <string name="toastErrorService">This service is disabled</string>
     <string name="toastErrorConnectionDevice">Error connection to device</string>
     <string name="toastErrorLocalNetwork">You must be in same local network</string>
     <string name="toastEmptyFieldLocalNetwork">You must insert a valid local IP to complete the request</string>
@@ -97,8 +69,6 @@
     <string name="toastRoomAdded">The room has been added</string>
     <string name="toastDeviceAdded">The device has been added</string>
 
-    <string name="dialogSignup">Your registration is nearly complete. Check you email to validate it.</string>
-    <string name="dialogRenameRoom">Write the new name of this room. Empty field will not apply any change.</string>
     <string name="dialogRemoveRoom">Are you sure you want to remove this room? This operation will not delete all the measures read.</string>
     <string name="dialogSettingNewDevice">Setting the new device. The operation will take about 30 seconds…</string>
 
@@ -108,17 +78,14 @@
     <string name="menuItemSettings">Settings</string>
     <string name="menuItemManageRoom">Manage rooms</string>
     <string name="menuItemAddRoom">Add room</string>
-    <string name="menuItemMarkAllRead">Mark all read</string>
     <string name="menuItemLogout">Logout</string>
 
     <string name="notificationChannelName_Device">Device</string>
     <string name="notificationChannelDescription_Device">Status of the devices, like connection and measure exception.</string>
-
     <string name="notificationTypeDevice_SubTypeDisconnected">Error connection device</string>
     <string name="notificationTypeDevice_SubTypeDisconnected_Body">is not revealing any measure from</string>
     <string name="notificationTypeDevice_SubTypeValidationFailed">Error measurement</string>
     <string name="notificationTypeDevice_SubTypeValidationFailed_Body">has revealed a strange measure for</string>
-
     <string name="notificationTypeDevice_End">Please, check the device.</string>
 
     <string-array name="spinnerTimezone">
