@@ -37,41 +37,41 @@ public interface APIRoute {
 //    String BASE_URL = "http://192.168.0.4:10000/";
     String BASE_URL = "https://airanalyzer.servehttp.com:444/";
 
-    @POST("user/login")
+    @POST("api/user/login")
     @Headers({"Content-Type: application/json"})
     Call<Authorization> login(@Body User user);
 
-    @GET("user/logout")
+    @GET("api/user/logout")
     Call<ResponseBody> logout(@Header("Authorization") String token);
 
-    @GET("user/getMe")
+    @GET("api/user/getMe")
     Call<User> getMe(@Header("Authorization") String token);
 
-    @POST("user/register")
+    @POST("api/user/register")
     @Headers({"Content-Type: application/json"})
     Call<User> signup(@Body User user);
 
-    @GET("measure/getLatestDay")
+    @GET("api/measure/getLatestDay")
     Call<ArrayList<Measure>> getLatestDayMeasures(@Header("Authorization") String token, @Query("date") String date, @Query("room_number") Byte roomNumber);
 
-    @GET("measure/getAverageDay")
+    @GET("api/measure/getAverageDay")
     Call<ArrayList<Measure>> getAverageDayMeasures(@Header("Authorization") String token, @Query("date") String date, @Query("room_number") Byte roomNumber);
 
-    @GET("room/getAll")
+    @GET("api/room/getAll")
     Call<ArrayList<Room>> getAllRooms(@Header("Authorization") String token, @Query("is_active") byte isActive);
 
     @FormUrlEncoded
-    @PATCH("/room/changeName")
+    @PATCH("api/room/changeName")
     Call<Room> changeNameRoom(@Header("Authorization") String token, @Field("number") int number, @Field("name") String name);
 
     @FormUrlEncoded
-    @PATCH("/room/changeStatusActivation")
+    @PATCH("api/room/changeStatusActivation")
     Call<Room> changeStatusActivationRoom(@Header("Authorization") String token, @Field("number") int number, @Field("is_active") byte isActive);
 
-    @GET("/notification/getAll")
+    @GET("api/notification/getAll")
     Call<ArrayList<Notification>> getAllNotifications(@Header("Authorization") String token, @Query("offset") Integer offset, @Query("limit") Integer limit, @Query("type") String type);
 
     @FormUrlEncoded
-    @PATCH("/notification/changeStatusView")
+    @PATCH("api/notification/changeStatusView")
     Call<Notification> changeStatusViewNotification(@Header("Authorization") String token, @Field("id") int id, @Field("is_seen") byte isSeen);
 }
