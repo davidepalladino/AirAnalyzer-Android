@@ -34,7 +34,7 @@
     <string name="textViewAddDeviceDescription">To add a new device, firstly follow the setup on it and when is viewed an local IP (e.g. 192.168.0.100), copy it in this field and confirm it.</string>
     <string name="textViewAddDeviceRemember">Remember: your devices will have to be connected to the same local network.</string>
     <string name="textViewCategoryNotification">Notifications</string>
-    <string name="textViewNotificationDevice">Status of the device</string>
+    <string name="textViewNotificationDevice">Status of device</string>
     <string name="textViewVersion">Version</string>
     <string name="textViewDeveloper">Developer</string>
     <string name="textViewSeparator">|</string>
