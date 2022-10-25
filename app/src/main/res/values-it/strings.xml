@@ -78,6 +78,7 @@
     <string name="menuItemSettings">Impostazioni</string>
     <string name="menuItemManageRoom">Gestisci stanze</string>
     <string name="menuItemAddRoom">Aggungi stanza</string>
+    <string name="menuItemMarkAllRead">Segna tutti come letto</string>
     <string name="menuItemLogout">Esci</string>
 
     <string name="notificationChannelName_Device">Dispositivo</string>

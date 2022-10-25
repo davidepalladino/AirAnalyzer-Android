@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
- * @version 2.0.0
- * @date 17th September, 2022
+ * @version 2.1.0
+ * @date 25th October, 2022
  *
  */
 
@@ -29,6 +29,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -36,6 +37,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.os.Handler;
 import android.os.IBinder;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -111,7 +113,6 @@ public class NotificationFragment extends Fragment {
         Toolbar toolbar = layoutFragment.findViewById(R.id.toolbar);
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         toolbar.inflateMenu(R.menu.menu_notification);
-        toolbar.setVisibility(View.GONE);               // Delete it when there is least one item of menu.
 
         swipeRefreshLayout = layoutFragment.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(() -> apiService.getAllNotifications(offsetNotifications, limitNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL, null));
@@ -134,6 +135,18 @@ public class NotificationFragment extends Fragment {
         });
 
         return layoutFragment;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        // MARK ALL READ
+        if (id == R.id.menuItemMarkAllRead) {
+            apiService.changeStatusViewAllNotifications(true, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_CHANGE_STATUS_VIEW_ALL);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -212,6 +225,10 @@ public class NotificationFragment extends Fragment {
                                 if (getContext() instanceof MainActivity) {
                                     ((MainActivity) getContext()).updateBadge(arrayListNotificationsLatest);
                                 }
+
+                            // MARK ALL READ
+                            } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_CHANGE_STATUS_VIEW_ALL) == 0) {
+                                apiService.getAllNotifications(offsetNotifications, limitNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL, null);
 
                             // LOGIN BROADCAST
                             } else if (intentFrom.getStringExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY).compareTo(Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN) == 0) {

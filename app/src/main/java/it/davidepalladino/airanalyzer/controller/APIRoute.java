@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
- * @version 3.0.0
- * @date 30th September, 2022
+ * @version 3.1.0
+ * @date 25th October, 2022
  *
  */
 
@@ -74,4 +74,8 @@ public interface APIRoute {
     @FormUrlEncoded
     @PATCH("api/notification/changeStatusView")
     Call<Notification> changeStatusViewNotification(@Header("Authorization") String token, @Field("id") int id, @Field("is_seen") byte isSeen);
+
+    @FormUrlEncoded
+    @PATCH("api/notification/changeStatusViewAll")
+    Call<Notification> changeStatusViewAllNotifications(@Header("Authorization") String token, @Field("is_seen") byte isSeen);
 }

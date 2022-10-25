@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
- * @version 3.0.0
- * @date 17th September, 2022
+ * @version 3.1.0
+ * @date 25th October, 2022
  *
  */
 
@@ -31,6 +31,7 @@ public interface BroadcastConst {
 
     String BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL = "GetAllNotifications";
     String BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_CHANGE_STATUS_VIEW = "ChangeStatusViewNotification";
+    String BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_CHANGE_STATUS_VIEW_ALL = "ChangeStatusViewAllNotifications";
 
     String BROADCAST_REQUEST_CODE_EXTENSION_SOCKET_WRITE_CREDENTIALS = "SocketWriteCredentials";
 }

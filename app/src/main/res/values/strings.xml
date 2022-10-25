@@ -78,6 +78,7 @@
     <string name="menuItemSettings">Settings</string>
     <string name="menuItemManageRoom">Manage rooms</string>
     <string name="menuItemAddRoom">Add room</string>
+    <string name="menuItemMarkAllRead">Mark all read</string>
     <string name="menuItemLogout">Logout</string>
 
     <string name="notificationChannelName_Device">Device</string>

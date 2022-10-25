@@ -8,8 +8,8 @@
  * @author Davide Palladino
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
- * @version 3.0.0
- * @date 24th September, 2022
+ * @version 3.1.0
+ * @date 25th October, 2022
  *
  */
 
@@ -356,6 +356,30 @@ public class APIService extends Service {
      */
     public void changeStatusViewNotification(int id, boolean isSeen, String applicantActivity) {
         Call<Notification> call = api.changeStatusViewNotification(Authorization.getInstance().getAuthorization(), id, isSeen ? (byte) 1 : (byte) 0);
+        call.enqueue(new Callback<Notification>() {
+            @Override
+            public void onResponse(Call<Notification> call, Response<Notification> response) {
+                Notification notification = response.body();
+
+                Intent intentBroadcast = new Intent(INTENT_BROADCAST);
+                intentBroadcast.putExtra(BROADCAST_REQUEST_CODE_APPLICANT_ACTIVITY, applicantActivity);
+                intentBroadcast.putExtra(SERVICE_STATUS_CODE, response.code());
+                intentBroadcast.putExtra(SERVICE_BODY, notification);
+                sendBroadcast(intentBroadcast);
+            }
+
+            @Override
+            public void onFailure(Call<Notification> call, Throwable t) { }
+        });
+    }
+
+    /**
+     * @brief This method provides to change the status for all notifications, between seen and unseen.
+     * @param isSeen Status of notification as "true" for viewed, else "false".
+     * @param applicantActivity Name of the applicant activity for the broadcast message.
+     */
+    public void changeStatusViewAllNotifications(boolean isSeen, String applicantActivity) {
+        Call<Notification> call = api.changeStatusViewAllNotifications(Authorization.getInstance().getAuthorization(), isSeen ? (byte) 1 : (byte) 0);
         call.enqueue(new Callback<Notification>() {
             @Override
             public void onResponse(Call<Notification> call, Response<Notification> response) {
