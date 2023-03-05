@@ -8,8 +8,8 @@
  * @author Davide Palladino
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
- * @version 3.0.0
- * @date 16th September, 2022
+ * @version 3.0.1
+ * @date 4th March, 2022
  *
  */
 
@@ -93,13 +93,15 @@ public class SplashActivity extends AppCompatActivity {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             apiService = localBinder.getService();
 
-            /* Executing the login and waiting the result within the time defined on TIME_LOGIN_TIMEOUT. */
-            apiService.login(user, SplashActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN);
+            if (apiService != null) {
+                /* Executing the login and waiting the result within the time defined on TIME_LOGIN_TIMEOUT. */
+                apiService.login(user, SplashActivity.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_USER_LOGIN);
 
-            /* Preparing the message for the previously purpose. */
-            Message messageLoginTimeout = new Message();
-            messageLoginTimeout.what = MESSAGE_LOGIN_TIMEOUT;
-            loginTimeout.sendMessageAtTime(messageLoginTimeout, SystemClock.uptimeMillis() + TIME_LOGIN_TIMEOUT);
+                /* Preparing the message for the previously purpose. */
+                Message messageLoginTimeout = new Message();
+                messageLoginTimeout.what = MESSAGE_LOGIN_TIMEOUT;
+                loginTimeout.sendMessageAtTime(messageLoginTimeout, SystemClock.uptimeMillis() + TIME_LOGIN_TIMEOUT);
+            }
         }
 
         @Override

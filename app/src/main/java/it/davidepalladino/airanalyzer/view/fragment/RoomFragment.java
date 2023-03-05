@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
- * @version 3.0.0
- * @date 16th September, 2022
+ * @version 3.0.1
+ * @date 4th March, 2022
  *
  */
 
@@ -526,7 +526,9 @@ public class RoomFragment extends Fragment implements View.OnClickListener {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             apiService = localBinder.getService();
 
-            apiService.getAllRooms(true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ROOM_GET_ALL);
+            if (apiService != null) {
+                apiService.getAllRooms(true, RoomFragment.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_ROOM_GET_ALL);
+            }
         }
 
         @Override

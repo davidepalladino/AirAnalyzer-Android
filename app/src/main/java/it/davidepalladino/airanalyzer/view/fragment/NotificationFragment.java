@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
- * @version 2.1.0
- * @date 25th October, 2022
+ * @version 2.1.1
+ * @date 4th March, 2022
  *
  */
 
@@ -200,7 +200,9 @@ public class NotificationFragment extends Fragment {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             apiService = localBinder.getService();
 
-            apiService.getAllNotifications(offsetNotifications, limitNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL, null);
+            if (apiService != null) {
+                apiService.getAllNotifications(offsetNotifications, limitNotifications, Notification.class.getSimpleName() + BROADCAST_REQUEST_CODE_EXTENSION_NOTIFICATION_GET_ALL, null);
+            }
         }
 
         @Override

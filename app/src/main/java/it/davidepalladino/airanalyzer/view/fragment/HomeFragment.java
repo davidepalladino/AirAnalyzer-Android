@@ -7,8 +7,8 @@
  * @author Davide Palladino
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
- * @version 3.0.0
- * @date 17th September, 2022
+ * @version 3.0.1
+ * @date 4th March, 2022
  *
  */
 
@@ -180,7 +180,9 @@ public class HomeFragment extends Fragment {
             APIService.LocalBinder localBinder = (APIService.LocalBinder) service;
             apiService = localBinder.getService();
 
-            getLatestDay();
+            if (apiService != null) {
+                getLatestDay();
+            }
         }
 
         @Override

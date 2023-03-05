@@ -8,8 +8,8 @@
  * @author Davide Palladino
  * @contact davidepalladino@hotmail.com
  * @website https://davidepalladino.github.io/
- * @version 3.1.0
- * @date 25th October, 2022
+ * @version 3.1.1
+ * @date 4th March, 2022
  *
  */
 
@@ -95,6 +95,14 @@ public class APIService extends Service {
     public void onDestroy() {
         super.onDestroy();
         isRunning = false;
+    }
+
+    /**
+     * This method provides the object APIRoute to perform requests outside this class.
+     * @return APIRoute object.
+     */
+    public APIRoute getApi() {
+        return this.api;
     }
 
     /**
